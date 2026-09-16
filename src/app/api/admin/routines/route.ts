@@ -141,9 +141,11 @@ export async function GET(request: NextRequest) {
       const sanitizedEx = sanitizeExerciseList(r.exercises || []);
       const calculatedDuration = calculateRoutineDuration(sanitizedEx);
       const finalDuration =
-        calculatedDuration.totalMinutes > 0
+        Number(r.durationMinutes) > 0
+          ? Number(r.durationMinutes)
+          : calculatedDuration.totalMinutes > 0
           ? calculatedDuration.totalMinutes
-          : Number(r.durationMinutes) || 45;
+          : 30;
 
       return {
         id: r._id.toString(),
@@ -188,11 +190,11 @@ export async function POST(request: NextRequest) {
     const sanitizedExercises = sanitizeExerciseList(exercises || []);
     const calculatedDuration = calculateRoutineDuration(sanitizedExercises);
     const finalDuration =
-      calculatedDuration.totalMinutes > 0
-        ? calculatedDuration.totalMinutes
-        : Number(durationMinutes) > 0
+      Number(durationMinutes) > 0
         ? Number(durationMinutes)
-        : 45;
+        : calculatedDuration.totalMinutes > 0
+        ? calculatedDuration.totalMinutes
+        : 30;
 
     const newRoutineDoc = {
       title: title.trim(),
@@ -259,20 +261,20 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof title === 'string') updateFields.title = title.trim();
     if (typeof description === 'string') updateFields.description = description.trim();
+    if (durationMinutes !== undefined && Number(durationMinutes) > 0) {
+      updateFields.durationMinutes = Number(durationMinutes);
+    }
 
     if (Array.isArray(exercises)) {
       const sanitized = sanitizeExerciseList(exercises);
       updateFields.exercises = sanitized;
-      const calculatedDuration = calculateRoutineDuration(sanitized);
-      updateFields.durationMinutes =
-        calculatedDuration.totalMinutes > 0
-          ? calculatedDuration.totalMinutes
-          : durationMinutes !== undefined
-          ? Number(durationMinutes)
-          : 45;
+      if (updateFields.durationMinutes === undefined) {
+        const calculatedDuration = calculateRoutineDuration(sanitized);
+        if (calculatedDuration.totalMinutes > 0) {
+          updateFields.durationMinutes = calculatedDuration.totalMinutes;
+        }
+      }
       await syncExercisesToCatalog(sanitized);
-    } else if (durationMinutes !== undefined) {
-      updateFields.durationMinutes = Number(durationMinutes);
     }
 
     const db = await getDatabase();

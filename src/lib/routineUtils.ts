@@ -7,16 +7,21 @@ export interface RoutineDurationCalculation {
   breakdown: {
     workSeconds: number;
     restSeconds: number;
+    transitionsSeconds: number;
+    warmupSeconds: number;
   };
 }
 
 /**
- * Calcula la duración estimada de una rutina a partir de sus ejercicios:
- * - series: número de series
- * - si unidad === 'segundos': el trabajo es el valor en segundos
- * - si unidad === 'repeticiones': el trabajo se estima a 3 segundos por repetición
- * - descanso: segundos de recuperación por serie
- * Duración total = Σ (series * (tiempo_trabajo + descanso))
+ * Calcula la duración estimada de una rutina a partir de sus ejercicios con cadencia deportiva/marcial:
+ * - series: número de series por ejercicio (mínimo 1)
+ * - si unidad === 'segundos': el trabajo activo es el valor en segundos (mínimo 5s)
+ * - si unidad === 'repeticiones': cada repetición se estima a 4 segundos de ejecución técnica
+ *   + 10 segundos de preparación de postura/respiración por serie (mínimo 15s de trabajo por serie)
+ * - descanso: segundos de pausa por serie (por defecto 45s)
+ * - transiciones: 45s entre estaciones/ejercicios diferentes
+ * - calentamiento base: 300s (5 min) para la sesión dojo
+ * Duración total = Σ (series * (trabajo + descanso)) + transiciones + calentamiento
  */
 export function calculateRoutineDuration(
   exercises?: Partial<ExerciseItem>[] | null
@@ -26,16 +31,23 @@ export function calculateRoutineDuration(
       totalMinutes: 0,
       totalSeconds: 0,
       formatted: '0 min',
-      breakdown: { workSeconds: 0, restSeconds: 0 },
+      breakdown: { workSeconds: 0, restSeconds: 0, transitionsSeconds: 0, warmupSeconds: 0 },
     };
   }
+
+  // Considerar ejercicios que tengan nombre o datos asignados
+  const validExercises = exercises.filter(
+    (ex) => !!ex && ((ex.name && ex.name.trim().length > 0) || (ex.sets && Number(ex.sets) > 0))
+  );
+
+  const listToCalculate = validExercises.length > 0 ? validExercises : exercises;
 
   let totalWorkSeconds = 0;
   let totalRestSeconds = 0;
 
-  for (const ex of exercises) {
+  for (const ex of listToCalculate) {
     if (!ex) continue;
-    const sets = ex.sets && Number(ex.sets) > 0 ? Number(ex.sets) : 1;
+    const sets = Math.max(1, Number(ex.sets) || 1);
 
     const unit: ExerciseMeasureUnit =
       ex.repsOrDurationUnit === 'segundos' ||
@@ -55,15 +67,26 @@ export function calculateRoutineDuration(
         ? Math.max(0, Number(ex.restSeconds))
         : 45;
 
-    // Si la unidad es segundos, el tiempo activo de la serie es numVal.
-    // Si son repeticiones, estimamos un promedio técnico de 3 segundos por repetición.
-    const workSecondsPerSet = unit === 'segundos' ? numVal : numVal * 3;
+    // Cálculo estimado de trabajo por serie
+    let workSecondsPerSet: number;
+    if (unit === 'segundos') {
+      workSecondsPerSet = Math.max(5, numVal);
+    } else {
+      // Repeticiones: 4s por repetición técnica + 10s de preparación por serie
+      workSecondsPerSet = Math.max(15, numVal * 4 + 10);
+    }
 
     totalWorkSeconds += sets * workSecondsPerSet;
     totalRestSeconds += sets * restSec;
   }
 
-  const totalSeconds = totalWorkSeconds + totalRestSeconds;
+  // Transición entre ejercicios (45s entre cada ejercicio)
+  const transitionsSeconds = Math.max(0, listToCalculate.length - 1) * 45;
+
+  // Calentamiento y acondicionamiento marcial inicial (5 min = 300s si hay ejercicios)
+  const warmupSeconds = listToCalculate.length > 0 ? 300 : 0;
+
+  const totalSeconds = totalWorkSeconds + totalRestSeconds + transitionsSeconds + warmupSeconds;
   const totalMinutes = totalSeconds > 0 ? Math.max(1, Math.round(totalSeconds / 60)) : 0;
 
   const mins = Math.floor(totalSeconds / 60);
@@ -84,6 +107,8 @@ export function calculateRoutineDuration(
     breakdown: {
       workSeconds: totalWorkSeconds,
       restSeconds: totalRestSeconds,
+      transitionsSeconds,
+      warmupSeconds,
     },
   };
 }

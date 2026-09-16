@@ -51,6 +51,7 @@ export default function AdminRoutinesPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [durationMinutes, setDurationMinutes] = useState(45);
+  const [isAutoDuration, setIsAutoDuration] = useState(true);
   const [exercises, setExercises] = useState<ExerciseItem[]>([
     {
       id: '1',
@@ -67,13 +68,13 @@ export default function AdminRoutinesPage() {
   const calculatedDuration = calculateRoutineDuration(exercises);
 
   useEffect(() => {
-    if (exercises && exercises.length > 0) {
+    if (isAutoDuration && exercises && exercises.length > 0) {
       const calc = calculateRoutineDuration(exercises);
       if (calc.totalMinutes > 0) {
         setDurationMinutes(calc.totalMinutes);
       }
     }
-  }, [exercises]);
+  }, [exercises, isAutoDuration]);
 
   const [submitting, setSubmitting] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -160,7 +161,8 @@ export default function AdminRoutinesPage() {
       },
     ];
     const initialCalc = calculateRoutineDuration(defaultEx);
-    setDurationMinutes(initialCalc.totalMinutes || 6);
+    setDurationMinutes(initialCalc.totalMinutes || 12);
+    setIsAutoDuration(true);
     setExercises(defaultEx);
     setActiveComboIndex(null);
     setSavedExerciseIndices({});
@@ -199,7 +201,13 @@ export default function AdminRoutinesPage() {
           ];
 
     const calc = calculateRoutineDuration(mappedExercises);
-    setDurationMinutes(calc.totalMinutes > 0 ? calc.totalMinutes : routine.durationMinutes || 45);
+    if (routine.durationMinutes && routine.durationMinutes > 0) {
+      setDurationMinutes(routine.durationMinutes);
+      setIsAutoDuration(false);
+    } else {
+      setDurationMinutes(calc.totalMinutes > 0 ? calc.totalMinutes : 30);
+      setIsAutoDuration(true);
+    }
     setExercises(mappedExercises);
     setActiveComboIndex(null);
     setSavedExerciseIndices({});
@@ -335,7 +343,8 @@ export default function AdminRoutinesPage() {
     try {
       const method = editingRoutine ? 'PATCH' : 'POST';
       const calc = calculateRoutineDuration(validExercises);
-      const finalDuration = calc.totalMinutes > 0 ? calc.totalMinutes : (Number(durationMinutes) || 45);
+      const userDurationNum = Number(durationMinutes);
+      const finalDuration = userDurationNum > 0 ? userDurationNum : (calc.totalMinutes > 0 ? calc.totalMinutes : 30);
 
       const bodyPayload = {
         ...(editingRoutine ? { id: editingRoutine.id || editingRoutine._id } : {}),
@@ -1214,27 +1223,56 @@ export default function AdminRoutinesPage() {
                 </div>
 
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', gap: '0.5rem' }}>
                     <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F' }}>
                       Duración Estimada
                     </label>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.3rem',
-                        fontSize: '0.72rem',
-                        color: '#10B981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.12)',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        padding: '0.15rem 0.5rem',
-                        borderRadius: '999px',
-                        fontWeight: 600,
-                      }}
-                      title="Calculada automáticamente según series, repeticiones/segundos y descansos"
-                    >
-                      <Sparkles size={11} /> Auto: {calculatedDuration.formatted}
-                    </span>
+                    {isAutoDuration ? (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          fontSize: '0.72rem',
+                          color: '#10B981',
+                          backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '999px',
+                          fontWeight: 600,
+                        }}
+                        title="Calculada automáticamente según series, repeticiones/segundos y descansos"
+                      >
+                        <Sparkles size={11} /> Auto: {calculatedDuration.formatted}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAutoDuration(true);
+                          if (calculatedDuration.totalMinutes > 0) {
+                            setDurationMinutes(calculatedDuration.totalMinutes);
+                          }
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          fontSize: '0.72rem',
+                          color: '#F5D77F',
+                          backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                          border: '1px solid rgba(212, 175, 55, 0.35)',
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '999px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                        title="Hacer clic para restablecer al cálculo automático"
+                      >
+                        <Sparkles size={11} /> Usar auto ({calculatedDuration.formatted})
+                      </button>
+                    )}
                   </div>
 
                   <div style={{ position: 'relative' }}>
@@ -1255,8 +1293,12 @@ export default function AdminRoutinesPage() {
                       type="number"
                       min={1}
                       max={360}
-                      value={durationMinutes}
-                      onChange={(e) => setDurationMinutes(Number(e.target.value))}
+                      value={durationMinutes || ''}
+                      onChange={(e) => {
+                        const val = e.target.value === '' ? 0 : Number(e.target.value);
+                        setDurationMinutes(val);
+                        setIsAutoDuration(false);
+                      }}
                       style={{
                         width: '100%',
                         padding: '0.75rem 5.5rem 0.75rem 2.5rem',
@@ -1268,7 +1310,7 @@ export default function AdminRoutinesPage() {
                         fontSize: '0.95rem',
                         outline: 'none',
                       }}
-                      title="Duración estimada en minutos (calculada automáticamente)"
+                      title="Duración estimada en minutos"
                     />
                     <div
                       style={{
@@ -1286,7 +1328,7 @@ export default function AdminRoutinesPage() {
                     </div>
                   </div>
                   <p style={{ fontSize: '0.72rem', color: '#9FA6B8', marginTop: '0.35rem', marginBottom: 0 }}>
-                    ⚡ Series × (tiempo/reps + descanso) = {calculatedDuration.formatted} total.
+                    ⚡ Estimado: 4s/rep + descansos + transiciones (~{calculatedDuration.formatted} total). {isAutoDuration ? 'Calculando automáticamente.' : 'Personalizado a mano.'}
                   </p>
                 </div>
               </div>
