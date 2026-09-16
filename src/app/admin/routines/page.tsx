@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Routine, ExerciseItem, ExerciseCatalogItem, ExerciseMeasureUnit } from '@/types';
+import { calculateRoutineDuration } from '@/lib/routineUtils';
 import {
   Dumbbell,
   Plus,
@@ -61,6 +62,18 @@ export default function AdminRoutinesPage() {
       notes: '',
     },
   ]);
+
+  // Cálculo en tiempo real de la duración estimada a partir de los ejercicios
+  const calculatedDuration = calculateRoutineDuration(exercises);
+
+  useEffect(() => {
+    if (exercises && exercises.length > 0) {
+      const calc = calculateRoutineDuration(exercises);
+      if (calc.totalMinutes > 0) {
+        setDurationMinutes(calc.totalMinutes);
+      }
+    }
+  }, [exercises]);
 
   const [submitting, setSubmitting] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -135,8 +148,7 @@ export default function AdminRoutinesPage() {
     setEditingRoutine(null);
     setTitle('');
     setDescription('');
-    setDurationMinutes(45);
-    setExercises([
+    const defaultEx: ExerciseItem[] = [
       {
         id: `ex-${Date.now()}-1`,
         name: '',
@@ -146,7 +158,10 @@ export default function AdminRoutinesPage() {
         restSeconds: 45,
         notes: '',
       },
-    ]);
+    ];
+    const initialCalc = calculateRoutineDuration(defaultEx);
+    setDurationMinutes(initialCalc.totalMinutes || 6);
+    setExercises(defaultEx);
     setActiveComboIndex(null);
     setSavedExerciseIndices({});
     setIsModalOpen(true);
@@ -157,8 +172,7 @@ export default function AdminRoutinesPage() {
     setEditingRoutine(routine);
     setTitle(routine.title || '');
     setDescription(routine.description || '');
-    setDurationMinutes(routine.durationMinutes || 45);
-    setExercises(
+    const mappedExercises: ExerciseItem[] =
       routine.exercises && routine.exercises.length > 0
         ? routine.exercises.map((ex) => ({
             ...ex,
@@ -182,8 +196,11 @@ export default function AdminRoutinesPage() {
               restSeconds: 45,
               notes: '',
             },
-          ]
-    );
+          ];
+
+    const calc = calculateRoutineDuration(mappedExercises);
+    setDurationMinutes(calc.totalMinutes > 0 ? calc.totalMinutes : routine.durationMinutes || 45);
+    setExercises(mappedExercises);
     setActiveComboIndex(null);
     setSavedExerciseIndices({});
     setIsModalOpen(true);
@@ -317,11 +334,14 @@ export default function AdminRoutinesPage() {
 
     try {
       const method = editingRoutine ? 'PATCH' : 'POST';
+      const calc = calculateRoutineDuration(validExercises);
+      const finalDuration = calc.totalMinutes > 0 ? calc.totalMinutes : (Number(durationMinutes) || 45);
+
       const bodyPayload = {
         ...(editingRoutine ? { id: editingRoutine.id || editingRoutine._id } : {}),
         title: title.trim(),
         description: description.trim(),
-        durationMinutes: Number(durationMinutes) || 45,
+        durationMinutes: finalDuration,
         exercises: validExercises,
       };
 
@@ -1235,26 +1255,80 @@ export default function AdminRoutinesPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.4rem' }}>
-                    Duración Estimada (Min)
-                  </label>
-                  <input
-                    type="number"
-                    min={5}
-                    max={240}
-                    value={durationMinutes}
-                    onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid rgba(212, 175, 55, 0.25)',
-                      color: '#FFFFFF',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                    }}
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <label style={{ fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F' }}>
+                      Duración Estimada
+                    </label>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.3rem',
+                        fontSize: '0.72rem',
+                        color: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '999px',
+                        fontWeight: 600,
+                      }}
+                      title="Calculada automáticamente según series, repeticiones/segundos y descansos"
+                    >
+                      <Sparkles size={11} /> Auto: {calculatedDuration.formatted}
+                    </span>
+                  </div>
+
+                  <div style={{ position: 'relative' }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '0.85rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#D4AF37',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Clock size={16} />
+                    </div>
+                    <input
+                      type="number"
+                      min={1}
+                      max={360}
+                      value={durationMinutes}
+                      onChange={(e) => setDurationMinutes(Number(e.target.value))}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 5.5rem 0.75rem 2.5rem',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        color: '#FFFFFF',
+                        fontWeight: 700,
+                        fontSize: '0.95rem',
+                        outline: 'none',
+                      }}
+                      title="Duración estimada en minutos (calculada automáticamente)"
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        right: '0.85rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: '#9FA6B8',
+                        fontSize: '0.82rem',
+                        pointerEvents: 'none',
+                        fontWeight: 600,
+                      }}
+                    >
+                      minutos
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '0.72rem', color: '#9FA6B8', marginTop: '0.35rem', marginBottom: 0 }}>
+                    ⚡ Series × (tiempo/reps + descanso) = {calculatedDuration.formatted} total.
+                  </p>
                 </div>
               </div>
 

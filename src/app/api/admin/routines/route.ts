@@ -4,6 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDatabase } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { Routine, ExerciseItem, ExerciseMeasureUnit } from '@/types';
+import { calculateRoutineDuration } from '@/lib/routineUtils';
 
 const SUPER_ADMINS = [
   'david.artavia.rodriguez@gmail.com',
@@ -136,17 +137,26 @@ export async function GET(request: NextRequest) {
 
     const rawRoutines = await collection.find(query).sort({ createdAt: -1 }).toArray();
 
-    const routines: Routine[] = rawRoutines.map((r) => ({
-      id: r._id.toString(),
-      _id: r._id.toString(),
-      title: r.title || 'Rutina sin título',
-      description: r.description || '',
-      durationMinutes: Number(r.durationMinutes) || 45,
-      exercises: sanitizeExerciseList(r.exercises || []),
-      createdBy: r.createdBy || 'Sensei',
-      createdAt: r.createdAt || new Date(),
-      updatedAt: r.updatedAt || new Date(),
-    }));
+    const routines: Routine[] = rawRoutines.map((r) => {
+      const sanitizedEx = sanitizeExerciseList(r.exercises || []);
+      const calculatedDuration = calculateRoutineDuration(sanitizedEx);
+      const finalDuration =
+        calculatedDuration.totalMinutes > 0
+          ? calculatedDuration.totalMinutes
+          : Number(r.durationMinutes) || 45;
+
+      return {
+        id: r._id.toString(),
+        _id: r._id.toString(),
+        title: r.title || 'Rutina sin título',
+        description: r.description || '',
+        durationMinutes: finalDuration,
+        exercises: sanitizedEx,
+        createdBy: r.createdBy || 'Sensei',
+        createdAt: r.createdAt || new Date(),
+        updatedAt: r.updatedAt || new Date(),
+      };
+    });
 
     return NextResponse.json({ success: true, routines });
   } catch (error) {
@@ -176,11 +186,18 @@ export async function POST(request: NextRequest) {
     }
 
     const sanitizedExercises = sanitizeExerciseList(exercises || []);
+    const calculatedDuration = calculateRoutineDuration(sanitizedExercises);
+    const finalDuration =
+      calculatedDuration.totalMinutes > 0
+        ? calculatedDuration.totalMinutes
+        : Number(durationMinutes) > 0
+        ? Number(durationMinutes)
+        : 45;
 
     const newRoutineDoc = {
       title: title.trim(),
       description: (description || '').trim(),
-      durationMinutes: Number(durationMinutes) > 0 ? Number(durationMinutes) : 45,
+      durationMinutes: finalDuration,
       exercises: sanitizedExercises,
       createdBy: auth.userEmail || 'Administrador',
       createdAt: new Date(),
@@ -242,12 +259,20 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof title === 'string') updateFields.title = title.trim();
     if (typeof description === 'string') updateFields.description = description.trim();
-    if (durationMinutes !== undefined) updateFields.durationMinutes = Number(durationMinutes);
 
     if (Array.isArray(exercises)) {
       const sanitized = sanitizeExerciseList(exercises);
       updateFields.exercises = sanitized;
+      const calculatedDuration = calculateRoutineDuration(sanitized);
+      updateFields.durationMinutes =
+        calculatedDuration.totalMinutes > 0
+          ? calculatedDuration.totalMinutes
+          : durationMinutes !== undefined
+          ? Number(durationMinutes)
+          : 45;
       await syncExercisesToCatalog(sanitized);
+    } else if (durationMinutes !== undefined) {
+      updateFields.durationMinutes = Number(durationMinutes);
     }
 
     const db = await getDatabase();
