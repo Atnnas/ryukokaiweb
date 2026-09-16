@@ -509,6 +509,9 @@ export default function Header() {
             flexDirection: 'column',
             gap: '1.25rem',
             animation: 'fadeIn 0.2s ease',
+            maxHeight: 'calc(100vh - 76px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
           }}
           className="md-hidden"
         >

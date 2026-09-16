@@ -71,7 +71,7 @@ export default function NosotrosPage() {
                 Nuestro método forja al practicante en el dominio técnico integral: la serenidad táctica, la fluidez del esquive, la explosividad del impacto y un código de honor inquebrantable.
               </p>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1.25rem' }}>
                 <div style={{ padding: '1.25rem', backgroundColor: '#0E0F14', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '8px' }}>
                   <Award size={24} color="#D4AF37" style={{ marginBottom: '0.5rem' }} />
                   <h4 style={{ fontSize: '1.1rem', margin: 0, color: '#FFFFFF' }}>Afiliación Oficial</h4>

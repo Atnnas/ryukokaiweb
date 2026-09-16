@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Zen_Kaku_Gothic_New } from 'next/font/google';
 import './globals.css';
 import NextAuthWrapper from '@/context/NextAuthWrapper';
@@ -13,6 +13,13 @@ const zenKaku = Zen_Kaku_Gothic_New({
   variable: '--font-zen-kaku',
   display: 'swap',
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#070709',
+};
 
 export const metadata: Metadata = {
   title: 'Ryoku Kai | Escuela de Karate Do • Disciplina, Poder y Honor',

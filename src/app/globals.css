@@ -243,3 +243,63 @@ p {
 ::-webkit-scrollbar-thumb:hover {
   background: #D4AF37;
 }
+
+/* ============================================================ */
+/* UTILIDADES RESPONSIVAS GLOBALES PARA MÓVILES Y TODA PANTALLA */
+/* ============================================================ */
+
+/* Touch-action optimizado para evitar retraso de 300ms en celulares */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Breakpoints Responsivos Universales */
+@media (min-width: 768px) {
+  .md-flex {
+    display: flex !important;
+  }
+  .md-hidden {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .md-flex {
+    display: none !important;
+  }
+  .md-hidden {
+    display: flex !important;
+  }
+  
+  /* Ajuste de tipografía en encabezados en pantallas móviles */
+  h1 {
+    font-size: clamp(1.85rem, 7.5vw, 2.75rem) !important;
+  }
+  h2 {
+    font-size: clamp(1.5rem, 6vw, 2.2rem) !important;
+  }
+}
+
+/* Ajuste de Hero Grid en Tablets y Móviles */
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+}
+
+/* Optimización para teléfonos compactos (iPhone SE, Galaxy A, etc. <= 480px) */
+@media (max-width: 480px) {
+  .container-dojo {
+    padding-left: 1.15rem !important;
+    padding-right: 1.15rem !important;
+  }
+
+  .btn-martial-primary,
+  .btn-martial-secondary {
+    width: 100% !important;
+    padding: 0.85rem 1.25rem !important;
+    font-size: 0.88rem !important;
+  }
+}
+

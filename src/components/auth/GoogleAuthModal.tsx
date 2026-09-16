@@ -29,6 +29,9 @@ export default function GoogleAuthModal() {
         style={{
           width: '100%',
           maxWidth: '460px',
+          maxHeight: '92vh',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
           backgroundColor: '#0E0F14',
           border: '1px solid rgba(212, 175, 55, 0.25)',
           borderRadius: '12px',
