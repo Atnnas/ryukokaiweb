@@ -80,6 +80,41 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Helper para sincronizar y guardar ejercicios directamente en la colección Exercises de MongoDB
+async function syncExercisesToCatalog(
+  exercises: { name: string; sets?: number; reps?: string; restSeconds?: number; notes?: string }[]
+) {
+  if (!Array.isArray(exercises) || exercises.length === 0) return;
+  try {
+    const db = await getDatabase();
+    const collection = db.collection('Exercises');
+    for (const ex of exercises) {
+      if (ex.name && ex.name.trim()) {
+        const cleanName = ex.name.trim();
+        await collection.updateOne(
+          { name: { $regex: `^${cleanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } },
+          {
+            $set: {
+              name: cleanName,
+              defaultSets: ex.sets || undefined,
+              defaultReps: ex.reps || undefined,
+              defaultRestSeconds: ex.restSeconds || undefined,
+              defaultNotes: ex.notes || undefined,
+              updatedAt: new Date(),
+            },
+            $setOnInsert: {
+              createdAt: new Date(),
+            },
+          },
+          { upsert: true }
+        );
+      }
+    }
+  } catch (err) {
+    console.error('Error al sincronizar ejercicios al catálogo:', err);
+  }
+}
+
 // POST: Crear una nueva rutina de ejercicio (guardada en MongoDB)
 export async function POST(request: NextRequest) {
   try {
@@ -125,6 +160,9 @@ export async function POST(request: NextRequest) {
 
     const db = await getDatabase();
     const result = await db.collection('Routines').insertOne(newRoutineDoc);
+
+    // Guardar los ejercicios en el catálogo general de la base de datos
+    await syncExercisesToCatalog(sanitizedExercises);
 
     const createdRoutine: Routine = {
       id: result.insertedId.toString(),
@@ -199,6 +237,10 @@ export async function PATCH(request: NextRequest) {
 
     if (!result) {
       return NextResponse.json({ error: 'Rutina no encontrada' }, { status: 404 });
+    }
+
+    if (Array.isArray(updateFields.exercises)) {
+      await syncExercisesToCatalog(updateFields.exercises as any);
     }
 
     return NextResponse.json({

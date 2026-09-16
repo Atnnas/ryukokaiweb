@@ -95,6 +95,17 @@ export interface ExerciseItem {
   notes?: string;
 }
 
+export interface ExerciseCatalogItem {
+  id?: string;
+  _id?: string;
+  name: string;
+  defaultSets?: number;
+  defaultReps?: string;
+  defaultRestSeconds?: number;
+  defaultNotes?: string;
+  createdAt?: string | Date;
+}
+
 export interface Routine {
   id?: string;
   _id?: string;

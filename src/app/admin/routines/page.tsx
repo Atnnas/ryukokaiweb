@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Routine, ExerciseItem } from '@/types';
+import { Routine, ExerciseItem, ExerciseCatalogItem } from '@/types';
 import {
   Dumbbell,
   Plus,
@@ -19,16 +19,26 @@ import {
   ChevronUp,
   Sparkles,
   Target,
-  FileText,
+  Database,
+  Save,
+  Check,
 } from 'lucide-react';
 
 export default function AdminRoutinesPage() {
   const { user } = useAuth();
 
-  // Estados de lista y búsqueda
+  // Estados de rutinas y búsqueda
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Catálogo de ejercicios de la base de datos para predicción y combo
+  const [catalogExercises, setCatalogExercises] = useState<ExerciseCatalogItem[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+
+  // Control de dropdown predictivo por fila de ejercicio
+  const [activeComboIndex, setActiveComboIndex] = useState<number | null>(null);
+  const comboContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Estado para expandir ejercicios en las tarjetas
   const [expandedRoutineIds, setExpandedRoutineIds] = useState<Record<string, boolean>>({});
@@ -37,7 +47,7 @@ export default function AdminRoutinesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
 
-  // Campos del formulario
+  // Campos del formulario de rutina
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [durationMinutes, setDurationMinutes] = useState(45);
@@ -48,6 +58,23 @@ export default function AdminRoutinesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [savedExerciseIndices, setSavedExerciseIndices] = useState<Record<number, boolean>>({});
+
+  // Cargar catálogo de ejercicios desde la base de datos
+  const fetchCatalogExercises = useCallback(async () => {
+    setCatalogLoading(true);
+    try {
+      const res = await fetch('/api/admin/exercises');
+      if (res.ok) {
+        const data = await res.json();
+        setCatalogExercises(data.exercises || []);
+      }
+    } catch (err) {
+      console.error('Error al cargar catálogo de ejercicios:', err);
+    } finally {
+      setCatalogLoading(false);
+    }
+  }, []);
 
   // Cargar rutinas desde la base de datos
   const fetchRoutines = useCallback(async () => {
@@ -70,8 +97,23 @@ export default function AdminRoutinesPage() {
   useEffect(() => {
     if (user && user.role === 'administrator') {
       fetchRoutines();
+      fetchCatalogExercises();
     }
-  }, [user, fetchRoutines]);
+  }, [user, fetchRoutines, fetchCatalogExercises]);
+
+  // Cerrar combo si se hace clic afuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (activeComboIndex !== null) {
+        const container = comboContainerRefs.current[activeComboIndex];
+        if (container && !container.contains(e.target as Node)) {
+          setActiveComboIndex(null);
+        }
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeComboIndex]);
 
   // Alternar vista expandida de ejercicios
   const toggleExpanded = (id: string) => {
@@ -88,8 +130,10 @@ export default function AdminRoutinesPage() {
     setDescription('');
     setDurationMinutes(45);
     setExercises([
-      { id: `ex-${Date.now()}-1`, name: '', sets: 4, reps: '15 repeticiones', restSeconds: 45, notes: '' },
+      { id: `ex-${Date.now()}-1`, name: '', sets: 4, reps: '15 reps', restSeconds: 45, notes: '' },
     ]);
+    setActiveComboIndex(null);
+    setSavedExerciseIndices({});
     setIsModalOpen(true);
   };
 
@@ -104,6 +148,8 @@ export default function AdminRoutinesPage() {
         ? routine.exercises.map((ex) => ({ ...ex }))
         : [{ id: `ex-${Date.now()}-1`, name: '', sets: 3, reps: '12 reps', restSeconds: 45, notes: '' }]
     );
+    setActiveComboIndex(null);
+    setSavedExerciseIndices({});
     setIsModalOpen(true);
   };
 
@@ -131,6 +177,68 @@ export default function AdminRoutinesPage() {
     });
   };
 
+  // Seleccionar ejercicio de la predicción o catálogo
+  const handleSelectFromCatalog = (index: number, item: ExerciseCatalogItem) => {
+    setExercises((prev) => {
+      const next = [...prev];
+      const current = next[index];
+      next[index] = {
+        ...current,
+        name: item.name,
+        sets: current.sets || item.defaultSets || 3,
+        reps: current.reps || item.defaultReps || '12 reps',
+        restSeconds: current.restSeconds !== undefined ? current.restSeconds : (item.defaultRestSeconds || 45),
+        notes: current.notes || item.defaultNotes || '',
+      };
+      return next;
+    });
+    setActiveComboIndex(null);
+  };
+
+  // Guardar un ejercicio individual directamente en la base de datos (Colección Exercises)
+  const handleSaveExerciseDirectlyToDB = async (index: number) => {
+    const ex = exercises[index];
+    if (!ex || !ex.name.trim()) {
+      setActionMessage({ type: 'error', text: 'Escribe el nombre del ejercicio antes de guardarlo en la base de datos.' });
+      setTimeout(() => setActionMessage(null), 3000);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/exercises', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: ex.name.trim(),
+          sets: ex.sets,
+          reps: ex.reps,
+          restSeconds: ex.restSeconds,
+          notes: ex.notes,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSavedExerciseIndices((prev) => ({ ...prev, [index]: true }));
+        setActionMessage({
+          type: 'success',
+          text: `"${ex.name.trim()}" guardado directamente en la base de datos.`,
+        });
+        await fetchCatalogExercises();
+        setTimeout(() => {
+          setSavedExerciseIndices((prev) => ({ ...prev, [index]: false }));
+        }, 3500);
+      } else {
+        setActionMessage({ type: 'error', text: data.error || 'Error al guardar ejercicio' });
+      }
+    } catch (err) {
+      console.error('Error al guardar ejercicio en DB:', err);
+      setActionMessage({ type: 'error', text: 'Error de conexión con la base de datos' });
+    } finally {
+      setTimeout(() => setActionMessage(null), 3500);
+    }
+  };
+
   // Eliminar un ejercicio
   const removeExerciseRow = (index: number) => {
     if (exercises.length <= 1) {
@@ -139,9 +247,12 @@ export default function AdminRoutinesPage() {
       return;
     }
     setExercises((prev) => prev.filter((_, idx) => idx !== index));
+    if (activeComboIndex === index) {
+      setActiveComboIndex(null);
+    }
   };
 
-  // Guardar rutina en Base de Datos (Crear o Actualizar)
+  // Guardar rutina completa en Base de Datos
   const handleSubmitRoutine = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -182,10 +293,13 @@ export default function AdminRoutinesPage() {
       if (res.ok && data.success) {
         setActionMessage({
           type: 'success',
-          text: editingRoutine ? 'Rutina actualizada en la base de datos' : 'Rutina guardada en la base de datos',
+          text: editingRoutine
+            ? 'Rutina y ejercicios actualizados en la base de datos'
+            : 'Rutina y ejercicios guardados en la base de datos',
         });
         setIsModalOpen(false);
         await fetchRoutines();
+        await fetchCatalogExercises();
       } else {
         setActionMessage({ type: 'error', text: data.error || 'Ocurrió un error al procesar la rutina' });
       }
@@ -222,7 +336,7 @@ export default function AdminRoutinesPage() {
     }
   };
 
-  // Filtrar rutinas por término de búsqueda
+  // Filtrar rutinas por búsqueda
   const filteredRoutines = routines.filter((item) => {
     if (!searchTerm.trim()) return true;
     const term = searchTerm.toLowerCase();
@@ -233,7 +347,7 @@ export default function AdminRoutinesPage() {
     );
   });
 
-  // Estadísticas generales
+  // Estadísticas
   const totalRoutines = routines.length;
   const totalExercises = routines.reduce((acc, r) => acc + (r.exercises?.length || 0), 0);
   const avgDuration =
@@ -327,13 +441,16 @@ export default function AdminRoutinesPage() {
             Rutinas de Ejercicio
           </h1>
           <p style={{ color: '#9FA6B8', fontSize: '0.95rem', margin: 0 }}>
-            Crea, almacena y administra sesiones de entrenamiento físico y técnico para el dojo.
+            Describe o selecciona ejercicios con predicción inteligente y almacena sesiones completas en la base de datos.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <button
-            onClick={fetchRoutines}
+            onClick={() => {
+              fetchRoutines();
+              fetchCatalogExercises();
+            }}
             disabled={loading}
             className="btn-martial-ghost"
             style={{
@@ -344,7 +461,7 @@ export default function AdminRoutinesPage() {
               fontSize: '0.88rem',
               borderRadius: '8px',
             }}
-            title="Refrescar listado"
+            title="Refrescar datos"
           >
             <RefreshCw size={16} className={loading ? 'spin-animation' : ''} />
             <span className="hide-mobile">Actualizar</span>
@@ -473,6 +590,38 @@ export default function AdminRoutinesPage() {
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{avgDuration} min</div>
           </div>
         </div>
+
+        <div
+          className="card-sumi"
+          style={{
+            padding: '1.25rem',
+            backgroundColor: '#0E0F14',
+            border: '1px solid rgba(212, 175, 55, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+          }}
+        >
+          <div
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(74, 222, 128, 0.12)',
+              border: '1px solid rgba(74, 222, 128, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#86EFAC',
+            }}
+          >
+            <Database size={24} />
+          </div>
+          <div>
+            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Catálogo de Ejercicios</span>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{catalogExercises.length}</div>
+          </div>
+        </div>
       </div>
 
       {/* Buscador */}
@@ -549,7 +698,7 @@ export default function AdminRoutinesPage() {
           <p style={{ color: '#9FA6B8', fontSize: '0.9rem', maxWidth: '450px', margin: '0 auto 1.5rem' }}>
             {searchTerm
               ? 'No se encontraron resultados para tu búsqueda.'
-              : 'Comienza creando la primera rutina de entrenamiento para tus atletas.'}
+              : 'Comienza creando la primera rutina de entrenamiento con el constructor interactivo.'}
           </p>
           <button onClick={openCreateModal} className="btn-martial-primary">
             <Plus size={16} /> Crear Rutina Ahora
@@ -913,7 +1062,7 @@ export default function AdminRoutinesPage() {
       )}
 
       {/* ============================================================ */}
-      {/* MODAL CREAR / EDITAR RUTINA DE EJERCICIO                     */}
+      {/* MODAL CREAR / EDITAR RUTINA CON COMBOBOX PREDICTIVO          */}
       {/* ============================================================ */}
       {isModalOpen && (
         <div
@@ -937,7 +1086,7 @@ export default function AdminRoutinesPage() {
               border: '1px solid rgba(212, 175, 55, 0.35)',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.12)',
               borderRadius: '14px',
-              maxWidth: '720px',
+              maxWidth: '740px',
               width: '100%',
               maxHeight: '92vh',
               display: 'flex',
@@ -975,7 +1124,7 @@ export default function AdminRoutinesPage() {
                     {editingRoutine ? 'Editar Rutina de Ejercicio' : 'Nueva Rutina de Ejercicio'}
                   </h2>
                   <span style={{ fontSize: '0.76rem', color: '#9FA6B8' }}>
-                    Al guardar, la rutina se registrará de inmediato en la base de datos.
+                    Puedes describir un ejercicio libremente o elegir del combo con predicción. Todo se guardará en la base de datos.
                   </span>
                 </div>
               </div>
@@ -1014,7 +1163,7 @@ export default function AdminRoutinesPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Ej: Acondicionamiento Físico y Coordinación"
+                    placeholder="Ej: Acondicionamiento Físico y Movilidad"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     style={{
@@ -1078,7 +1227,7 @@ export default function AdminRoutinesPage() {
                 />
               </div>
 
-              {/* Constructor de Ejercicios */}
+              {/* Constructor de Ejercicios con Combobox Predictivo */}
               <div
                 style={{
                   padding: '1rem',
@@ -1124,156 +1273,342 @@ export default function AdminRoutinesPage() {
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  {exercises.map((ex, idx) => (
-                    <div
-                      key={ex.id || idx}
-                      style={{
-                        padding: '0.9rem',
-                        backgroundColor: '#070709',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: '8px',
-                        position: 'relative',
-                      }}
-                    >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {exercises.map((ex, idx) => {
+                    // Filtrar sugerencias predictivas para este ejercicio
+                    const searchWord = (ex.name || '').toLowerCase().trim();
+                    const filteredPredictions = catalogExercises.filter((item) =>
+                      searchWord === '' || item.name.toLowerCase().includes(searchWord)
+                    );
+                    const isDropdownOpen = activeComboIndex === idx;
+                    const isSavedDirectly = !!savedExerciseIndices[idx];
+
+                    return (
                       <div
+                        key={ex.id || idx}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          marginBottom: '0.6rem',
+                          padding: '1rem',
+                          backgroundColor: '#070709',
+                          border: '1px solid rgba(212, 175, 55, 0.18)',
+                          borderRadius: '8px',
+                          position: 'relative',
                         }}
                       >
-                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#F5D77F' }}>
-                          Ejercicio #{idx + 1}
-                        </span>
-
-                        <button
-                          type="button"
-                          onClick={() => removeExerciseRow(idx)}
+                        {/* Cabecera del ejercicio con botón de Guardar directo a Base de Datos */}
+                        <div
                           style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#F87171',
-                            cursor: 'pointer',
-                            fontSize: '0.78rem',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.2rem',
+                            justifyContent: 'space-between',
+                            marginBottom: '0.75rem',
                           }}
                         >
-                          <Trash2 size={13} />
-                          <span>Quitar</span>
-                        </button>
-                      </div>
+                          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F5D77F' }}>
+                            Ejercicio #{idx + 1}
+                          </span>
 
-                      {/* Nombre del Ejercicio */}
-                      <div style={{ marginBottom: '0.6rem' }}>
-                        <input
-                          type="text"
-                          required
-                          placeholder="Nombre del ejercicio (Ej: Saltos pliométricos, flexiones, etc.)"
-                          value={ex.name}
-                          onChange={(e) => updateExerciseField(idx, 'name', e.target.value)}
-                          style={{
-                            width: '100%',
-                            padding: '0.55rem 0.8rem',
-                            borderRadius: '6px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            color: '#FFFFFF',
-                            fontSize: '0.86rem',
-                            outline: 'none',
-                          }}
-                        />
-                      </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            {/* Botón Guardar directo en Base de Datos */}
+                            {ex.name.trim() && (
+                              <button
+                                type="button"
+                                onClick={() => handleSaveExerciseDirectlyToDB(idx)}
+                                title="Guarda este ejercicio de inmediato en la base de datos para recordarlo en el combo"
+                                style={{
+                                  padding: '0.3rem 0.6rem',
+                                  borderRadius: '5px',
+                                  backgroundColor: isSavedDirectly ? 'rgba(34, 197, 94, 0.2)' : 'rgba(212, 175, 55, 0.12)',
+                                  border: `1px solid ${isSavedDirectly ? '#22C55E' : 'rgba(212, 175, 55, 0.3)'}`,
+                                  color: isSavedDirectly ? '#4ADE80' : '#F5D77F',
+                                  fontSize: '0.74rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem',
+                                  transition: 'all 0.15s ease',
+                                }}
+                              >
+                                {isSavedDirectly ? <Check size={12} /> : <Database size={12} />}
+                                <span>{isSavedDirectly ? 'Guardado en BD' : 'Guardar en BD'}</span>
+                              </button>
+                            )}
 
-                      {/* Series, Repeticiones y Descanso */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1.5fr', gap: '0.6rem', marginBottom: '0.6rem' }}>
-                        <div>
-                          <input
-                            type="number"
-                            min={1}
-                            placeholder="Series"
-                            value={ex.sets || ''}
-                            onChange={(e) => updateExerciseField(idx, 'sets', Number(e.target.value))}
-                            style={{
-                              width: '100%',
-                              padding: '0.5rem 0.6rem',
-                              borderRadius: '6px',
-                              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
-                              color: '#FFFFFF',
-                              fontSize: '0.82rem',
-                              outline: 'none',
-                            }}
-                            title="Número de series"
-                          />
+                            {/* Botón Quitar */}
+                            <button
+                              type="button"
+                              onClick={() => removeExerciseRow(idx)}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#F87171',
+                                cursor: 'pointer',
+                                fontSize: '0.78rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.2rem',
+                              }}
+                            >
+                              <Trash2 size={13} />
+                              <span>Quitar</span>
+                            </button>
+                          </div>
                         </div>
 
+                        {/* COMBOBOX PREDICTIVO: Describir o Seleccionar del Combo */}
+                        <div
+                          ref={(el) => {
+                            comboContainerRefs.current[idx] = el;
+                          }}
+                          style={{ position: 'relative', marginBottom: '0.75rem' }}
+                        >
+                          <label style={{ display: 'block', fontSize: '0.76rem', color: '#9FA6B8', marginBottom: '0.3rem' }}>
+                            Nombre del Ejercicio (escribe para predecir o haz clic en la flecha para elegir del combo)
+                          </label>
+
+                          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <input
+                              type="text"
+                              required
+                              placeholder="Escribe o describe el ejercicio (ej: Burpees, Sentadillas, Flexiones...)"
+                              value={ex.name}
+                              onChange={(e) => {
+                                updateExerciseField(idx, 'name', e.target.value);
+                                setActiveComboIndex(idx);
+                              }}
+                              onFocus={() => setActiveComboIndex(idx)}
+                              style={{
+                                width: '100%',
+                                padding: '0.65rem 2.4rem 0.65rem 0.85rem',
+                                borderRadius: '6px',
+                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                border: isDropdownOpen
+                                  ? '1px solid #D4AF37'
+                                  : '1px solid rgba(212, 175, 55, 0.25)',
+                                color: '#FFFFFF',
+                                fontSize: '0.88rem',
+                                outline: 'none',
+                              }}
+                            />
+
+                            {/* Botón flecha para abrir o cerrar el combo de la base de datos */}
+                            <button
+                              type="button"
+                              onClick={() => setActiveComboIndex(isDropdownOpen ? null : idx)}
+                              title="Ver listado de ejercicios de la base de datos"
+                              style={{
+                                position: 'absolute',
+                                right: '6px',
+                                background: 'none',
+                                border: 'none',
+                                color: '#D4AF37',
+                                cursor: 'pointer',
+                                padding: '0.35rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <ChevronDown
+                                size={18}
+                                style={{
+                                  transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
+                                  transition: 'transform 0.15s ease',
+                                }}
+                              />
+                            </button>
+                          </div>
+
+                          {/* MENÚ DESPLEGABLE PREDICTIVO */}
+                          {isDropdownOpen && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: 'calc(100% + 4px)',
+                                left: 0,
+                                right: 0,
+                                zIndex: 60,
+                                backgroundColor: '#0E0F14',
+                                border: '1px solid rgba(212, 175, 55, 0.4)',
+                                borderRadius: '8px',
+                                boxShadow: '0 12px 30px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.1)',
+                                maxHeight: '220px',
+                                overflowY: 'auto',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  padding: '0.4rem 0.75rem',
+                                  fontSize: '0.72rem',
+                                  color: '#F5D77F',
+                                  fontWeight: 700,
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.05em',
+                                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                                  backgroundColor: 'rgba(212, 175, 55, 0.06)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                }}
+                              >
+                                <span>Predicciones en Base de Datos ({filteredPredictions.length})</span>
+                                <span style={{ color: '#9FA6B8', fontWeight: 400, textTransform: 'none' }}>
+                                  Clic para autocompletar
+                                </span>
+                              </div>
+
+                              {filteredPredictions.length === 0 ? (
+                                <div style={{ padding: '0.85rem 1rem', color: '#9FA6B8', fontSize: '0.82rem' }}>
+                                  <span>No hay coincidencias exactas.</span>
+                                  <div style={{ marginTop: '0.3rem', color: '#F5D77F', fontSize: '0.78rem' }}>
+                                    ✨ Puedes describir este nuevo ejercicio libremente y al guardar se registrará en la base de datos.
+                                  </div>
+                                </div>
+                              ) : (
+                                filteredPredictions.map((catItem) => (
+                                  <div
+                                    key={catItem.id || catItem.name}
+                                    onClick={() => handleSelectFromCatalog(idx, catItem)}
+                                    style={{
+                                      padding: '0.65rem 0.85rem',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                                      transition: 'background-color 0.15s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.12)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                  >
+                                    <span style={{ color: '#FFFFFF', fontSize: '0.86rem', fontWeight: 600 }}>
+                                      {catItem.name}
+                                    </span>
+
+                                    {(catItem.defaultSets || catItem.defaultReps) && (
+                                      <span
+                                        style={{
+                                          fontSize: '0.74rem',
+                                          color: '#F5D77F',
+                                          backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                                          padding: '0.15rem 0.45rem',
+                                          borderRadius: '4px',
+                                        }}
+                                      >
+                                        {catItem.defaultSets ? `${catItem.defaultSets}x ` : ''}
+                                        {catItem.defaultReps || ''}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Series, Repeticiones y Descanso */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1.5fr', gap: '0.6rem', marginBottom: '0.6rem' }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                              Series
+                            </label>
+                            <input
+                              type="number"
+                              min={1}
+                              placeholder="3"
+                              value={ex.sets || ''}
+                              onChange={(e) => updateExerciseField(idx, 'sets', Number(e.target.value))}
+                              style={{
+                                width: '100%',
+                                padding: '0.5rem 0.6rem',
+                                borderRadius: '6px',
+                                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                border: '1px solid rgba(255, 255, 255, 0.15)',
+                                color: '#FFFFFF',
+                                fontSize: '0.84rem',
+                                outline: 'none',
+                              }}
+                              title="Número de series"
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                              Repeticiones / Tiempo
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="12 reps o 45 seg"
+                              value={ex.reps || ''}
+                              onChange={(e) => updateExerciseField(idx, 'reps', e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '0.5rem 0.6rem',
+                                borderRadius: '6px',
+                                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                border: '1px solid rgba(255, 255, 255, 0.15)',
+                                color: '#FFFFFF',
+                                fontSize: '0.84rem',
+                                outline: 'none',
+                              }}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                              Descanso (seg)
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              placeholder="45"
+                              value={ex.restSeconds || ''}
+                              onChange={(e) => updateExerciseField(idx, 'restSeconds', Number(e.target.value))}
+                              style={{
+                                width: '100%',
+                                padding: '0.5rem 0.6rem',
+                                borderRadius: '6px',
+                                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                border: '1px solid rgba(255, 255, 255, 0.15)',
+                                color: '#FFFFFF',
+                                fontSize: '0.84rem',
+                                outline: 'none',
+                              }}
+                              title="Descanso en segundos"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Notas técnicas */}
                         <div>
+                          <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                            Indicaciones o notas técnicas (opcional)
+                          </label>
                           <input
                             type="text"
-                            placeholder="Reps/Tiempo (Ej: 15 reps, 45s)"
-                            value={ex.reps || ''}
-                            onChange={(e) => updateExerciseField(idx, 'reps', e.target.value)}
+                            placeholder="Ej: Cuidar alineación de rodilla y respiración profunda"
+                            value={ex.notes || ''}
+                            onChange={(e) => updateExerciseField(idx, 'notes', e.target.value)}
                             style={{
                               width: '100%',
                               padding: '0.5rem 0.6rem',
                               borderRadius: '6px',
                               backgroundColor: 'rgba(255, 255, 255, 0.04)',
                               border: '1px solid rgba(255, 255, 255, 0.15)',
-                              color: '#FFFFFF',
+                              color: '#CBD5E1',
                               fontSize: '0.82rem',
                               outline: 'none',
+                              fontStyle: 'italic',
                             }}
                           />
                         </div>
-
-                        <div>
-                          <input
-                            type="number"
-                            min={0}
-                            placeholder="Descanso (seg)"
-                            value={ex.restSeconds || ''}
-                            onChange={(e) => updateExerciseField(idx, 'restSeconds', Number(e.target.value))}
-                            style={{
-                              width: '100%',
-                              padding: '0.5rem 0.6rem',
-                              borderRadius: '6px',
-                              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
-                              color: '#FFFFFF',
-                              fontSize: '0.82rem',
-                              outline: 'none',
-                            }}
-                            title="Descanso en segundos"
-                          />
-                        </div>
                       </div>
-
-                      {/* Notas técnicas */}
-                      <div>
-                        <input
-                          type="text"
-                          placeholder="Indicaciones o notas adicionales (opcional)"
-                          value={ex.notes || ''}
-                          onChange={(e) => updateExerciseField(idx, 'notes', e.target.value)}
-                          style={{
-                            width: '100%',
-                            padding: '0.5rem 0.6rem',
-                            borderRadius: '6px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            color: '#CBD5E1',
-                            fontSize: '0.8rem',
-                            outline: 'none',
-                            fontStyle: 'italic',
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
