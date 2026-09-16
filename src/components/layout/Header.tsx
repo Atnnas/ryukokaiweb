@@ -515,6 +515,48 @@ export default function Header() {
           }}
           className="md-hidden"
         >
+          {/* Logo y Marca Oficial en Menú Móvil */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              paddingBottom: '0.85rem',
+              borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+            }}
+          >
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 75%)',
+                border: '1.5px solid rgba(212, 175, 55, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '3px',
+                flexShrink: 0,
+              }}
+            >
+              <Image
+                src="/images/logos/LogoRyukukaiSinFondo.png"
+                alt="Logo Oficial Ryūko Kai"
+                width={34}
+                height={34}
+                style={{ objectFit: 'contain' }}
+              />
+            </div>
+            <div>
+              <span style={{ fontSize: '1.05rem', fontWeight: 900, letterSpacing: '0.06em', color: '#FFFFFF' }}>
+                <span style={{ color: '#D4AF37' }}>RYOKU</span> KAI
+              </span>
+              <span style={{ display: 'block', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.18em', color: '#C5A059', textTransform: 'uppercase' }}>
+                Escuela de Karate Do
+              </span>
+            </div>
+          </div>
+
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
             {navLinks.map((link) => {
               const isActive = pathname === link.href;

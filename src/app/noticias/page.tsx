@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import {
   Calendar,
@@ -197,6 +198,30 @@ export default function NoticiasPage() {
       >
         <div className="container-dojo">
           <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+            <div
+              style={{
+                width: '74px',
+                height: '74px',
+                margin: '0 auto 1.25rem',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, transparent 75%)',
+                border: '1.5px solid rgba(212, 175, 55, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 25px rgba(212, 175, 55, 0.25)',
+                padding: '8px',
+              }}
+            >
+              <Image
+                src="/images/logos/LogoRyukukaiSinFondo.png"
+                alt="Logo Oficial Ryūko Kai"
+                width={58}
+                height={58}
+                style={{ objectFit: 'contain' }}
+                priority
+              />
+            </div>
             <span
               style={{
                 fontSize: '0.8rem',

@@ -22,13 +22,34 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL || 'https://ryukokai.com'),
   title: 'Ryoku Kai | Escuela de Karate Do • Disciplina, Poder y Honor',
   description: 'Dojo oficial de Karate Do tradicional y de alta competencia Ryoku Kai. Formación marcial, valores de disciplina, karate infantil, juvenil y adultos.',
   keywords: ['karate', 'dojo', 'ryoku kai', 'ryuko kai', 'artes marciales', 'defensa personal', 'kata', 'kumite'],
+  icons: {
+    icon: [
+      { url: '/icon.png', sizes: 'any' },
+      { url: '/images/logos/LogoRyukukaiSinFondo.png', type: 'image/png' },
+      { url: '/images/logos/Logo_Blanco_Color_Transparente.png', sizes: '192x192', type: 'image/png' },
+    ],
+    shortcut: '/icon.png',
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/images/logos/LogoRyukukaiSinFondo.png' },
+    ],
+  },
   openGraph: {
     title: 'Ryoku Kai | Escuela de Karate Do',
     description: 'Equilibrio entre la mente, la técnica y el espíritu. Conoce nuestros programas marciales y entrena en Ryoku Kai.',
     type: 'website',
+    images: [
+      {
+        url: '/images/logos/LogoRyukukaiSinFondo.png',
+        width: 800,
+        height: 800,
+        alt: 'Logo Oficial Ryūko Kai',
+      },
+    ],
   },
 };
 

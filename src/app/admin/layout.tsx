@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -100,18 +101,26 @@ export default function AdminLayout({
         >
           <div
             style={{
-              width: '74px',
-              height: '74px',
+              width: '84px',
+              height: '84px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(212, 175, 55, 0.12)',
-              border: '2px solid rgba(212, 175, 55, 0.35)',
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, transparent 75%)',
+              border: '2px solid rgba(212, 175, 55, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 1.5rem',
+              boxShadow: '0 0 25px rgba(212, 175, 55, 0.25)',
+              padding: '8px',
             }}
           >
-            <Lock size={36} color="#D4AF37" />
+            <Image
+              src="/images/logos/LogoRyukukaiSinFondo.png"
+              alt="Logo Ryūko Kai"
+              width={68}
+              height={68}
+              style={{ objectFit: 'contain' }}
+            />
           </div>
 
           <span
@@ -246,17 +255,26 @@ export default function AdminLayout({
           >
             <div
               style={{
-                width: '34px',
-                height: '34px',
+                width: '38px',
+                height: '38px',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(212, 175, 55, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1px solid rgba(212, 175, 55, 0.35)',
+                border: '1.5px solid rgba(212, 175, 55, 0.4)',
+                overflow: 'hidden',
+                padding: '2px',
+                flexShrink: 0,
               }}
             >
-              <ShieldCheck size={18} color="#F5D77F" />
+              <Image
+                src="/images/logos/LogoRyukukaiSinFondo.png"
+                alt="Logo Ryūko Kai"
+                width={32}
+                height={32}
+                style={{ objectFit: 'contain' }}
+              />
             </div>
             <div>
               <span

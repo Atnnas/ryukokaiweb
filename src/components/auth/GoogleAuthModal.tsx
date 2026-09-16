@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { X, ShieldCheck, Lock, Award, CheckCircle2 } from 'lucide-react';
 
@@ -64,8 +65,33 @@ export default function GoogleAuthModal() {
           <X size={20} />
         </button>
 
-        {/* Encabezado */}
+        {/* Encabezado con Logo Oficial Ryūko Kai */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              margin: '0 auto 1rem',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, transparent 75%)',
+              border: '1.5px solid rgba(212, 175, 55, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 20px rgba(212, 175, 55, 0.25)',
+              padding: '6px',
+            }}
+          >
+            <Image
+              src="/images/logos/LogoRyukukaiSinFondo.png"
+              alt="Logo Oficial Ryūko Kai"
+              width={52}
+              height={52}
+              style={{ objectFit: 'contain' }}
+              priority
+            />
+          </div>
+
           <div
             style={{
               display: 'inline-flex',
@@ -80,7 +106,7 @@ export default function GoogleAuthModal() {
               fontWeight: 700,
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
-              marginBottom: '1rem',
+              marginBottom: '0.75rem',
             }}
           >
             <ShieldCheck size={14} /> Portal de Alumnos & Maestros
