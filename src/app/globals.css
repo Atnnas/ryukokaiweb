@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+:root {
+  /* Paleta Oficial Dojo Ying Yang */
+  --color-ying: #23346B;
+  --color-ying-light: #394F9A;
+  --color-ying-glow: rgba(41, 63, 133, 0.35);
+
+  --color-yang: #8E2323;
+  --color-yang-light: #B83131;
+  --color-yang-glow: rgba(168, 38, 38, 0.35);
+
+  --bg-main: #0B0C10;
+  --bg-surface: #12151D;
+  --bg-surface-elevated: #191D28;
+  --bg-surface-glass: rgba(18, 21, 29, 0.85);
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.16);
+  --border-ying: rgba(57, 79, 154, 0.4);
+  --border-yang: rgba(184, 49, 49, 0.4);
+
+  --text-main: #F7F8FA;
+  --text-secondary: #9FA6B8;
+  --text-muted: #676E80;
+
+  --font-family-base: var(--font-zen-kaku), system-ui, -apple-system, sans-serif;
+  
+  /* Sistema de espaciado y contenedores */
+  --container-max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-family-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Ambient Background Lights - Dual Ying & Yang Energy */
+body::before {
+  content: "";
+  position: fixed;
+  top: -15vw;
+  left: -15vw;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-ying-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  bottom: -15vw;
+  right: -15vw;
+  width: 55vw;
+  height: 55vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-yang-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(90px);
+}
+
+/* Tipografía Responsiva */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-base);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-main);
+  line-height: 1.15;
+}
+
+p {
+  font-family: var(--font-family-base);
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+/* Contenedor Responsivo Global */
+.container-dojo {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1.5rem, 5vw, 4.5rem);
+  padding-right: clamp(1.5rem, 5vw, 4.5rem);
+  position: relative;
+  z-index: 1;
+}
+
+/* Botones con estilo Marcial */
+.btn-martial-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.85rem;
+  background: linear-gradient(135deg, var(--color-yang) 0%, var(--color-yang-light) 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(184, 49, 49, 0.35);
+}
+
+.btn-martial-primary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--color-yang-light) 0%, #D43838 100%);
+  box-shadow: 0 6px 28px rgba(184, 49, 49, 0.55);
+}
+
+.btn-martial-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.85rem;
+  background: rgba(35, 52, 107, 0.15);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  border: 1px solid var(--border-ying);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-martial-secondary:hover {
+  background: rgba(35, 52, 107, 0.35);
+  border-color: var(--color-ying-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(41, 63, 133, 0.35);
+}
+
+/* Tarjetas con Efecto Cristal / Glassmorphism */
+.glass-panel {
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  border-color: var(--border-medium);
+}
+
+/* Insignias de Cinturón */
+.belt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Animaciones sutiles */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* Barra de desplazamiento personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #242938;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #39425A;
+}
