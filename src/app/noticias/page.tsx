@@ -34,8 +34,8 @@ export default function NoticiasPage() {
       platform: 'official',
       category: 'examen',
       date: '14 de Septiembre, 2026',
-      author: 'Tribunal Técnico Dojo Ying Yang',
-      socialHandle: '@dojoyingyang',
+      author: 'Tribunal Técnico Ryoku Kai',
+      socialHandle: '@ryokukai',
       url: 'https://instagram.com',
       likes: 124,
       commentsCount: 18,
@@ -46,12 +46,12 @@ export default function NoticiasPage() {
       id: 'news-2',
       title: 'Oro y Plata en el Campeonato Nacional WKF',
       content: 'Felicitamos a nuestros atletas del equipo de Kumite de alta competencia por su destacada actuación este fin de semana en el Torneo Nacional. Tres medallas de oro en categorías juvenil y dos de plata en senior.',
-      excerpt: '¡Orgullo Ying Yang! Nuestros alumnos demostraron temple, respeto y precisión en cada combate.',
+      excerpt: '¡Orgullo Ryoku Kai! Nuestros alumnos demostraron temple, respeto y precisión en cada combate.',
       platform: 'instagram',
       category: 'torneo',
       date: '12 de Septiembre, 2026',
-      author: 'Instagram Feed • @dojoyingyang',
-      socialHandle: '@dojoyingyang_karate',
+      author: 'Instagram Feed • @ryokukai',
+      socialHandle: '@ryokukai_karate',
       url: 'https://instagram.com',
       likes: 289,
       commentsCount: 34,
@@ -65,8 +65,8 @@ export default function NoticiasPage() {
       platform: 'facebook',
       category: 'seminario',
       date: '10 de Septiembre, 2026',
-      author: 'Facebook Page • Dojo Ying Yang',
-      socialHandle: 'facebook.com/dojoyingyang',
+      author: 'Facebook Page • Ryoku Kai',
+      socialHandle: 'facebook.com/ryokukai',
       url: 'https://facebook.com',
       likes: 95,
       commentsCount: 12,
@@ -80,8 +80,8 @@ export default function NoticiasPage() {
       platform: 'youtube',
       category: 'comunidad',
       date: '8 de Septiembre, 2026',
-      author: 'YouTube Channel • Dojo Ying Yang TV',
-      socialHandle: 'youtube.com/@dojoyingyang',
+      author: 'YouTube Channel • Ryoku Kai TV',
+      socialHandle: 'youtube.com/@ryokukai',
       url: 'https://youtube.com',
       likes: 340,
       commentsCount: 42,
@@ -96,7 +96,7 @@ export default function NoticiasPage() {
       category: 'seminario',
       date: '5 de Septiembre, 2026',
       author: 'Instagram Reel • Sensei Laura S.',
-      socialHandle: '@dojoyingyang_karate',
+      socialHandle: '@ryokukai_karate',
       url: 'https://instagram.com',
       likes: 182,
       commentsCount: 19,
@@ -111,7 +111,7 @@ export default function NoticiasPage() {
       category: 'comunidad',
       date: '1 de Septiembre, 2026',
       author: 'Dirección Administrativa',
-      socialHandle: '@dojoyingyang',
+      socialHandle: '@ryokukai',
       url: 'https://instagram.com',
       likes: 78,
       commentsCount: 7,
@@ -211,7 +211,7 @@ export default function NoticiasPage() {
               Comunidad, Eventos & Redes
             </span>
             <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', marginBottom: '1.25rem' }}>
-              Noticias del Dojo Ying Yang
+              Noticias de Ryoku Kai
             </h1>
             <p style={{ fontSize: '1.1rem', color: '#9DA3B4', lineHeight: 1.7 }}>
               Mantente al día con los eventos, torneos, ascensos de grado y las publicaciones más recientes conectadas directamente desde nuestras redes sociales.

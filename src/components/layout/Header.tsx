@@ -94,14 +94,14 @@ export default function Header() {
             <span
               style={{
                 display: 'block',
-                fontSize: '1.2rem',
+                fontSize: '1.25rem',
                 fontWeight: 900,
                 letterSpacing: '0.08em',
                 lineHeight: 1.1,
                 color: '#FFFFFF',
               }}
             >
-              DOJO <span style={{ color: '#D4AF37' }}>YING</span> <span style={{ color: '#FFFFFF' }}>YANG</span>
+              <span style={{ color: '#D4AF37' }}>RYOKU</span> <span style={{ color: '#FFFFFF' }}>KAI</span>
             </span>
             <span
               style={{
@@ -790,7 +790,7 @@ export default function Header() {
                     Ficha Marcial WKF
                   </h3>
                   <p style={{ fontSize: '0.75rem', color: '#C5A059', margin: 0 }}>
-                    Federación Mundial de Karate • Dojo Ying Yang
+                    Federación Mundial de Karate • Ryoku Kai
                   </p>
                 </div>
               </div>

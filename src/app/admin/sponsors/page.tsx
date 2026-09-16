@@ -582,7 +582,7 @@ export default function AdminSponsorsPage() {
           <p style={{ fontSize: '0.88rem', maxWidth: '420px', margin: '0 auto 1.5rem' }}>
             {loading
               ? 'Conectando con la colección Sponsors de MongoDB...'
-              : 'Registra los comercios, marcas y aliados que apoyan al Dojo Ying Yang con sus logotipos y vigencias.'}
+              : 'Registra los comercios, marcas y aliados que apoyan a Ryoku Kai con sus logotipos y vigencias.'}
           </p>
           {!loading && (
             <button onClick={openCreateModal} className="btn-martial-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}>

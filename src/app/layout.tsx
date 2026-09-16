@@ -15,12 +15,12 @@ const zenKaku = Zen_Kaku_Gothic_New({
 });
 
 export const metadata: Metadata = {
-  title: 'Dojo de Karate Ying Yang | Disciplina, Poder y Equilibrio',
-  description: 'Dojo oficial de Karate Do tradicional y de alta competencia. Formación marcial, valores de disciplina, karate infantil, juvenil y adultos.',
-  keywords: ['karate', 'dojo', 'ying yang', 'artes marciales', 'defensa personal', 'kata', 'kumite'],
+  title: 'Ryoku Kai | Escuela de Karate Do • Disciplina, Poder y Honor',
+  description: 'Dojo oficial de Karate Do tradicional y de alta competencia Ryoku Kai. Formación marcial, valores de disciplina, karate infantil, juvenil y adultos.',
+  keywords: ['karate', 'dojo', 'ryoku kai', 'ryuko kai', 'artes marciales', 'defensa personal', 'kata', 'kumite'],
   openGraph: {
-    title: 'Dojo de Karate Ying Yang',
-    description: 'Equilibrio entre la mente, la técnica y el espíritu. Conoce nuestros programas marciales y entrena en el Dojo Ying Yang.',
+    title: 'Ryoku Kai | Escuela de Karate Do',
+    description: 'Equilibrio entre la mente, la técnica y el espíritu. Conoce nuestros programas marciales y entrena en Ryoku Kai.',
     type: 'website',
   },
 };

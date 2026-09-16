@@ -146,7 +146,7 @@ export default function AdminLayout({
               marginBottom: '2rem',
             }}
           >
-            La sección administrativa y todas sus subrutas son accesibles <strong>única y exclusivamente</strong> para cuentas con el rol de <strong style={{ color: '#FFFFFF' }}>administrator</strong> (el rol más elevado del Dojo Ying Yang).
+            La sección administrativa y todas sus subrutas son accesibles <strong>única y exclusivamente</strong> para cuentas con el rol de <strong style={{ color: '#FFFFFF' }}>administrator</strong> (el rol más elevado de Ryoku Kai).
             {user ? (
               <span style={{ display: 'block', marginTop: '0.75rem', padding: '0.65rem', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '6px' }}>
                 Has iniciado sesión como <strong style={{ color: '#FFFFFF' }}>{user.email}</strong>, pero tu rol actual es <strong style={{ color: '#F5D77F' }}>{user.role}</strong> {user.status !== 'active' ? `(estado: ${user.status})` : ''}. No posees permisos de administrador activo.
@@ -275,7 +275,7 @@ export default function AdminLayout({
                   textTransform: 'uppercase',
                 }}
               >
-                Ying Yang System
+                Ryoku Kai System
               </span>
             </div>
           </div>

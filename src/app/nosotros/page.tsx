@@ -5,8 +5,8 @@ import { Shield, Award, ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Nosotros | Dojo de Karate Ying Yang',
-  description: 'Conoce la historia, linaje marcial y filosofía de nuestro dojo de karate.',
+  title: 'Nosotros | Ryoku Kai - Escuela de Karate Do',
+  description: 'Conoce la historia, linaje marcial y filosofía de Ryoku Kai.',
 };
 
 export default function NosotrosPage() {
@@ -37,7 +37,7 @@ export default function NosotrosPage() {
               Linaje, Historia & Tradición
             </span>
             <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', marginBottom: '1.25rem' }}>
-              Sobre el Dojo Ying Yang
+              Sobre Ryoku Kai
             </h1>
             <p style={{ fontSize: '1.1rem', color: '#9DA3B4', lineHeight: 1.7 }}>
               Nacimos con el firme propósito de ser más que una academia deportiva: un santuario donde cada alumno descubre su máximo potencial físico y cultiva una mente inquebrantable.
@@ -62,13 +62,13 @@ export default function NosotrosPage() {
                 Nuestra Génesis
               </span>
               <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', marginBottom: '1.25rem' }}>
-                El Principio del Equilibrio
+                La Fuerza del Dragón y el Tigre
               </h2>
               <p style={{ fontSize: '1rem', color: '#9DA3B4', lineHeight: 1.7, marginBottom: '1.25rem' }}>
-                Fundado hace más de dos décadas, el <strong>Dojo Ying Yang</strong> toma su nombre del principio universal de la complementariedad. Creemos que la fuerza bruta sin control mental es destructiva, y que la calma sin capacidad de respuesta es vulnerable.
+                Fundado con el más alto rigor marcial, <strong>Ryoku Kai</strong> toma su inspiración de la unión del Dragón y el Tigre. Creemos que la fuerza sin control mental es destructiva, y que la calma sin capacidad de respuesta es vulnerable.
               </p>
               <p style={{ fontSize: '1rem', color: '#9DA3B4', lineHeight: 1.7, marginBottom: '2rem' }}>
-                Nuestro método entrena al practicante en ambos polos: el <strong>Ying</strong> (la serenidad, el esquive elástico, la estrategia fría y la compasión) y el <strong>Yang</strong> (la explosividad del impacto, la decisión implacable y el coraje frente al reto).
+                Nuestro método forja al practicante en el dominio técnico integral: la serenidad táctica, la fluidez del esquive, la explosividad del impacto y un código de honor inquebrantable.
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>

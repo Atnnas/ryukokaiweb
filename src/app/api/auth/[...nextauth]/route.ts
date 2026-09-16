@@ -10,7 +10,7 @@ const getNextAuthUrl = () => {
     return rawUrl;
   }
   if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-    return 'https://yingyangweb.vercel.app';
+    return process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://ryukokaiweb.vercel.app';
   }
   return 'http://localhost:3000';
 };

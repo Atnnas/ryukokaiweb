@@ -3,13 +3,13 @@ import { MapPin, Phone, Mail, Clock, MessageSquare, ExternalLink } from 'lucide-
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Contacto | Dojo de Karate Ying Yang',
-  description: 'Contáctanos directamente por WhatsApp o visita nuestras instalaciones del Dojo Ying Yang.',
+  title: 'Contacto | Ryoku Kai - Escuela de Karate Do',
+  description: 'Contáctanos directamente por WhatsApp o visita las instalaciones de Ryoku Kai.',
 };
 
 export default function ContactoPage() {
   const whatsappMessage = encodeURIComponent(
-    'Hola Sensei! Me gustaría solicitar información sobre las clases y horarios en el Dojo Ying Yang.'
+    'Hola Sensei! Me gustaría solicitar información sobre las clases y horarios en Ryoku Kai.'
   );
 
   return (
@@ -222,7 +222,7 @@ export default function ContactoPage() {
                       <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
                         Correo Electrónico
                       </strong>
-                      <span style={{ color: '#CBD5E1' }}>contacto@dojoyingyang.com</span>
+                      <span style={{ color: '#CBD5E1' }}>contacto@ryokukai.com</span>
                     </div>
                   </div>
                 </div>
@@ -245,7 +245,7 @@ export default function ContactoPage() {
               >
                 <div>
                   <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
-                    Tatami Principal Dojo Ying Yang
+                    Tatami Principal Ryoku Kai
                   </p>
                   <p style={{ fontSize: '0.78rem', color: '#9FA6B8', margin: '0.2rem 0 0' }}>
                     180 m² de tatami reglamentario y zona de entrenamiento

@@ -65,8 +65,8 @@ export default function Footer() {
                 />
               </div>
               <div>
-                <span style={{ display: 'block', fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF', letterSpacing: '0.06em', lineHeight: 1.1 }}>
-                  DOJO <span style={{ color: '#D4AF37' }}>YING</span> <span style={{ color: '#FFFFFF' }}>YANG</span>
+                <span style={{ display: 'block', fontSize: '1.2rem', fontWeight: 900, color: '#FFFFFF', letterSpacing: '0.06em', lineHeight: 1.1 }}>
+                  <span style={{ color: '#D4AF37' }}>RYOKU</span> <span style={{ color: '#FFFFFF' }}>KAI</span>
                 </span>
                 <span style={{ fontSize: '0.68rem', color: '#C5A059', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 700 }}>
                   Karate Do Tradicional
@@ -96,7 +96,7 @@ export default function Footer() {
                   color: '#F5D77F',
                   transition: 'all 0.2s',
                 }}
-                aria-label="Instagram Dojo Ying Yang"
+                aria-label="Instagram Ryoku Kai"
               >
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
@@ -121,7 +121,7 @@ export default function Footer() {
                   color: '#F5D77F',
                   transition: 'all 0.2s',
                 }}
-                aria-label="Facebook Dojo Ying Yang"
+                aria-label="Facebook Ryoku Kai"
               >
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
@@ -144,7 +144,7 @@ export default function Footer() {
                   color: '#F5D77F',
                   transition: 'all 0.2s',
                 }}
-                aria-label="YouTube Dojo Ying Yang"
+                aria-label="YouTube Ryoku Kai"
               >
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
@@ -236,7 +236,7 @@ export default function Footer() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                 <Mail size={17} color="#D4AF37" style={{ flexShrink: 0 }} />
-                <span>contacto@dojoyingyang.com</span>
+                <span>contacto@ryokukai.com</span>
               </div>
             </div>
           </div>
@@ -257,7 +257,7 @@ export default function Footer() {
           }}
         >
           <p style={{ margin: 0 }}>
-            © {new Date().getFullYear()} Dojo de Karate Ying Yang. Todos los derechos reservados.
+            © {new Date().getFullYear()} Ryoku Kai - Escuela de Karate Do. Todos los derechos reservados.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>

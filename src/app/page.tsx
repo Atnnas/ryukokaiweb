@@ -86,7 +86,7 @@ export default function HomePage() {
                     WebkitTextFillColor: 'transparent',
                   }}
                 >
-                  Ying Yang
+                  Ryoku Kai
                 </span>
               </h1>
 
@@ -99,7 +99,7 @@ export default function HomePage() {
                   maxWidth: '640px',
                 }}
               >
-                Forjamos mente, cuerpo y espíritu a través del Karate Do. Descubre la armonía entre la serenidad reflexiva del <strong style={{ color: '#F5D77F' }}>Ying</strong> y la fuerza contundente del <strong style={{ color: '#FFFFFF' }}>Yang</strong>.
+                Forjamos mente, cuerpo y espíritu a través del Karate Do tradicional y formativo. Forja tu carácter con disciplina, poder, honor y excelencia marcial.
               </p>
 
               {/* Cintillo / Pasarela de Patrocinadores */}
@@ -159,13 +159,13 @@ export default function HomePage() {
                     color: '#FFFFFF',
                   }}
                 >
-                  DOJO YING YANG
+                  <span style={{ color: '#D4AF37' }}>RYOKU</span> KAI
                 </h3>
                 <p style={{ fontSize: '0.88rem', color: '#9FA6B8', margin: '0 auto 1.5rem', maxWidth: '360px', lineHeight: 1.5 }}>
                   El arte de vencer sin luchar y la firmeza del golpe que nace de la calma interior.
                 </p>
 
-                {/* Dualidad Ying Yang Badges en Dorado y Blanco */}
+                {/* Pilares Marciales Dragón y Tigre en Dorado y Blanco */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
                   <div
                     style={{
@@ -178,10 +178,10 @@ export default function HomePage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#F5D77F', fontWeight: 800, fontSize: '0.85rem' }}>
                       <Droplets size={16} color="#D4AF37" />
-                      <span>YING</span>
+                      <span>RYŪ • DRAGÓN</span>
                     </div>
                     <p style={{ fontSize: '0.75rem', color: '#CBD5E1', margin: '0.3rem 0 0' }}>
-                      Técnica, defensa, fluidez, concentración y autocontrol.
+                      Sabiduría, fluidez técnica, concentración y autocontrol.
                     </p>
                   </div>
 
@@ -196,10 +196,10 @@ export default function HomePage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#FFFFFF', fontWeight: 800, fontSize: '0.85rem' }}>
                       <Flame size={16} color="#FFFFFF" />
-                      <span>YANG</span>
+                      <span>KO • TIGRE</span>
                     </div>
                     <p style={{ fontSize: '0.75rem', color: '#CBD5E1', margin: '0.3rem 0 0' }}>
-                      Impacto, potencia, espíritu indomable y resolución.
+                      Potencia de impacto, espíritu indomable y resolución.
                     </p>
                   </div>
                 </div>
