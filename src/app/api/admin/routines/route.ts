@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDatabase } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
-import { Routine, RoutineDifficulty } from '@/types';
+import { Routine } from '@/types';
 
 const SUPER_ADMINS = [
   'david.artavia.rodriguez@gmail.com',
@@ -35,7 +35,7 @@ async function verifyAdmin() {
   return { authorized: false, reason: 'Privilegios insuficientes de administrador' };
 }
 
-// GET: Listar rutinas con filtros y búsqueda
+// GET: Listar rutinas con búsqueda
 export async function GET(request: NextRequest) {
   try {
     const auth = await verifyAdmin();
@@ -45,21 +45,16 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search')?.toLowerCase().trim() || '';
-    const difficultyFilter = searchParams.get('difficulty') || '';
 
     const db = await getDatabase();
     const collection = db.collection('Routines');
 
     const query: Record<string, unknown> = {};
 
-    if (difficultyFilter && difficultyFilter !== 'all') {
-      query.difficulty = difficultyFilter;
-    }
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
-        { targetBelt: { $regex: search, $options: 'i' } },
         { 'exercises.name': { $regex: search, $options: 'i' } },
       ];
     }
@@ -71,8 +66,6 @@ export async function GET(request: NextRequest) {
       _id: r._id.toString(),
       title: r.title || 'Rutina sin título',
       description: r.description || '',
-      difficulty: (r.difficulty as RoutineDifficulty) || 'all-levels',
-      targetBelt: r.targetBelt || 'Todos los niveles',
       durationMinutes: Number(r.durationMinutes) || 45,
       exercises: Array.isArray(r.exercises) ? r.exercises : [],
       createdBy: r.createdBy || 'Sensei',
@@ -99,14 +92,12 @@ export async function POST(request: NextRequest) {
     const {
       title,
       description,
-      difficulty,
-      targetBelt,
       durationMinutes,
       exercises,
     } = body;
 
     if (!title || typeof title !== 'string' || !title.trim()) {
-      return NextResponse.json({ error: 'El título de la rutina es obligatorio' }, { status: 400 });
+      return NextResponse.json({ error: 'El nombre de la rutina es obligatorio' }, { status: 400 });
     }
 
     const sanitizedExercises = Array.isArray(exercises)
@@ -125,8 +116,6 @@ export async function POST(request: NextRequest) {
     const newRoutineDoc = {
       title: title.trim(),
       description: (description || '').trim(),
-      difficulty: (difficulty as RoutineDifficulty) || 'all-levels',
-      targetBelt: (targetBelt || 'Todos los niveles').trim(),
       durationMinutes: Number(durationMinutes) > 0 ? Number(durationMinutes) : 45,
       exercises: sanitizedExercises,
       createdBy: auth.userEmail || 'Administrador',
@@ -164,8 +153,6 @@ export async function PATCH(request: NextRequest) {
       _id,
       title,
       description,
-      difficulty,
-      targetBelt,
       durationMinutes,
       exercises,
     } = body;
@@ -188,8 +175,6 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof title === 'string') updateFields.title = title.trim();
     if (typeof description === 'string') updateFields.description = description.trim();
-    if (difficulty) updateFields.difficulty = difficulty;
-    if (typeof targetBelt === 'string') updateFields.targetBelt = targetBelt.trim();
     if (durationMinutes !== undefined) updateFields.durationMinutes = Number(durationMinutes);
 
     if (Array.isArray(exercises)) {

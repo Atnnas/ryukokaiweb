@@ -86,12 +86,6 @@ export interface Sponsor {
   updatedAt?: string | Date;
 }
 
-export type RoutineDifficulty =
-  | 'all-levels'
-  | 'beginner'
-  | 'intermediate'
-  | 'advanced';
-
 export interface ExerciseItem {
   id: string;
   name: string;
@@ -106,8 +100,6 @@ export interface Routine {
   _id?: string;
   title: string;
   description: string;
-  difficulty: RoutineDifficulty;
-  targetBelt?: string; // Ej: "Todos los cinturones", "Blanca a Naranja", "Verde a Marrón", "Cintas Negras"
   durationMinutes: number; // Duración estimada en minutos
   exercises: ExerciseItem[];
   createdBy?: string;
