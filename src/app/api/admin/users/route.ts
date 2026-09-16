@@ -113,15 +113,15 @@ export async function GET(request: NextRequest) {
         name: u.name || 'Sin nombre',
         email: u.email,
         avatar: u.avatar || null,
-        belt: u.belt || wkf.beltName,
-        beltColor: u.beltColor || wkf.beltColor,
+        belt: wkf.beltName,
+        beltColor: wkf.beltColor,
         kyuDan: u.kyuDan || '9° Kyu',
         birthDate: u.birthDate || '',
         weight: u.weight !== undefined ? u.weight : null,
         gender: u.gender || 'male',
         age: wkf.age,
-        kataCategory: u.kataCategory || wkf.kataCategory,
-        kumiteCategory: u.kumiteCategory || wkf.kumiteCategory,
+        kataCategory: wkf.kataCategory,
+        kumiteCategory: wkf.kumiteCategory,
         role: isSuperAdminEmail(u.email) ? 'administrator' : (u.role || 'viewer'),
         status: isSuperAdminEmail(u.email) ? 'active' : (u.status || 'pending'),
         joinedDate: u.joinedDate || 'Reciente',
@@ -156,6 +156,7 @@ export async function POST(request: NextRequest) {
       kyuDan = '9° Kyu',
       birthDate = '',
       weight = null,
+      weightUnit = 'kg',
       gender = 'male',
     } = body;
 
@@ -176,9 +177,11 @@ export async function POST(request: NextRequest) {
     }
 
     const parsedWeight = weight !== null && weight !== undefined && weight !== '' ? Number(weight) : null;
+    const targetWeightUnit = weightUnit || (parsedWeight && parsedWeight > 125 ? 'lbs' : 'kg');
     const wkf = calculateWKFCategories({
       birthDate,
       weight: parsedWeight || undefined,
+      weightUnit: targetWeightUnit,
       gender: gender || 'male',
       kyuDan,
     });
@@ -229,11 +232,13 @@ export async function PATCH(request: NextRequest) {
     const {
       id,
       email,
+      name,
       role,
       status,
       kyuDan,
       birthDate,
       weight,
+      weightUnit,
       gender,
       classesAttended,
     } = body;
@@ -262,6 +267,7 @@ export async function PATCH(request: NextRequest) {
 
     const updateFields: Record<string, unknown> = {};
 
+    if (name !== undefined) updateFields.name = name.trim();
     if (role) updateFields.role = role;
     if (status) {
       updateFields.status = status;
@@ -272,39 +278,32 @@ export async function PATCH(request: NextRequest) {
     }
     if (typeof classesAttended === 'number') updateFields.classesAttended = classesAttended;
 
-    // Calcular y actualizar datos marciales
+    // Calcular y actualizar datos marciales y categorías WKF
     const targetKyuDan = kyuDan !== undefined ? kyuDan : userToUpdate.kyuDan;
     const targetBirthDate = birthDate !== undefined ? birthDate : userToUpdate.birthDate;
     const targetWeight = weight !== undefined ? (weight !== '' && weight !== null ? Number(weight) : null) : userToUpdate.weight;
     const targetGender = gender !== undefined ? gender : (userToUpdate.gender || 'male');
+    const targetWeightUnit = weightUnit || (targetWeight && targetWeight > 125 ? 'lbs' : 'kg');
 
     const wkf = calculateWKFCategories({
       birthDate: targetBirthDate,
       weight: targetWeight ? Number(targetWeight) : undefined,
+      weightUnit: targetWeightUnit,
       gender: targetGender,
       kyuDan: targetKyuDan,
     });
 
-    if (kyuDan !== undefined) {
-      updateFields.kyuDan = kyuDan;
-      updateFields.belt = wkf.beltName;
-      updateFields.beltColor = wkf.beltColor;
-    }
-    if (birthDate !== undefined) {
-      updateFields.birthDate = birthDate;
-      updateFields.age = wkf.age;
-      updateFields.kataCategory = wkf.kataCategory;
-      updateFields.kumiteCategory = wkf.kumiteCategory;
-    }
-    if (weight !== undefined) {
-      updateFields.weight = targetWeight;
-      updateFields.kumiteCategory = wkf.kumiteCategory;
-    }
-    if (gender !== undefined) {
-      updateFields.gender = gender;
-      updateFields.kataCategory = wkf.kataCategory;
-      updateFields.kumiteCategory = wkf.kumiteCategory;
-    }
+    if (kyuDan !== undefined) updateFields.kyuDan = kyuDan;
+    if (birthDate !== undefined) updateFields.birthDate = birthDate;
+    if (weight !== undefined) updateFields.weight = targetWeight;
+    if (gender !== undefined) updateFields.gender = gender;
+
+    // Actualizar siempre los campos oficiales WKF calculados
+    updateFields.belt = wkf.beltName;
+    updateFields.beltColor = wkf.beltColor;
+    updateFields.age = wkf.age;
+    updateFields.kataCategory = wkf.kataCategory;
+    updateFields.kumiteCategory = wkf.kumiteCategory;
 
     await usersCol.updateOne(query, { $set: updateFields });
 
@@ -312,6 +311,11 @@ export async function PATCH(request: NextRequest) {
       success: true,
       message: 'Datos del estudiante y categorías WKF actualizados correctamente',
       wkf,
+      updatedUser: {
+        ...userToUpdate,
+        ...updateFields,
+        id: userToUpdate._id.toString(),
+      },
     });
   } catch (err: unknown) {
     const error = err as Error;

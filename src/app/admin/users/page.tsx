@@ -50,6 +50,7 @@ export default function AdminUsersPage() {
   const [newKyuDan, setNewKyuDan] = useState('9° Kyu');
   const [newBirthDate, setNewBirthDate] = useState('');
   const [newWeight, setNewWeight] = useState('');
+  const [newWeightUnit, setNewWeightUnit] = useState<'kg' | 'lbs'>('kg');
   const [newGender, setNewGender] = useState<'male' | 'female'>('male');
 
   // Modal para editar usuario
@@ -62,6 +63,7 @@ export default function AdminUsersPage() {
   const [editKyuDan, setEditKyuDan] = useState('9° Kyu');
   const [editBirthDate, setEditBirthDate] = useState('');
   const [editWeight, setEditWeight] = useState('');
+  const [editWeightUnit, setEditWeightUnit] = useState<'kg' | 'lbs'>('kg');
   const [editGender, setEditGender] = useState<'male' | 'female'>('male');
 
   const [submitting, setSubmitting] = useState(false);
@@ -188,6 +190,7 @@ export default function AdminUsersPage() {
           kyuDan: newKyuDan,
           birthDate: newBirthDate,
           weight: newWeight ? Number(newWeight) : null,
+          weightUnit: newWeightUnit,
           gender: newGender,
         }),
       });
@@ -202,6 +205,7 @@ export default function AdminUsersPage() {
         setNewName('');
         setNewBirthDate('');
         setNewWeight('');
+        setNewWeightUnit('kg');
         setNewKyuDan('9° Kyu');
         setNewRankType('kyu');
         setNewGender('male');
@@ -231,7 +235,10 @@ export default function AdminUsersPage() {
     setEditRankType(isDan ? 'dan' : 'kyu');
     setEditKyuDan(u.kyuDan || (isDan ? '1° Dan' : '9° Kyu'));
     setEditBirthDate(u.birthDate || '');
-    setEditWeight(u.weight !== undefined && u.weight !== null ? String(u.weight) : '');
+    const numWeight = u.weight !== undefined && u.weight !== null ? Number(u.weight) : null;
+    setEditWeight(numWeight !== null ? String(numWeight) : '');
+    // Si el valor guardado es mayor a 120, inferir que se ingresó en libras
+    setEditWeightUnit(numWeight && numWeight > 120 ? 'lbs' : 'kg');
     setEditGender(u.gender || 'male');
     setIsEditModalOpen(true);
   };
@@ -254,6 +261,7 @@ export default function AdminUsersPage() {
           kyuDan: editKyuDan,
           birthDate: editBirthDate,
           weight: editWeight ? Number(editWeight) : null,
+          weightUnit: editWeightUnit,
           gender: editGender,
         }),
       });
@@ -301,6 +309,7 @@ export default function AdminUsersPage() {
   const addWkfPreview = calculateWKFCategories({
     birthDate: newBirthDate,
     weight: newWeight ? Number(newWeight) : undefined,
+    weightUnit: newWeightUnit,
     gender: newGender,
     kyuDan: newKyuDan,
   });
@@ -309,6 +318,7 @@ export default function AdminUsersPage() {
   const editWkfPreview = calculateWKFCategories({
     birthDate: editBirthDate,
     weight: editWeight ? Number(editWeight) : undefined,
+    weightUnit: editWeightUnit,
     gender: editGender,
     kyuDan: editKyuDan,
   });
@@ -1360,6 +1370,7 @@ export default function AdminUsersPage() {
                   </label>
                   <input
                     type="date"
+                    max={new Date().toISOString().split('T')[0]}
                     value={newBirthDate}
                     onChange={(e) => setNewBirthDate(e.target.value)}
                     style={{
@@ -1373,17 +1384,66 @@ export default function AdminUsersPage() {
                       outline: 'none',
                     }}
                   />
+                  {newBirthDate && (
+                    <div style={{ marginTop: '0.35rem', fontSize: '0.72rem' }}>
+                      {addWkfPreview.age > 0 ? (
+                        <span style={{ color: '#86EFAC', fontWeight: 700 }}>
+                          ✓ Edad: {addWkfPreview.age} años
+                        </span>
+                      ) : (
+                        <span style={{ color: '#FCA5A5', fontWeight: 700 }}>
+                          ⚠️ Año {newBirthDate.split('-')[0]} (Edad: 0). Revisa el año.
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#F7F8FA', marginBottom: '0.35rem' }}>
-                    <Scale size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />
-                    Peso (kg)
-                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#F7F8FA' }}>
+                      <Scale size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />
+                      Peso ({newWeightUnit})
+                    </label>
+                    <div style={{ display: 'flex', gap: '2px', backgroundColor: '#0B0D14', padding: '2px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                      <button
+                        type="button"
+                        onClick={() => setNewWeightUnit('kg')}
+                        style={{
+                          padding: '0.1rem 0.35rem',
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          border: 'none',
+                          borderRadius: '3px',
+                          cursor: 'pointer',
+                          backgroundColor: newWeightUnit === 'kg' ? 'var(--color-gold)' : 'transparent',
+                          color: newWeightUnit === 'kg' ? '#000' : '#9FA6B8',
+                        }}
+                      >
+                        kg
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNewWeightUnit('lbs')}
+                        style={{
+                          padding: '0.1rem 0.35rem',
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          border: 'none',
+                          borderRadius: '3px',
+                          cursor: 'pointer',
+                          backgroundColor: newWeightUnit === 'lbs' ? 'var(--color-gold)' : 'transparent',
+                          color: newWeightUnit === 'lbs' ? '#000' : '#9FA6B8',
+                        }}
+                      >
+                        lbs
+                      </button>
+                    </div>
+                  </div>
                   <input
                     type="number"
                     step="0.1"
-                    placeholder="Ej: 64.5"
+                    placeholder={newWeightUnit === 'lbs' ? 'Ej: 182' : 'Ej: 64.5'}
                     value={newWeight}
                     onChange={(e) => setNewWeight(e.target.value)}
                     style={{
@@ -1397,6 +1457,11 @@ export default function AdminUsersPage() {
                       outline: 'none',
                     }}
                   />
+                  {newWeight && newWeightUnit === 'lbs' && (
+                    <span style={{ display: 'block', fontSize: '0.7rem', color: '#CBD5E1', marginTop: '0.25rem' }}>
+                      ≈ {(Number(newWeight) * 0.453592).toFixed(1)} kg para WKF
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -1728,6 +1793,7 @@ export default function AdminUsersPage() {
                   </label>
                   <input
                     type="date"
+                    max={new Date().toISOString().split('T')[0]}
                     value={editBirthDate}
                     onChange={(e) => setEditBirthDate(e.target.value)}
                     style={{
@@ -1741,17 +1807,66 @@ export default function AdminUsersPage() {
                       outline: 'none',
                     }}
                   />
+                  {editBirthDate && (
+                    <div style={{ marginTop: '0.35rem', fontSize: '0.72rem' }}>
+                      {editWkfPreview.age > 0 ? (
+                        <span style={{ color: '#86EFAC', fontWeight: 700 }}>
+                          ✓ Edad: {editWkfPreview.age} años
+                        </span>
+                      ) : (
+                        <span style={{ color: '#FCA5A5', fontWeight: 700 }}>
+                          ⚠️ Año {editBirthDate.split('-')[0]} (Edad: 0). Revisa el año.
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#F7F8FA', marginBottom: '0.35rem' }}>
-                    <Scale size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />
-                    Peso (kg)
-                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#F7F8FA' }}>
+                      <Scale size={12} style={{ display: 'inline', marginRight: '0.25rem' }} />
+                      Peso ({editWeightUnit})
+                    </label>
+                    <div style={{ display: 'flex', gap: '2px', backgroundColor: '#0B0D14', padding: '2px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                      <button
+                        type="button"
+                        onClick={() => setEditWeightUnit('kg')}
+                        style={{
+                          padding: '0.1rem 0.35rem',
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          border: 'none',
+                          borderRadius: '3px',
+                          cursor: 'pointer',
+                          backgroundColor: editWeightUnit === 'kg' ? 'var(--color-gold)' : 'transparent',
+                          color: editWeightUnit === 'kg' ? '#000' : '#9FA6B8',
+                        }}
+                      >
+                        kg
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditWeightUnit('lbs')}
+                        style={{
+                          padding: '0.1rem 0.35rem',
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          border: 'none',
+                          borderRadius: '3px',
+                          cursor: 'pointer',
+                          backgroundColor: editWeightUnit === 'lbs' ? 'var(--color-gold)' : 'transparent',
+                          color: editWeightUnit === 'lbs' ? '#000' : '#9FA6B8',
+                        }}
+                      >
+                        lbs
+                      </button>
+                    </div>
+                  </div>
                   <input
                     type="number"
                     step="0.1"
-                    placeholder="Ej: 64.5"
+                    placeholder={editWeightUnit === 'lbs' ? 'Ej: 182' : 'Ej: 64.5'}
                     value={editWeight}
                     onChange={(e) => setEditWeight(e.target.value)}
                     style={{
@@ -1765,6 +1880,11 @@ export default function AdminUsersPage() {
                       outline: 'none',
                     }}
                   />
+                  {editWeight && editWeightUnit === 'lbs' && (
+                    <span style={{ display: 'block', fontSize: '0.7rem', color: '#CBD5E1', marginTop: '0.25rem' }}>
+                      ≈ {(Number(editWeight) * 0.453592).toFixed(1)} kg para WKF
+                    </span>
+                  )}
                 </div>
 
                 <div>

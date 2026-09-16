@@ -80,9 +80,27 @@ export function deriveBeltFromKyuDan(kyuDan?: string): { beltName: string; beltC
 
 /**
  * Calcular edad exacta en años a partir de una fecha de nacimiento (YYYY-MM-DD)
+ * Evita desfasajes de zona horaria parseando directamente año, mes y día.
  */
 export function calculateAge(birthDateString?: string): number {
-  if (!birthDateString) return 0;
+  if (!birthDateString || !birthDateString.trim()) return 0;
+  
+  const parts = birthDateString.trim().split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+      const today = new Date();
+      let age = today.getFullYear() - year;
+      const m = today.getMonth() - month;
+      if (m < 0 || (m === 0 && today.getDate() < day)) {
+        age--;
+      }
+      return age;
+    }
+  }
+
   const birth = new Date(birthDateString);
   if (isNaN(birth.getTime())) return 0;
 
@@ -92,7 +110,7 @@ export function calculateAge(birthDateString?: string): number {
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
     age--;
   }
-  return Math.max(0, age);
+  return age;
 }
 
 /**
@@ -101,17 +119,14 @@ export function calculateAge(birthDateString?: string): number {
 export function calculateWKFCategories(params: {
   birthDate?: string;
   weight?: number;
+  weightUnit?: 'kg' | 'lbs';
   gender?: 'male' | 'female';
   kyuDan?: string;
 }): WKFCategoryResult {
-  const { birthDate, weight = 0, gender = 'male', kyuDan } = params;
-  const age = calculateAge(birthDate);
-  const isFemale = gender === 'female';
-  const rama = isFemale ? 'Femenino' : 'Masculino';
-
+  const { birthDate, weight = 0, weightUnit = 'kg', gender = 'male', kyuDan } = params;
   const { beltName, beltColor } = deriveBeltFromKyuDan(kyuDan);
 
-  if (!birthDate || age === 0) {
+  if (!birthDate || !birthDate.trim()) {
     return {
       age: 0,
       kataCategory: 'Pendiente fecha de nacimiento',
@@ -120,6 +135,24 @@ export function calculateWKFCategories(params: {
       beltColor,
     };
   }
+
+  const age = calculateAge(birthDate);
+  const currentYear = new Date().getFullYear();
+  const birthYear = parseInt(birthDate.trim().split('-')[0], 10);
+
+  // Si el año ingresado es igual o mayor al año actual, o la edad resulta 0 o menor:
+  if (birthYear >= currentYear || age <= 0) {
+    return {
+      age: 0,
+      kataCategory: 'Revisa el año de nacimiento (detectado año actual)',
+      kumiteCategory: 'Revisa el año de nacimiento',
+      beltName,
+      beltColor,
+    };
+  }
+
+  const isFemale = gender === 'female';
+  const rama = isFemale ? 'Femenino' : 'Masculino';
 
   // 1. CÁLCULO DE CATEGORÍA DE KATA WKF POR EDAD
   let kataCategory = '';
@@ -143,8 +176,14 @@ export function calculateWKFCategories(params: {
   }
 
   // 2. CÁLCULO DE CATEGORÍA DE KUMITE WKF POR EDAD, GÉNERO Y PESO
+  // Soporte inteligente para pesos ingresados en libras (libras a kg: 1 lb = 0.453592 kg)
+  let w = Number(weight) || 0;
+  if (weightUnit === 'lbs' || (w > 125 && w < 350)) {
+    // Si se especificó explícitamente lbs o el valor ingresado corresponde al rango clásico en libras (ej: 140-250 lbs)
+    w = Math.round(w * 0.45359237 * 10) / 10;
+  }
+
   let kumiteCategory = '';
-  const w = Number(weight) || 0;
 
   if (w <= 0) {
     kumiteCategory = `Kumite WKF (${age} años ${rama}, peso pendiente)`;

@@ -102,8 +102,8 @@ export const authOptions: NextAuthOptions = {
             (session.user as Record<string, unknown>).weight = dbUser.weight !== undefined ? dbUser.weight : null;
             (session.user as Record<string, unknown>).gender = dbUser.gender || 'male';
             (session.user as Record<string, unknown>).age = wkf.age;
-            (session.user as Record<string, unknown>).kataCategory = dbUser.kataCategory || wkf.kataCategory;
-            (session.user as Record<string, unknown>).kumiteCategory = dbUser.kumiteCategory || wkf.kumiteCategory;
+            (session.user as Record<string, unknown>).kataCategory = wkf.kataCategory;
+            (session.user as Record<string, unknown>).kumiteCategory = wkf.kumiteCategory;
             (session.user as Record<string, unknown>).role = isAdmin ? 'administrator' : (dbUser.role || 'viewer');
             (session.user as Record<string, unknown>).status = isAdmin ? 'active' : (dbUser.status || 'pending');
             (session.user as Record<string, unknown>).classesAttended = dbUser.classesAttended || 0;
