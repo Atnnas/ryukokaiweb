@@ -85,15 +85,15 @@ export default function SponsorsTicker() {
                 width: '24px',
                 height: '24px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(35, 52, 107, 0.45)',
-                border: '1px solid rgba(140, 166, 248, 0.4)',
+                backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 0 10px rgba(140, 166, 248, 0.25)',
+                boxShadow: '0 0 10px rgba(212, 175, 55, 0.25)',
               }}
             >
-              <Handshake size={13} color="#8CA6F8" />
+              <Handshake size={13} color="#D4AF37" />
             </div>
             <span
               style={{
@@ -101,7 +101,7 @@ export default function SponsorsTicker() {
                 fontWeight: 800,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: '#8CA6F8',
+                color: '#F5D77F',
               }}
             >
               Patrocinador Oficial
@@ -129,11 +129,11 @@ export default function SponsorsTicker() {
         <div
           className="sponsor-showcase-box"
           style={{
-            background: 'linear-gradient(145deg, rgba(18, 22, 33, 0.95) 0%, rgba(10, 13, 20, 0.98) 100%)',
-            border: '1px solid rgba(140, 166, 248, 0.25)',
+            background: 'linear-gradient(145deg, rgba(16, 18, 25, 0.95) 0%, rgba(8, 9, 12, 0.98) 100%)',
+            border: '1px solid rgba(212, 175, 55, 0.25)',
             borderRadius: '16px',
             padding: '1.25rem 1.5rem',
-            boxShadow: '0 12px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 12px 35px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(212, 175, 55, 0.1)',
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -198,7 +198,7 @@ export default function SponsorsTicker() {
               <span
                 style={{
                   fontSize: '0.7rem',
-                  color: '#8CA6F8',
+                  color: '#F5D77F',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
                   fontWeight: 700,
@@ -208,7 +208,7 @@ export default function SponsorsTicker() {
                 }}
               >
                 Patrocinador Oficial del Dojo
-                <ExternalLink size={11} color="#8CA6F8" />
+                <ExternalLink size={11} color="#D4AF37" />
               </span>
             </a>
           ) : (
@@ -260,7 +260,7 @@ export default function SponsorsTicker() {
               <span
                 style={{
                   fontSize: '0.7rem',
-                  color: '#8CA6F8',
+                  color: '#F5D77F',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
                   fontWeight: 700,
@@ -426,11 +426,11 @@ export default function SponsorsTicker() {
         <style jsx>{`
           .sponsor-logo-link:hover .sponsor-logo-img {
             transform: scale(1.04);
-            filter: drop-shadow(0 8px 22px rgba(140, 166, 248, 0.45));
+            filter: drop-shadow(0 8px 22px rgba(212, 175, 55, 0.45));
           }
           .sponsor-logo-link:hover {
-            border-color: rgba(140, 166, 248, 0.4);
-            background: radial-gradient(ellipse at center, rgba(140, 166, 248, 0.12) 0%, rgba(18, 21, 30, 0.5) 70%, transparent 100%);
+            border-color: rgba(212, 175, 55, 0.4);
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.15) 0%, rgba(14, 15, 20, 0.6) 70%, transparent 100%);
           }
           .phone-btn:hover {
             transform: translateY(-3px) scale(1.02);
@@ -486,15 +486,15 @@ export default function SponsorsTicker() {
               width: '24px',
               height: '24px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(35, 52, 107, 0.45)',
-              border: '1px solid rgba(140, 166, 248, 0.4)',
+              backgroundColor: 'rgba(212, 175, 55, 0.15)',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 10px rgba(140, 166, 248, 0.25)',
+              boxShadow: '0 0 10px rgba(212, 175, 55, 0.25)',
             }}
           >
-            <Handshake size={13} color="#8CA6F8" />
+            <Handshake size={13} color="#D4AF37" />
           </div>
           <span
             style={{
@@ -502,7 +502,7 @@ export default function SponsorsTicker() {
               fontWeight: 800,
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
-              color: '#8CA6F8',
+              color: '#F5D77F',
             }}
           >
             Patrocinadores & Alianzas Oficiales
@@ -550,10 +550,10 @@ export default function SponsorsTicker() {
                   alignItems: 'center',
                   gap: '1rem',
                   padding: '0.75rem 1.35rem 0.75rem 0.85rem',
-                  backgroundColor: 'rgba(18, 22, 33, 0.92)',
-                  border: '1.5px solid rgba(140, 166, 248, 0.2)',
+                  backgroundColor: 'rgba(14, 16, 22, 0.94)',
+                  border: '1.5px solid rgba(212, 175, 55, 0.22)',
                   borderRadius: '12px',
-                  boxShadow: '0 6px 18px rgba(0, 0, 0, 0.4)',
+                  boxShadow: '0 6px 18px rgba(0, 0, 0, 0.6)',
                   flexShrink: 0,
                   transition: 'all 0.25s ease',
                   cursor: webUrl ? 'pointer' : 'default',
@@ -599,7 +599,7 @@ export default function SponsorsTicker() {
                     >
                       {sponsor.name}
                     </p>
-                    {webUrl && <ExternalLink size={12} color="#8CA6F8" />}
+                    {webUrl && <ExternalLink size={12} color="#D4AF37" />}
                   </div>
 
                   {/* Debajo del nombre: Teléfono y Dirección Web */}
@@ -686,8 +686,8 @@ export default function SponsorsTicker() {
 
         .ticker-sponsor-card:hover {
           transform: translateY(-3px) scale(1.02);
-          border-color: rgba(140, 166, 248, 0.6);
-          box-shadow: 0 8px 25px rgba(35, 52, 107, 0.5), 0 0 15px rgba(140, 166, 248, 0.3);
+          border-color: rgba(212, 175, 55, 0.6);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.25);
         }
 
         @keyframes scrollRightToLeft {

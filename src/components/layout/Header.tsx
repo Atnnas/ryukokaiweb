@@ -38,10 +38,10 @@ export default function Header() {
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        backgroundColor: 'rgba(11, 12, 16, 0.88)',
+        backgroundColor: 'rgba(7, 7, 9, 0.92)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        borderBottom: '1px solid rgba(212, 175, 55, 0.18)',
         transition: 'all 0.3s ease',
       }}
     >
@@ -73,18 +73,19 @@ export default function Header() {
               height: '46px',
               borderRadius: '50%',
               overflow: 'hidden',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 80%)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 80%)',
+              border: '1.5px solid rgba(212, 175, 55, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxShadow: '0 0 15px rgba(212, 175, 55, 0.15)',
             }}
           >
             <Image
-              src="/images/logos/Logo_Blanco_Color_Transparente.png"
-              alt="Logo Dojo Ying Yang"
-              width={42}
-              height={42}
+              src="/images/logos/LogoRyukukaiSinFondo.png"
+              alt="Logo Oficial Ryūko Kai"
+              width={44}
+              height={44}
               style={{ objectFit: 'contain' }}
               priority
             />
@@ -97,10 +98,10 @@ export default function Header() {
                 fontWeight: 900,
                 letterSpacing: '0.08em',
                 lineHeight: 1.1,
-                color: '#F7F8FA',
+                color: '#FFFFFF',
               }}
             >
-              DOJO <span style={{ color: '#8CA6F8' }}>YING</span> <span style={{ color: '#E55353' }}>YANG</span>
+              DOJO <span style={{ color: '#D4AF37' }}>YING</span> <span style={{ color: '#FFFFFF' }}>YANG</span>
             </span>
             <span
               style={{
@@ -108,7 +109,7 @@ export default function Header() {
                 fontSize: '0.68rem',
                 fontWeight: 700,
                 letterSpacing: '0.22em',
-                color: '#9FA6B8',
+                color: '#C5A059',
                 textTransform: 'uppercase',
               }}
             >
@@ -135,10 +136,10 @@ export default function Header() {
                 style={{
                   textDecoration: 'none',
                   fontSize: '0.9rem',
-                  fontWeight: isActive ? 700 : 500,
+                  fontWeight: isActive ? 800 : 500,
                   letterSpacing: '0.05em',
                   textTransform: 'uppercase',
-                  color: isActive ? '#F7F8FA' : '#9DA3B4',
+                  color: isActive ? '#F5D77F' : '#A0A5B5',
                   position: 'relative',
                   padding: '0.5rem 0',
                   transition: 'color 0.2s ease',
@@ -153,8 +154,9 @@ export default function Header() {
                       left: 0,
                       width: '100%',
                       height: '2px',
-                      background: 'linear-gradient(90deg, var(--color-ying-light) 0%, var(--color-yang-light) 100%)',
+                      background: 'linear-gradient(90deg, #D4AF37 0%, #F5D77F 100%)',
                       borderRadius: '2px',
+                      boxShadow: '0 0 8px rgba(212, 175, 55, 0.6)',
                     }}
                   />
                 )}
@@ -181,12 +183,13 @@ export default function Header() {
                   alignItems: 'center',
                   gap: '0.65rem',
                   padding: '0.4rem 0.85rem 0.4rem 0.45rem',
-                  backgroundColor: '#191D28',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  backgroundColor: '#121318',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
                   borderRadius: '30px',
-                  color: '#F7F8FA',
+                  color: '#FFFFFF',
                   cursor: 'pointer',
                   fontSize: '0.85rem',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.4)',
                 }}
               >
                 <div
@@ -194,7 +197,7 @@ export default function Header() {
                     width: '30px',
                     height: '30px',
                     borderRadius: '50%',
-                    backgroundColor: isAdmin ? '#8E2323' : '#23346B',
+                    backgroundColor: isAdmin ? '#AA7C11' : '#1A1C24',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -202,7 +205,7 @@ export default function Header() {
                     fontWeight: 700,
                     overflow: 'hidden',
                     flexShrink: 0,
-                    border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                    border: '1.5px solid rgba(212, 175, 55, 0.45)',
                   }}
                 >
                   {user.avatar ? (
@@ -224,12 +227,12 @@ export default function Header() {
                   style={{
                     fontSize: '0.65rem',
                     padding: '0.15rem 0.45rem',
-                    backgroundColor: isAdmin ? 'rgba(147, 51, 234, 0.25)' : 'rgba(142, 35, 35, 0.3)',
-                    border: `1px solid ${isAdmin ? 'rgba(192, 132, 252, 0.4)' : 'rgba(184, 49, 49, 0.5)'}`,
-                    color: isAdmin ? '#C084FC' : '#FF9E9E',
+                    backgroundColor: 'rgba(212, 175, 55, 0.18)',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    color: '#F5D77F',
                     borderRadius: '4px',
                     textTransform: 'uppercase',
-                    fontWeight: 700,
+                    fontWeight: 800,
                   }}
                 >
                   {isAdmin ? 'ADMIN' : user.kyuDan}
@@ -244,11 +247,11 @@ export default function Header() {
                     top: '110%',
                     right: 0,
                     width: '260px',
-                    backgroundColor: '#161922',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    backgroundColor: '#0E0F14',
+                    border: '1px solid rgba(212, 175, 55, 0.25)',
                     borderRadius: '8px',
                     padding: '0.85rem',
-                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+                    boxShadow: '0 10px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.1)',
                     zIndex: 60,
                   }}
                 >
@@ -259,7 +262,7 @@ export default function Header() {
                           width: '40px',
                           height: '40px',
                           borderRadius: '50%',
-                          backgroundColor: isAdmin ? '#8E2323' : '#23346B',
+                          backgroundColor: isAdmin ? '#AA7C11' : '#1A1C24',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -267,7 +270,7 @@ export default function Header() {
                           fontWeight: 700,
                           overflow: 'hidden',
                           flexShrink: 0,
-                          border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                          border: '1.5px solid rgba(212, 175, 55, 0.4)',
                         }}
                       >
                         {user.avatar ? (
@@ -285,7 +288,7 @@ export default function Header() {
                         )}
                       </div>
                       <div style={{ overflow: 'hidden' }}>
-                        <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#F7F8FA', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {user.name}
                         </p>
                         <p style={{ fontSize: '0.72rem', color: '#9FA6B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -296,8 +299,8 @@ export default function Header() {
 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.4rem', fontSize: '0.76rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#E2E8F0', fontWeight: 600 }}>
-                        <Award size={14} color="#ECC94B" />
-                        <span>{user.kyuDan || user.belt || 'Sin grado'}</span>
+                        <Award size={14} color="#D4AF37" />
+                        <span style={{ color: '#F5D77F', fontWeight: 700 }}>{user.kyuDan || user.belt || 'Sin grado'}</span>
                       </div>
                       <span style={{ fontSize: '0.7rem', color: '#9FA6B8' }}>{user.classesAttended || 0} clases</span>
                     </div>
@@ -307,13 +310,13 @@ export default function Header() {
                         style={{
                           marginTop: '0.6rem',
                           padding: '0.55rem',
-                          backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                          border: '1px solid rgba(212, 175, 55, 0.15)',
                           borderRadius: '6px',
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                          <span style={{ fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.06em', color: '#9DA3B4', textTransform: 'uppercase' }}>
+                          <span style={{ fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.06em', color: '#D4AF37', textTransform: 'uppercase' }}>
                             Categorías WKF
                           </span>
                           {user.age && (
@@ -325,16 +328,16 @@ export default function Header() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                           {user.kataCategory && (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                              <span style={{ color: '#93C5FD', fontWeight: 600 }}>🥋 Kata:</span>
-                              <span style={{ color: '#F7F8FA', fontWeight: 700, backgroundColor: 'rgba(59, 130, 246, 0.2)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+                              <span style={{ color: '#F5D77F', fontWeight: 600 }}>🥋 Kata:</span>
+                              <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(212, 175, 55, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
                                 {user.kataCategory}
                               </span>
                             </div>
                           )}
                           {user.kumiteCategory && (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                              <span style={{ color: '#FCA5A5', fontWeight: 600 }}>🥊 Kumite:</span>
-                              <span style={{ color: '#F7F8FA', fontWeight: 700, backgroundColor: 'rgba(239, 68, 68, 0.2)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(248, 113, 113, 0.3)' }}>
+                              <span style={{ color: '#E2E8F0', fontWeight: 600 }}>🥊 Kumite:</span>
+                              <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(255, 255, 255, 0.1)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
                                 {user.kumiteCategory}
                               </span>
                             </div>
@@ -357,16 +360,17 @@ export default function Header() {
                         justifyContent: 'center',
                         gap: '0.45rem',
                         padding: '0.45rem',
-                        backgroundColor: 'rgba(140, 166, 248, 0.12)',
-                        border: '1px solid rgba(140, 166, 248, 0.3)',
-                        color: '#8CA6F8',
+                        backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        color: '#F5D77F',
                         borderRadius: '6px',
                         fontSize: '0.76rem',
                         fontWeight: 700,
                         cursor: 'pointer',
+                        transition: 'all 0.2s ease',
                       }}
                     >
-                      <FileText size={13} />
+                      <FileText size={13} color="#D4AF37" />
                       <span>Ver Ficha Marcial WKF</span>
                     </button>
 
@@ -375,11 +379,11 @@ export default function Header() {
                         style={{
                           marginTop: '0.5rem',
                           padding: '0.35rem 0.55rem',
-                          backgroundColor: 'rgba(234, 179, 8, 0.15)',
-                          border: '1px solid rgba(234, 179, 8, 0.3)',
+                          backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                          border: '1px solid rgba(212, 175, 55, 0.3)',
                           borderRadius: '4px',
                           fontSize: '0.72rem',
-                          color: '#FACC15',
+                          color: '#F5D77F',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.35rem',
@@ -400,17 +404,17 @@ export default function Header() {
                         gap: '0.6rem',
                         padding: '0.65rem 0.6rem',
                         marginTop: '0.5rem',
-                        backgroundColor: 'rgba(35, 52, 107, 0.3)',
-                        border: '1px solid rgba(140, 166, 248, 0.3)',
+                        backgroundColor: 'rgba(212, 175, 55, 0.14)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
                         borderRadius: '6px',
-                        color: '#8CA6F8',
+                        color: '#F5D77F',
                         textDecoration: 'none',
                         fontSize: '0.82rem',
                         fontWeight: 700,
                         transition: 'background-color 0.2s ease',
                       }}
                     >
-                      <Shield size={16} color="#8CA6F8" />
+                      <Shield size={16} color="#D4AF37" />
                       <span>Panel de Administración (/admin)</span>
                     </Link>
                   )}
@@ -429,7 +433,7 @@ export default function Header() {
                       padding: '0.5rem 0.4rem',
                       backgroundColor: 'transparent',
                       border: 'none',
-                      color: '#F87171',
+                      color: '#E5E7EB',
                       cursor: 'pointer',
                       fontSize: '0.8rem',
                       borderRadius: '4px',
@@ -448,16 +452,17 @@ export default function Header() {
                 alignItems: 'center',
                 gap: '0.55rem',
                 padding: '0.6rem 1.15rem',
-                backgroundColor: 'rgba(35, 52, 107, 0.25)',
-                border: '1px solid rgba(57, 79, 154, 0.5)',
+                backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                border: '1.5px solid rgba(212, 175, 55, 0.45)',
                 borderRadius: '4px',
-                color: '#F7F8FA',
+                color: '#FFFFFF',
                 fontSize: '0.85rem',
-                fontWeight: 700,
+                fontWeight: 800,
                 letterSpacing: '0.05em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
+                boxShadow: '0 0 15px rgba(212, 175, 55, 0.12)',
               }}
             >
               {/* Google G icon */}
@@ -497,8 +502,8 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div
           style={{
-            backgroundColor: '#0F1118',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            backgroundColor: '#090A0E',
+            borderTop: '1px solid rgba(212, 175, 55, 0.2)',
             padding: '1.5rem',
             display: 'flex',
             flexDirection: 'column',
@@ -519,9 +524,9 @@ export default function Header() {
                     textDecoration: 'none',
                     fontSize: '1.1rem',
                     fontWeight: isActive ? 800 : 500,
-                    color: isActive ? '#8CA6F8' : '#D1D5DB',
+                    color: isActive ? '#F5D77F' : '#D1D5DB',
                     padding: '0.6rem 0',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
                   }}
                 >
                   {link.name}
@@ -535,9 +540,9 @@ export default function Header() {
               <div
                 style={{
                   padding: '0.85rem',
-                  backgroundColor: '#191D28',
+                  backgroundColor: '#121318',
                   borderRadius: '6px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
@@ -546,7 +551,7 @@ export default function Header() {
                       width: '38px',
                       height: '38px',
                       borderRadius: '50%',
-                      backgroundColor: isAdmin ? '#8E2323' : '#23346B',
+                      backgroundColor: isAdmin ? '#AA7C11' : '#1A1C24',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -554,7 +559,7 @@ export default function Header() {
                       fontWeight: 700,
                       overflow: 'hidden',
                       flexShrink: 0,
-                      border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                      border: '1.5px solid rgba(212, 175, 55, 0.4)',
                     }}
                   >
                     {user.avatar ? (
@@ -572,8 +577,8 @@ export default function Header() {
                     )}
                   </div>
                   <div>
-                    <p style={{ fontWeight: 700, color: '#F7F8FA', lineHeight: 1.2 }}>{user.name}</p>
-                    <p style={{ fontSize: '0.78rem', color: '#8CA6F8', fontWeight: 600 }}>{user.kyuDan || user.belt}</p>
+                    <p style={{ fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{user.name}</p>
+                    <p style={{ fontSize: '0.78rem', color: '#F5D77F', fontWeight: 700 }}>{user.kyuDan || user.belt}</p>
                   </div>
                 </div>
 
@@ -582,13 +587,13 @@ export default function Header() {
                     style={{
                       marginTop: '0.65rem',
                       padding: '0.55rem',
-                      backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                      border: '1px solid rgba(212, 175, 55, 0.15)',
                       borderRadius: '6px',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                      <span style={{ fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.06em', color: '#9DA3B4', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.06em', color: '#D4AF37', textTransform: 'uppercase' }}>
                         Categorías WKF
                       </span>
                       {user.age && (
@@ -600,16 +605,16 @@ export default function Header() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                       {user.kataCategory && (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                          <span style={{ color: '#93C5FD', fontWeight: 600 }}>🥋 Kata:</span>
-                          <span style={{ color: '#F7F8FA', fontWeight: 700, backgroundColor: 'rgba(59, 130, 246, 0.2)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                          <span style={{ color: '#F5D77F', fontWeight: 600 }}>🥋 Kata:</span>
+                          <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(212, 175, 55, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
                             {user.kataCategory}
                           </span>
                         </div>
                       )}
                       {user.kumiteCategory && (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                          <span style={{ color: '#FCA5A5', fontWeight: 600 }}>🥊 Kumite:</span>
-                          <span style={{ color: '#F7F8FA', fontWeight: 700, backgroundColor: 'rgba(239, 68, 68, 0.2)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                          <span style={{ color: '#E2E8F0', fontWeight: 600 }}>🥊 Kumite:</span>
+                          <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(255, 255, 255, 0.1)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
                             {user.kumiteCategory}
                           </span>
                         </div>
@@ -632,21 +637,21 @@ export default function Header() {
                     justifyContent: 'center',
                     gap: '0.45rem',
                     padding: '0.5rem',
-                    backgroundColor: 'rgba(140, 166, 248, 0.12)',
-                    border: '1px solid rgba(140, 166, 248, 0.3)',
-                    color: '#8CA6F8',
+                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                    border: '1px solid rgba(212, 175, 55, 0.35)',
+                    color: '#F5D77F',
                     borderRadius: '6px',
                     fontSize: '0.78rem',
                     fontWeight: 700,
                     cursor: 'pointer',
                   }}
                 >
-                  <FileText size={14} />
+                  <FileText size={14} color="#D4AF37" />
                   <span>Ver Ficha Marcial WKF</span>
                 </button>
 
                 {user.status === 'pending' && (
-                  <p style={{ fontSize: '0.72rem', color: '#FACC15', marginTop: '0.3rem' }}>
+                  <p style={{ fontSize: '0.72rem', color: '#F5D77F', marginTop: '0.3rem' }}>
                     <Clock size={12} style={{ display: 'inline', marginRight: '4px' }} /> En espera de aprobación
                   </p>
                 )}
@@ -661,16 +666,16 @@ export default function Header() {
                       gap: '0.5rem',
                       padding: '0.5rem 0.75rem',
                       marginTop: '0.65rem',
-                      backgroundColor: 'rgba(35, 52, 107, 0.4)',
-                      border: '1px solid rgba(140, 166, 248, 0.4)',
+                      backgroundColor: 'rgba(212, 175, 55, 0.14)',
+                      border: '1px solid rgba(212, 175, 55, 0.35)',
                       borderRadius: '4px',
-                      color: '#8CA6F8',
+                      color: '#F5D77F',
                       fontWeight: 700,
                       fontSize: '0.85rem',
                       textDecoration: 'none',
                     }}
                   >
-                    <Shield size={14} /> Panel Administrativo (/admin)
+                    <Shield size={14} color="#D4AF37" /> Panel Administrativo (/admin)
                   </Link>
                 )}
 
@@ -683,7 +688,7 @@ export default function Header() {
                     marginTop: '0.65rem',
                     background: 'none',
                     border: 'none',
-                    color: '#F87171',
+                    color: '#E5E7EB',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.4rem',
@@ -707,16 +712,17 @@ export default function Header() {
                   justifyContent: 'center',
                   gap: '0.5rem',
                   padding: '0.85rem',
-                  backgroundColor: '#1C2438',
-                  border: '1px solid rgba(57, 79, 154, 0.6)',
+                  backgroundColor: '#121318',
+                  border: '1.5px solid rgba(212, 175, 55, 0.45)',
                   borderRadius: '4px',
-                  color: '#F7F8FA',
+                  color: '#FFFFFF',
                   fontSize: '0.95rem',
-                  fontWeight: 700,
+                  fontWeight: 800,
                   cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(212, 175, 55, 0.12)',
                 }}
               >
-                <LogIn size={18} /> Iniciar Sesión con Google
+                <LogIn size={18} color="#D4AF37" /> Iniciar Sesión con Google
               </button>
             )}
           </div>
@@ -730,9 +736,9 @@ export default function Header() {
             position: 'fixed',
             inset: 0,
             zIndex: 100,
-            backgroundColor: 'rgba(5, 7, 12, 0.85)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(5, 5, 8, 0.88)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -745,10 +751,10 @@ export default function Header() {
             style={{
               width: '100%',
               maxWidth: '520px',
-              backgroundColor: '#12151E',
-              border: '1px solid rgba(140, 166, 248, 0.3)',
+              backgroundColor: '#0E0F14',
+              border: '1px solid rgba(212, 175, 55, 0.35)',
               borderRadius: '16px',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 25px rgba(140, 166, 248, 0.15)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(212, 175, 55, 0.15)',
               overflow: 'hidden',
               animation: 'fadeIn 0.2s ease',
             }}
@@ -757,8 +763,8 @@ export default function Header() {
             <div
               style={{
                 padding: '1.25rem 1.5rem',
-                background: 'linear-gradient(135deg, rgba(35, 52, 107, 0.4) 0%, rgba(142, 35, 35, 0.25) 100%)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(14, 15, 20, 0.95) 100%)',
+                borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -770,20 +776,20 @@ export default function Header() {
                     width: '36px',
                     height: '36px',
                     borderRadius: '50%',
-                    backgroundColor: '#191D28',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    backgroundColor: '#16171E',
+                    border: '1px solid rgba(212, 175, 55, 0.35)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <Award size={20} color="#ECC94B" />
+                  <Award size={20} color="#D4AF37" />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#F7F8FA', margin: 0, letterSpacing: '0.02em' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#FFFFFF', margin: 0, letterSpacing: '0.02em' }}>
                     Ficha Marcial WKF
                   </h3>
-                  <p style={{ fontSize: '0.75rem', color: '#9FA6B8', margin: 0 }}>
+                  <p style={{ fontSize: '0.75rem', color: '#C5A059', margin: 0 }}>
                     Federación Mundial de Karate • Dojo Ying Yang
                   </p>
                 </div>
@@ -816,8 +822,8 @@ export default function Header() {
                   alignItems: 'center',
                   gap: '1rem',
                   padding: '1rem',
-                  backgroundColor: '#161922',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#121318',
+                  border: '1px solid rgba(212, 175, 55, 0.2)',
                   borderRadius: '10px',
                   marginBottom: '1.25rem',
                 }}
@@ -827,7 +833,7 @@ export default function Header() {
                     width: '56px',
                     height: '56px',
                     borderRadius: '50%',
-                    backgroundColor: '#23346B',
+                    backgroundColor: '#1A1C24',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -835,7 +841,7 @@ export default function Header() {
                     fontWeight: 800,
                     overflow: 'hidden',
                     flexShrink: 0,
-                    border: '2px solid rgba(140, 166, 248, 0.4)',
+                    border: '2px solid rgba(212, 175, 55, 0.5)',
                   }}
                 >
                   {user.avatar ? (
@@ -853,7 +859,7 @@ export default function Header() {
                   )}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#F7F8FA', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#FFFFFF', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {user.name}
                   </h4>
                   <p style={{ fontSize: '0.78rem', color: '#9FA6B8', margin: '0.15rem 0' }}>
@@ -864,16 +870,16 @@ export default function Header() {
                       style={{
                         fontSize: '0.72rem',
                         padding: '0.2rem 0.6rem',
-                        backgroundColor: 'rgba(140, 166, 248, 0.2)',
-                        border: '1px solid rgba(140, 166, 248, 0.4)',
-                        color: '#8CA6F8',
+                        backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        color: '#F5D77F',
                         borderRadius: '4px',
                         fontWeight: 700,
                       }}
                     >
                       {user.kyuDan || user.belt || 'Sin grado'}
                     </span>
-                    <span style={{ fontSize: '0.72rem', color: '#A0AEC0' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#D1D5DB' }}>
                       • {user.classesAttended || 0} clases asistidas
                     </span>
                   </div>
@@ -882,25 +888,25 @@ export default function Header() {
 
               {/* Ficha Física y Datos Biométricos */}
               <div style={{ marginBottom: '1.25rem' }}>
-                <h5 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.6rem' }}>
+                <h5 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#C5A059', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.6rem' }}>
                   Datos Biométricos de Competición
                 </h5>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.65rem' }}>
-                  <div style={{ backgroundColor: '#191D28', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)', textAlign: 'center' }}>
+                  <div style={{ backgroundColor: '#121318', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', textAlign: 'center' }}>
                     <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>Fecha Nac.</span>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F7F8FA' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#FFFFFF' }}>
                       {user.birthDate || 'No reg.'}
                     </span>
                   </div>
-                  <div style={{ backgroundColor: '#191D28', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)', textAlign: 'center' }}>
-                    <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>Edad Oficial</span>
-                    <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#60A5FA' }}>
+                  <div style={{ backgroundColor: '#121318', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)', textAlign: 'center' }}>
+                    <span style={{ display: 'block', fontSize: '0.7rem', color: '#C5A059', marginBottom: '0.2rem' }}>Edad Oficial</span>
+                    <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#F5D77F' }}>
                       {user.age !== undefined ? `${user.age} años` : 'N/A'}
                     </span>
                   </div>
-                  <div style={{ backgroundColor: '#191D28', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)', textAlign: 'center' }}>
+                  <div style={{ backgroundColor: '#121318', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', textAlign: 'center' }}>
                     <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>Peso Báscula</span>
-                    <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#F87171' }}>
+                    <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#FFFFFF' }}>
                       {user.weight ? `${user.weight} kg` : 'N/A'}
                     </span>
                   </div>
@@ -909,15 +915,15 @@ export default function Header() {
 
               {/* Categorías Oficiales WKF */}
               <div>
-                <h5 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.6rem' }}>
+                <h5 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#C5A059', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.6rem' }}>
                   Categorías Oficiales WKF (Calculadas)
                 </h5>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {/* Kata */}
                   <div
                     style={{
-                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                      border: '1px solid rgba(96, 165, 250, 0.25)',
+                      backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
                       borderRadius: '10px',
                       padding: '0.85rem 1rem',
                       display: 'flex',
@@ -928,10 +934,10 @@ export default function Header() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                       <span style={{ fontSize: '1.3rem' }}>🥋</span>
                       <div>
-                        <span style={{ display: 'block', fontSize: '0.72rem', color: '#93C5FD', fontWeight: 700, textTransform: 'uppercase' }}>
+                        <span style={{ display: 'block', fontSize: '0.72rem', color: '#F5D77F', fontWeight: 700, textTransform: 'uppercase' }}>
                           División Kata (Formas)
                         </span>
-                        <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#F7F8FA' }}>
+                        <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#FFFFFF' }}>
                           {user.kataCategory || 'Pendiente de cálculo (registra fecha de nacimiento)'}
                         </span>
                       </div>
@@ -941,8 +947,8 @@ export default function Header() {
                   {/* Kumite */}
                   <div
                     style={{
-                      backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                      border: '1px solid rgba(248, 113, 113, 0.25)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.18)',
                       borderRadius: '10px',
                       padding: '0.85rem 1rem',
                       display: 'flex',
@@ -953,10 +959,10 @@ export default function Header() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                       <span style={{ fontSize: '1.3rem' }}>🥊</span>
                       <div>
-                        <span style={{ display: 'block', fontSize: '0.72rem', color: '#FCA5A5', fontWeight: 700, textTransform: 'uppercase' }}>
+                        <span style={{ display: 'block', fontSize: '0.72rem', color: '#D1D5DB', fontWeight: 700, textTransform: 'uppercase' }}>
                           División Kumite (Combate)
                         </span>
-                        <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#F7F8FA' }}>
+                        <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#FFFFFF' }}>
                           {user.kumiteCategory || 'Pendiente de cálculo (registra peso y fecha de nacimiento)'}
                         </span>
                       </div>
@@ -974,10 +980,10 @@ export default function Header() {
             <div
               style={{
                 padding: '0.85rem 1.5rem',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                borderTop: '1px solid rgba(212, 175, 55, 0.15)',
                 display: 'flex',
                 justifyContent: 'flex-end',
-                backgroundColor: '#0F1118',
+                backgroundColor: '#08080C',
               }}
             >
               <button
@@ -985,13 +991,14 @@ export default function Header() {
                 onClick={() => setIsFichaModalOpen(false)}
                 style={{
                   padding: '0.55rem 1.25rem',
-                  backgroundColor: '#1E2333',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  backgroundColor: '#15161D',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
                   borderRadius: '6px',
-                  color: '#F7F8FA',
+                  color: '#FFFFFF',
                   fontSize: '0.85rem',
                   fontWeight: 600,
                   cursor: 'pointer',
+                  transition: 'border-color 0.2s',
                 }}
               >
                 Cerrar

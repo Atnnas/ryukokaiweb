@@ -240,10 +240,10 @@ export default function AdminAttendancePage() {
                 alignItems: 'center',
                 gap: '0.35rem',
                 padding: '0.2rem 0.6rem',
-                backgroundColor: 'rgba(35, 52, 107, 0.3)',
-                border: '1px solid rgba(140, 166, 248, 0.4)',
+                backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
                 borderRadius: '20px',
-                color: '#8CA6F8',
+                color: '#F5D77F',
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.05em',
@@ -409,8 +409,8 @@ export default function AdminAttendancePage() {
               padding: '0.45rem 0.85rem',
               backgroundColor:
                 selectedDate === new Date().toISOString().split('T')[0]
-                  ? 'rgba(35, 52, 107, 0.4)'
-                  : '#161922',
+                  ? 'rgba(212, 175, 55, 0.25)'
+                  : '#0E0F14',
               border: '1px solid rgba(255, 255, 255, 0.12)',
               borderRadius: '4px',
               color: '#F7F8FA',
@@ -650,13 +650,13 @@ export default function AdminAttendancePage() {
               width: '42px',
               height: '42px',
               borderRadius: '8px',
-              backgroundColor: 'rgba(35, 52, 107, 0.3)',
+              backgroundColor: 'rgba(212, 175, 55, 0.15)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Users size={22} color="#8CA6F8" />
+            <Users size={22} color="#F5D77F" />
           </div>
           <div>
             <p
@@ -867,7 +867,7 @@ export default function AdminAttendancePage() {
                             gap: '0.35rem',
                             fontSize: '0.82rem',
                             fontWeight: 700,
-                            color: '#8CA6F8',
+                            color: '#F5D77F',
                           }}
                         >
                           <Award size={14} color="#ECC94B" />

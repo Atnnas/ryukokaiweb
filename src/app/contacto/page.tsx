@@ -18,8 +18,8 @@ export default function ContactoPage() {
       <section
         style={{
           padding: 'clamp(3rem, 6vw, 5rem) 0 3rem',
-          backgroundColor: '#0C0E14',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundColor: '#0A0B0E',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
         }}
       >
         <div className="container-dojo">
@@ -28,7 +28,7 @@ export default function ContactoPage() {
               style={{
                 fontSize: '0.8rem',
                 fontWeight: 700,
-                color: '#8CA6F8',
+                color: '#F5D77F',
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 display: 'block',
@@ -172,16 +172,16 @@ export default function ContactoPage() {
               }}
             >
               <div>
-                <h2 style={{ fontSize: '1.5rem', color: '#F7F8FA', marginBottom: '1.5rem', fontWeight: 800 }}>
+                <h2 style={{ fontSize: '1.5rem', color: '#FFFFFF', marginBottom: '1.5rem', fontWeight: 800 }}>
                   Información del Dojo
                 </h2>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', fontSize: '0.92rem', color: '#9DA3B4' }}>
                   {/* Dirección */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
-                    <MapPin size={22} color="#E55353" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <MapPin size={22} color="#D4AF37" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div>
-                      <strong style={{ color: '#F7F8FA', display: 'block', fontSize: '0.95rem' }}>
+                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
                         Dirección Central
                       </strong>
                       <span style={{ color: '#CBD5E1' }}>Av. de las Artes Marciales #108, Col. Tradición, Zona Centro</span>
@@ -193,9 +193,9 @@ export default function ContactoPage() {
 
                   {/* Horario */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
-                    <Clock size={22} color="#8CA6F8" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <Clock size={22} color="#F5D77F" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <div>
-                      <strong style={{ color: '#F7F8FA', display: 'block', fontSize: '0.95rem' }}>
+                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
                         Horario de Atención en Recepción
                       </strong>
                       <span style={{ color: '#CBD5E1' }}>Lunes a Viernes: 15:30 - 21:30 hrs</span>
@@ -206,9 +206,9 @@ export default function ContactoPage() {
 
                   {/* Teléfono */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <Phone size={22} color="#48BB78" style={{ flexShrink: 0 }} />
+                    <Phone size={22} color="#D4AF37" style={{ flexShrink: 0 }} />
                     <div>
-                      <strong style={{ color: '#F7F8FA', display: 'block', fontSize: '0.95rem' }}>
+                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
                         Línea Telefónica Directa
                       </strong>
                       <span style={{ color: '#CBD5E1' }}>+52 (55) 1234-5678</span>
@@ -217,9 +217,9 @@ export default function ContactoPage() {
 
                   {/* Correo */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <Mail size={22} color="#ECC94B" style={{ flexShrink: 0 }} />
+                    <Mail size={22} color="#F5D77F" style={{ flexShrink: 0 }} />
                     <div>
-                      <strong style={{ color: '#F7F8FA', display: 'block', fontSize: '0.95rem' }}>
+                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
                         Correo Electrónico
                       </strong>
                       <span style={{ color: '#CBD5E1' }}>contacto@dojoyingyang.com</span>
@@ -233,8 +233,8 @@ export default function ContactoPage() {
                 style={{
                   marginTop: '2rem',
                   padding: '1.35rem',
-                  backgroundColor: '#161922',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#0E0F14',
+                  border: '1px solid rgba(212, 175, 55, 0.2)',
                   borderRadius: '10px',
                   display: 'flex',
                   alignItems: 'center',
@@ -244,7 +244,7 @@ export default function ContactoPage() {
                 }}
               >
                 <div>
-                  <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#F7F8FA', margin: 0 }}>
+                  <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
                     Tatami Principal Dojo Ying Yang
                   </p>
                   <p style={{ fontSize: '0.78rem', color: '#9FA6B8', margin: '0.2rem 0 0' }}>
@@ -261,11 +261,11 @@ export default function ContactoPage() {
                     gap: '0.4rem',
                     fontSize: '0.82rem',
                     fontWeight: 700,
-                    color: '#8CA6F8',
+                    color: '#F5D77F',
                     textDecoration: 'none',
                     padding: '0.4rem 0.8rem',
-                    backgroundColor: 'rgba(140, 166, 248, 0.1)',
-                    border: '1px solid rgba(140, 166, 248, 0.25)',
+                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
                     borderRadius: '6px',
                   }}
                 >

@@ -16,8 +16,8 @@ export default function NosotrosPage() {
       <section
         style={{
           padding: 'clamp(3rem, 6vw, 5rem) 0 3rem',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          backgroundColor: '#0C0E14',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+          backgroundColor: '#0A0B0E',
           position: 'relative',
         }}
       >
@@ -27,7 +27,7 @@ export default function NosotrosPage() {
               style={{
                 fontSize: '0.8rem',
                 fontWeight: 700,
-                color: '#8CA6F8',
+                color: '#F5D77F',
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 display: 'block',
@@ -58,7 +58,7 @@ export default function NosotrosPage() {
             }}
           >
             <div>
-              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#FF8A8A', letterSpacing: '0.15em', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#F5D77F', letterSpacing: '0.15em', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
                 Nuestra Génesis
               </span>
               <h2 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', marginBottom: '1.25rem' }}>
@@ -72,14 +72,14 @@ export default function NosotrosPage() {
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-                <div style={{ padding: '1.25rem', backgroundColor: '#131620', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px' }}>
-                  <Award size={24} color="#8CA6F8" style={{ marginBottom: '0.5rem' }} />
-                  <h4 style={{ fontSize: '1.1rem', margin: 0, color: '#F7F8FA' }}>Afiliación Oficial</h4>
+                <div style={{ padding: '1.25rem', backgroundColor: '#0E0F14', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '8px' }}>
+                  <Award size={24} color="#D4AF37" style={{ marginBottom: '0.5rem' }} />
+                  <h4 style={{ fontSize: '1.1rem', margin: 0, color: '#FFFFFF' }}>Afiliación Oficial</h4>
                   <p style={{ fontSize: '0.82rem', color: '#9DA3B4', margin: '0.35rem 0 0' }}>Reconocidos por federaciones nacionales e internacionales de Karate Do.</p>
                 </div>
-                <div style={{ padding: '1.25rem', backgroundColor: '#131620', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px' }}>
-                  <Shield size={24} color="#FF8A8A" style={{ marginBottom: '0.5rem' }} />
-                  <h4 style={{ fontSize: '1.1rem', margin: 0, color: '#F7F8FA' }}>Espacio Seguro</h4>
+                <div style={{ padding: '1.25rem', backgroundColor: '#0E0F14', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '8px' }}>
+                  <Shield size={24} color="#F5D77F" style={{ marginBottom: '0.5rem' }} />
+                  <h4 style={{ fontSize: '1.1rem', margin: 0, color: '#FFFFFF' }}>Espacio Seguro</h4>
                   <p style={{ fontSize: '0.82rem', color: '#9DA3B4', margin: '0.35rem 0 0' }}>Ambiente familiar con protocolos estrictos de cuidado y cero tolerancia al abuso.</p>
                 </div>
               </div>
@@ -96,12 +96,12 @@ export default function NosotrosPage() {
                 style={{
                   width: '100%',
                   maxWidth: '440px',
-                  backgroundColor: '#11141C',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  backgroundColor: '#0E0F14',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
                   borderRadius: '16px',
                   padding: '2.5rem',
                   textAlign: 'center',
-                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.1)',
                 }}
               >
                 <div
@@ -113,15 +113,15 @@ export default function NosotrosPage() {
                   }}
                 >
                   <Image
-                    src="/images/logos/Logo_Blanco_Transparente.png"
-                    alt="Emblema Dojo Ying Yang"
+                    src="/images/logos/LogoRyukukaiSinFondo.png"
+                    alt="Emblema Oficial Ryūko Kai"
                     fill
                     sizes="160px"
                     style={{ objectFit: 'contain' }}
                   />
                 </div>
 
-                <h3 style={{ fontSize: '1.3rem', color: '#F7F8FA', marginBottom: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.3rem', color: '#FFFFFF', marginBottom: '0.5rem' }}>
                   Uniformes & Grados Certificados
                 </h3>
                 <p style={{ fontSize: '0.88rem', color: '#9DA3B4', lineHeight: 1.6, marginBottom: '1.5rem' }}>
@@ -132,21 +132,22 @@ export default function NosotrosPage() {
                   style={{
                     display: 'flex',
                     justifyContent: 'center',
-                    gap: '1rem',
+                    gap: '0.75rem',
+                    flexWrap: 'wrap',
                     fontSize: '0.8rem',
-                    color: '#CBD5E1',
+                    color: '#F5D77F',
                   }}
                 >
-                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px' }}>
+                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '4px' }}>
                     Kata
                   </span>
-                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px' }}>
+                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '4px' }}>
                     Kumite
                   </span>
-                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px' }}>
+                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '4px' }}>
                     Bunkai
                   </span>
-                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px' }}>
+                  <span style={{ padding: '0.35rem 0.75rem', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '4px' }}>
                     Kihon
                   </span>
                 </div>

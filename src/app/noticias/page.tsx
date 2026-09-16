@@ -178,8 +178,8 @@ export default function NoticiasPage() {
       default:
         return {
           name: 'Oficial Dojo',
-          bg: 'linear-gradient(135deg, var(--color-ying) 0%, var(--color-yang) 100%)',
-          color: '#ffffff',
+          bg: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)',
+          color: '#08080A',
           icon: <ShieldCheck size={14} />
         };
     }
@@ -191,8 +191,8 @@ export default function NoticiasPage() {
       <section
         style={{
           padding: 'clamp(3rem, 6vw, 5rem) 0 3rem',
-          backgroundColor: '#0C0E14',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundColor: '#0A0B0E',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
         }}
       >
         <div className="container-dojo">
@@ -201,7 +201,7 @@ export default function NoticiasPage() {
               style={{
                 fontSize: '0.8rem',
                 fontWeight: 700,
-                color: '#8CA6F8',
+                color: '#F5D77F',
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
                 display: 'block',
@@ -221,7 +221,7 @@ export default function NoticiasPage() {
       </section>
 
       {/* ================= PANEL DE SINCRONIZACIÓN Y PREVISTA ================= */}
-      <section style={{ padding: '2rem 0', backgroundColor: '#090A0E', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+      <section style={{ padding: '2rem 0', backgroundColor: '#070709', borderBottom: '1px solid rgba(212, 175, 55, 0.12)' }}>
         <div className="container-dojo">
           <div
             style={{
@@ -230,8 +230,8 @@ export default function NoticiasPage() {
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '1.25rem',
-              backgroundColor: '#131620',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: '#0E0F14',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
               borderRadius: '8px',
               padding: '1rem 1.5rem',
             }}
@@ -242,8 +242,8 @@ export default function NoticiasPage() {
                   width: '38px',
                   height: '38px',
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(57, 79, 154, 0.25)',
-                  color: '#8CA6F8',
+                  backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                  color: '#F5D77F',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -252,7 +252,7 @@ export default function NoticiasPage() {
                 <Sparkles size={20} />
               </div>
               <div>
-                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#F7F8FA', margin: 0 }}>
+                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
                   Prevista de Sincronización Social Activa
                 </p>
                 <p style={{ fontSize: '0.78rem', color: '#9DA3B4', margin: '0.15rem 0 0' }}>
@@ -270,10 +270,10 @@ export default function NoticiasPage() {
                   alignItems: 'center',
                   gap: '0.5rem',
                   padding: '0.5rem 1rem',
-                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
                   borderRadius: '6px',
-                  color: '#E2E8F0',
+                  color: '#F5D77F',
                   fontSize: '0.85rem',
                   fontWeight: 600,
                   cursor: isSyncing ? 'not-allowed' : 'pointer',
@@ -292,10 +292,10 @@ export default function NoticiasPage() {
                     alignItems: 'center',
                     gap: '0.5rem',
                     padding: '0.5rem 1rem',
-                    backgroundColor: 'rgba(35, 52, 107, 0.4)',
-                    border: '1px solid rgba(57, 79, 154, 0.5)',
+                    backgroundColor: 'rgba(212, 175, 55, 0.18)',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
                     borderRadius: '6px',
-                    color: '#F7F8FA',
+                    color: '#F5D77F',
                     fontSize: '0.85rem',
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -332,8 +332,8 @@ export default function NoticiasPage() {
               style={{
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
-                border: selectedFilter === 'all' ? '1px solid #4F6BFF' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'all' ? 'rgba(35, 52, 107, 0.5)' : '#12151E',
+                border: selectedFilter === 'all' ? '1px solid var(--color-gold)' : '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: selectedFilter === 'all' ? 'rgba(212, 175, 55, 0.2)' : '#0E0F14',
                 color: selectedFilter === 'all' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -349,7 +349,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'instagram' ? '1px solid #E1306C' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'instagram' ? 'rgba(225, 48, 108, 0.25)' : '#12151E',
+                backgroundColor: selectedFilter === 'instagram' ? 'rgba(225, 48, 108, 0.25)' : '#0E0F14',
                 color: selectedFilter === 'instagram' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -365,7 +365,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'facebook' ? '1px solid #1877F2' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'facebook' ? 'rgba(24, 119, 242, 0.25)' : '#12151E',
+                backgroundColor: selectedFilter === 'facebook' ? 'rgba(24, 119, 242, 0.25)' : '#0E0F14',
                 color: selectedFilter === 'facebook' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -381,7 +381,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'youtube' ? '1px solid #FF0000' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'youtube' ? 'rgba(255, 0, 0, 0.25)' : '#12151E',
+                backgroundColor: selectedFilter === 'youtube' ? 'rgba(255, 0, 0, 0.25)' : '#0E0F14',
                 color: selectedFilter === 'youtube' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -396,8 +396,8 @@ export default function NoticiasPage() {
               style={{
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
-                border: selectedFilter === 'official' ? '1px solid #E55353' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'official' ? 'rgba(184, 49, 49, 0.3)' : '#12151E',
+                border: selectedFilter === 'official' ? '1px solid var(--color-gold)' : '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: selectedFilter === 'official' ? 'rgba(212, 175, 55, 0.25)' : '#0E0F14',
                 color: selectedFilter === 'official' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -462,7 +462,7 @@ export default function NoticiasPage() {
                     </div>
 
                     {/* Título y Contenido */}
-                    <h3 style={{ fontSize: '1.25rem', color: '#F7F8FA', lineHeight: 1.35, marginBottom: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.25rem', color: '#FFFFFF', lineHeight: 1.35, marginBottom: '0.75rem' }}>
                       {item.title}
                     </h3>
                     <p style={{ fontSize: '0.9rem', color: '#CBD5E1', lineHeight: 1.6, marginBottom: '1.25rem' }}>
@@ -478,8 +478,9 @@ export default function NoticiasPage() {
                             fontSize: '0.72rem',
                             padding: '0.2rem 0.55rem',
                             borderRadius: '4px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            color: '#9DA3B4',
+                            backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                            color: '#F5D77F',
+                            border: '1px solid rgba(212, 175, 55, 0.2)',
                           }}
                         >
                           #{t}
@@ -507,14 +508,14 @@ export default function NoticiasPage() {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.35rem',
-                          color: isLiked ? '#F87171' : '#9DA3B4',
+                          color: isLiked ? '#F5D77F' : '#9DA3B4',
                           fontSize: '0.85rem',
                           cursor: 'pointer',
                           padding: 0,
                           transition: 'color 0.2s',
                         }}
                       >
-                        <Heart size={16} fill={isLiked ? '#F87171' : 'none'} />
+                        <Heart size={16} fill={isLiked ? '#F5D77F' : 'none'} />
                         <span>{totalLikes}</span>
                       </button>
 
@@ -534,7 +535,7 @@ export default function NoticiasPage() {
                         gap: '0.35rem',
                         fontSize: '0.8rem',
                         fontWeight: 700,
-                        color: '#8CA6F8',
+                        color: '#F5D77F',
                         textDecoration: 'none',
                       }}
                     >

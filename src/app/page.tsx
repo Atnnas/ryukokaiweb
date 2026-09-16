@@ -40,9 +40,10 @@ export default function HomePage() {
                   gap: '0.65rem',
                   padding: '0.45rem 1rem',
                   borderRadius: '30px',
-                  backgroundColor: 'rgba(35, 52, 107, 0.25)',
-                  border: '1px solid rgba(140, 166, 248, 0.3)',
+                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
                   marginBottom: '1.25rem',
+                  boxShadow: '0 0 15px rgba(212, 175, 55, 0.1)',
                 }}
               >
                 <div
@@ -50,17 +51,17 @@ export default function HomePage() {
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
-                    backgroundColor: '#8CA6F8',
-                    boxShadow: '0 0 8px #8CA6F8',
+                    backgroundColor: '#D4AF37',
+                    boxShadow: '0 0 8px #D4AF37',
                   }}
                 />
                 <span
                   style={{
                     fontSize: '0.78rem',
-                    fontWeight: 700,
+                    fontWeight: 800,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
-                    color: '#8CA6F8',
+                    color: '#F5D77F',
                   }}
                 >
                   Dojo Tradicional & Kumite Deportivo
@@ -74,13 +75,13 @@ export default function HomePage() {
                   lineHeight: 1.08,
                   letterSpacing: '-0.02em',
                   marginBottom: '1.25rem',
-                  color: '#F7F8FA',
+                  color: '#FFFFFF',
                 }}
               >
                 Camino a la Excelencia Marcial en{' '}
                 <span
                   style={{
-                    background: 'linear-gradient(135deg, #8CA6F8 0%, #E55353 100%)',
+                    background: 'linear-gradient(135deg, #FFFFFF 0%, #F5D77F 50%, #D4AF37 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                   }}
@@ -92,13 +93,13 @@ export default function HomePage() {
               <p
                 style={{
                   fontSize: 'clamp(1rem, 1.6vw, 1.15rem)',
-                  color: '#9FA6B8',
+                  color: '#D1D5DB',
                   lineHeight: 1.65,
                   marginBottom: '1.75rem',
                   maxWidth: '640px',
                 }}
               >
-                Forjamos mente, cuerpo y espíritu a través del Karate Do. Descubre la armonía entre la serenidad reflexiva del <strong>Ying</strong> y la fuerza contundente del <strong>Yang</strong>.
+                Forjamos mente, cuerpo y espíritu a través del Karate Do. Descubre la armonía entre la serenidad reflexiva del <strong style={{ color: '#F5D77F' }}>Ying</strong> y la fuerza contundente del <strong style={{ color: '#FFFFFF' }}>Yang</strong>.
               </p>
 
               {/* Cintillo / Pasarela de Patrocinadores */}
@@ -119,17 +120,16 @@ export default function HomePage() {
                 style={{
                   width: '100%',
                   maxWidth: '520px',
-                  background: 'linear-gradient(145deg, rgba(25, 29, 40, 0.75) 0%, rgba(13, 14, 18, 0.95) 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  background: 'linear-gradient(145deg, rgba(16, 18, 24, 0.85) 0%, rgba(8, 9, 12, 0.98) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
                   borderRadius: '16px',
                   padding: 'clamp(2rem, 4vw, 3rem)',
-                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 60px rgba(35, 52, 107, 0.25)',
+                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(212, 175, 55, 0.15)',
                   position: 'relative',
                   overflow: 'hidden',
                   textAlign: 'center',
                 }}
               >
-                {/* Kanji de Fondo en Marca de Agua */}
                 {/* Símbolo Central: Logo Oficial */}
                 <div
                   style={{
@@ -137,12 +137,12 @@ export default function HomePage() {
                     height: 'clamp(180px, 30vw, 250px)',
                     margin: '0 auto 1.5rem',
                     position: 'relative',
-                    filter: 'drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5))',
+                    filter: 'drop-shadow(0 10px 25px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px rgba(212, 175, 55, 0.2))',
                   }}
                 >
                   <Image
-                    src="/images/logos/Logo_Blanco_Color_Transparente.png"
-                    alt="Logo Insignia Dojo Ying Yang"
+                    src="/images/logos/LogoRyukukaiSinFondo.png"
+                    alt="Logo Insignia Oficial Ryūko Kai"
                     fill
                     sizes="(max-width: 768px) 200px, 250px"
                     style={{ objectFit: 'contain' }}
@@ -156,7 +156,7 @@ export default function HomePage() {
                     fontWeight: 900,
                     letterSpacing: '0.1em',
                     marginBottom: '0.5rem',
-                    color: '#F7F8FA',
+                    color: '#FFFFFF',
                   }}
                 >
                   DOJO YING YANG
@@ -165,22 +165,22 @@ export default function HomePage() {
                   El arte de vencer sin luchar y la firmeza del golpe que nace de la calma interior.
                 </p>
 
-                {/* Dualidad Ying Yang Badges */}
+                {/* Dualidad Ying Yang Badges en Dorado y Blanco */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
                   <div
                     style={{
                       padding: '0.85rem',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(35, 52, 107, 0.25)',
-                      border: '1px solid rgba(57, 79, 154, 0.4)',
+                      backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                      border: '1px solid rgba(212, 175, 55, 0.35)',
                       textAlign: 'left',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#8CA6F8', fontWeight: 700, fontSize: '0.85rem' }}>
-                      <Droplets size={16} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#F5D77F', fontWeight: 800, fontSize: '0.85rem' }}>
+                      <Droplets size={16} color="#D4AF37" />
                       <span>YING</span>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: '#9FA6B8', margin: '0.3rem 0 0' }}>
+                    <p style={{ fontSize: '0.75rem', color: '#CBD5E1', margin: '0.3rem 0 0' }}>
                       Técnica, defensa, fluidez, concentración y autocontrol.
                     </p>
                   </div>
@@ -189,16 +189,16 @@ export default function HomePage() {
                     style={{
                       padding: '0.85rem',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(142, 35, 35, 0.25)',
-                      border: '1px solid rgba(184, 49, 49, 0.4)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.18)',
                       textAlign: 'left',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#FF8A8A', fontWeight: 700, fontSize: '0.85rem' }}>
-                      <Flame size={16} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#FFFFFF', fontWeight: 800, fontSize: '0.85rem' }}>
+                      <Flame size={16} color="#FFFFFF" />
                       <span>YANG</span>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: '#9FA6B8', margin: '0.3rem 0 0' }}>
+                    <p style={{ fontSize: '0.75rem', color: '#CBD5E1', margin: '0.3rem 0 0' }}>
                       Impacto, potencia, espíritu indomable y resolución.
                     </p>
                   </div>

@@ -29,11 +29,11 @@ export default function GoogleAuthModal() {
         style={{
           width: '100%',
           maxWidth: '460px',
-          backgroundColor: '#12151E',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: '#0E0F14',
+          border: '1px solid rgba(212, 175, 55, 0.25)',
           borderRadius: '12px',
           padding: 'clamp(1.5rem, 5vw, 2.25rem)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px rgba(35, 52, 107, 0.25)',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7), 0 0 35px rgba(212, 175, 55, 0.15)',
           position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -70,9 +70,9 @@ export default function GoogleAuthModal() {
               gap: '0.5rem',
               padding: '0.35rem 0.85rem',
               borderRadius: '20px',
-              backgroundColor: 'rgba(35, 52, 107, 0.25)',
-              border: '1px solid rgba(57, 79, 154, 0.4)',
-              color: '#8CA6F8',
+              backgroundColor: 'rgba(212, 175, 55, 0.12)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              color: '#F5D77F',
               fontSize: '0.75rem',
               fontWeight: 700,
               letterSpacing: '0.06em',
@@ -82,7 +82,7 @@ export default function GoogleAuthModal() {
           >
             <ShieldCheck size={14} /> Portal de Alumnos & Maestros
           </div>
-          <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: '#F7F8FA' }}>
+          <h3 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: '#FFFFFF' }}>
             Acceso al Dojo Ying Yang
           </h3>
           <p style={{ fontSize: '0.875rem', color: '#9FA6B8', lineHeight: 1.5 }}>
@@ -146,16 +146,16 @@ export default function GoogleAuthModal() {
             gap: '0.65rem',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#8891A6' }}>
-            <CheckCircle2 size={15} color="#48BB78" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#D1D5DB' }}>
+            <CheckCircle2 size={15} color="#D4AF37" />
             <span>Registro de asistencias y calendario de entrenamientos</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#8891A6' }}>
-            <Award size={15} color="#ECC94B" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#D1D5DB' }}>
+            <Award size={15} color="#F5D77F" />
             <span>Historial de grados (Kyu / Dan) y preparación para exámenes</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#8891A6' }}>
-            <Lock size={15} color="#4299E1" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#D1D5DB' }}>
+            <Lock size={15} color="#D4AF37" />
             <span>Seguridad y privacidad respaldadas por Google Identity</span>
           </div>
         </div>

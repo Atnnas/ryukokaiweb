@@ -31,14 +31,14 @@ export default function AdminLayout({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#0B0C10',
+          backgroundColor: '#070709',
         }}
       >
         <div style={{ textAlign: 'center', color: '#9FA6B8' }}>
           <RefreshCw
             size={36}
             className="spin-animation"
-            style={{ color: '#8CA6F8', margin: '0 auto 1rem' }}
+            style={{ color: '#F5D77F', margin: '0 auto 1rem' }}
           />
           <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>
             Verificando credenciales de acceso...
@@ -80,9 +80,9 @@ export default function AdminLayout({
           alignItems: 'center',
           justifyContent: 'center',
           padding: '2rem 1rem',
-          backgroundColor: '#0B0C10',
+          backgroundColor: '#070709',
           backgroundImage:
-            'radial-gradient(circle at top right, rgba(142, 35, 35, 0.12) 0%, transparent 60%)',
+            'radial-gradient(circle at top right, rgba(212, 175, 55, 0.12) 0%, transparent 60%)',
         }}
       >
         <div
@@ -92,8 +92,9 @@ export default function AdminLayout({
             width: '100%',
             textAlign: 'center',
             padding: '3rem 2.2rem',
-            border: '1px solid rgba(142, 35, 35, 0.35)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+            backgroundColor: '#0E0F14',
+            border: '1px solid rgba(212, 175, 55, 0.35)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.7), 0 0 30px rgba(212, 175, 55, 0.1)',
           }}
         >
           <div
@@ -101,15 +102,15 @@ export default function AdminLayout({
               width: '74px',
               height: '74px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(142, 35, 35, 0.15)',
-              border: '2px solid rgba(184, 49, 49, 0.4)',
+              backgroundColor: 'rgba(212, 175, 55, 0.12)',
+              border: '2px solid rgba(212, 175, 55, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 1.5rem',
             }}
           >
-            <Lock size={36} color="#E55353" />
+            <Lock size={36} color="#D4AF37" />
           </div>
 
           <span
@@ -118,7 +119,7 @@ export default function AdminLayout({
               fontWeight: 800,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
-              color: '#E55353',
+              color: '#F5D77F',
               display: 'block',
               marginBottom: '0.5rem',
             }}
@@ -130,7 +131,7 @@ export default function AdminLayout({
             style={{
               fontSize: '1.75rem',
               fontWeight: 800,
-              color: '#F7F8FA',
+              color: '#FFFFFF',
               marginBottom: '1rem',
             }}
           >
@@ -145,10 +146,10 @@ export default function AdminLayout({
               marginBottom: '2rem',
             }}
           >
-            La sección administrativa y todas sus subrutas son accesibles <strong>única y exclusivamente</strong> para cuentas con el rol de <strong style={{ color: '#F7F8FA' }}>administrator</strong> (el rol más elevado del Dojo Ying Yang).
+            La sección administrativa y todas sus subrutas son accesibles <strong>única y exclusivamente</strong> para cuentas con el rol de <strong style={{ color: '#FFFFFF' }}>administrator</strong> (el rol más elevado del Dojo Ying Yang).
             {user ? (
               <span style={{ display: 'block', marginTop: '0.75rem', padding: '0.65rem', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '6px' }}>
-                Has iniciado sesión como <strong style={{ color: '#F7F8FA' }}>{user.email}</strong>, pero tu rol actual es <strong style={{ color: '#E55353' }}>{user.role}</strong> {user.status !== 'active' ? `(estado: ${user.status})` : ''}. No posees permisos de administrador activo.
+                Has iniciado sesión como <strong style={{ color: '#FFFFFF' }}>{user.email}</strong>, pero tu rol actual es <strong style={{ color: '#F5D77F' }}>{user.role}</strong> {user.status !== 'active' ? `(estado: ${user.status})` : ''}. No posees permisos de administrador activo.
               </span>
             ) : (
               <span style={{ display: 'block', marginTop: '0.75rem' }}>
@@ -202,7 +203,7 @@ export default function AdminLayout({
       className="admin-shell"
       style={{
         minHeight: '100vh',
-        backgroundColor: '#0B0C10',
+        backgroundColor: '#070709',
         display: 'flex',
       }}
     >
@@ -213,8 +214,8 @@ export default function AdminLayout({
         className="admin-sidebar"
         style={{
           width: '260px',
-          backgroundColor: '#0F121A',
-          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundColor: '#0A0B0E',
+          borderRight: '1px solid rgba(212, 175, 55, 0.12)',
           display: 'flex',
           flexDirection: 'column',
           flexShrink: 0,
@@ -230,7 +231,7 @@ export default function AdminLayout({
           className="admin-brand-box"
           style={{
             paddingBottom: '1.25rem',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            borderBottom: '1px solid rgba(212, 175, 55, 0.12)',
             marginBottom: '1.25rem',
           }}
         >
@@ -246,21 +247,21 @@ export default function AdminLayout({
                 width: '34px',
                 height: '34px',
                 borderRadius: '50%',
-                backgroundColor: '#23346B',
+                backgroundColor: 'rgba(212, 175, 55, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1px solid rgba(140, 166, 248, 0.3)',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
               }}
             >
-              <ShieldCheck size={18} color="#8CA6F8" />
+              <ShieldCheck size={18} color="#F5D77F" />
             </div>
             <div>
               <span
                 style={{
                   fontSize: '0.85rem',
                   fontWeight: 900,
-                  color: '#F7F8FA',
+                  color: '#FFFFFF',
                   letterSpacing: '0.04em',
                 }}
               >
@@ -270,7 +271,7 @@ export default function AdminLayout({
                 style={{
                   display: 'block',
                   fontSize: '0.68rem',
-                  color: '#9FA6B8',
+                  color: '#F5D77F',
                   textTransform: 'uppercase',
                 }}
               >
@@ -300,12 +301,12 @@ export default function AdminLayout({
               padding: '0.85rem 1rem',
               borderRadius: '8px',
               border: isUsersActive
-                ? '1px solid rgba(140, 166, 248, 0.4)'
+                ? '1px solid rgba(212, 175, 55, 0.4)'
                 : '1px solid transparent',
               backgroundColor: isUsersActive
-                ? 'rgba(35, 52, 107, 0.45)'
+                ? 'rgba(212, 175, 55, 0.15)'
                 : 'transparent',
-              color: isUsersActive ? '#F7F8FA' : '#9FA6B8',
+              color: isUsersActive ? '#FFFFFF' : '#9FA6B8',
               fontSize: '0.9rem',
               fontWeight: isUsersActive ? 700 : 500,
               textDecoration: 'none',
@@ -321,7 +322,7 @@ export default function AdminLayout({
             >
               <Users
                 size={18}
-                color={isUsersActive ? '#8CA6F8' : '#9FA6B8'}
+                color={isUsersActive ? '#F5D77F' : '#9FA6B8'}
               />
               <span>Usuarios</span>
             </div>
@@ -337,12 +338,12 @@ export default function AdminLayout({
               padding: '0.85rem 1rem',
               borderRadius: '8px',
               border: isAttendanceActive
-                ? '1px solid rgba(140, 166, 248, 0.4)'
+                ? '1px solid rgba(212, 175, 55, 0.4)'
                 : '1px solid transparent',
               backgroundColor: isAttendanceActive
-                ? 'rgba(35, 52, 107, 0.45)'
+                ? 'rgba(212, 175, 55, 0.15)'
                 : 'transparent',
-              color: isAttendanceActive ? '#F7F8FA' : '#9FA6B8',
+              color: isAttendanceActive ? '#FFFFFF' : '#9FA6B8',
               fontSize: '0.9rem',
               fontWeight: isAttendanceActive ? 700 : 500,
               textDecoration: 'none',
@@ -358,7 +359,7 @@ export default function AdminLayout({
             >
               <CalendarCheck
                 size={18}
-                color={isAttendanceActive ? '#8CA6F8' : '#9FA6B8'}
+                color={isAttendanceActive ? '#F5D77F' : '#9FA6B8'}
               />
               <span>Asistencia</span>
             </div>
@@ -374,12 +375,12 @@ export default function AdminLayout({
               padding: '0.85rem 1rem',
               borderRadius: '8px',
               border: isSponsorsActive
-                ? '1px solid rgba(140, 166, 248, 0.4)'
+                ? '1px solid rgba(212, 175, 55, 0.4)'
                 : '1px solid transparent',
               backgroundColor: isSponsorsActive
-                ? 'rgba(35, 52, 107, 0.45)'
+                ? 'rgba(212, 175, 55, 0.15)'
                 : 'transparent',
-              color: isSponsorsActive ? '#F7F8FA' : '#9FA6B8',
+              color: isSponsorsActive ? '#FFFFFF' : '#9FA6B8',
               fontSize: '0.9rem',
               fontWeight: isSponsorsActive ? 700 : 500,
               textDecoration: 'none',
@@ -395,7 +396,7 @@ export default function AdminLayout({
             >
               <Handshake
                 size={18}
-                color={isSponsorsActive ? '#8CA6F8' : '#9FA6B8'}
+                color={isSponsorsActive ? '#F5D77F' : '#9FA6B8'}
               />
               <span>Patrocinadores</span>
             </div>
@@ -407,7 +408,7 @@ export default function AdminLayout({
           className="admin-footer-box"
           style={{
             paddingTop: '1rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            borderTop: '1px solid rgba(212, 175, 55, 0.12)',
           }}
         >
           <Link
@@ -456,11 +457,11 @@ export default function AdminLayout({
             padding: 0.75rem 1rem !important;
             flex-direction: row !important;
             align-items: center !important;
-            justifyContent: space-between !important;
+            justify-content: space-between !important;
             border-right: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.12) !important;
             gap: 0.75rem !important;
-            background-color: rgba(15, 18, 26, 0.96) !important;
+            background-color: rgba(10, 11, 14, 0.96) !important;
             backdrop-filter: blur(12px) !important;
             z-index: 45 !important;
           }

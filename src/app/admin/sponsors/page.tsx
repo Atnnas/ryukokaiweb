@@ -372,10 +372,10 @@ export default function AdminSponsorsPage() {
                 alignItems: 'center',
                 gap: '0.35rem',
                 padding: '0.2rem 0.6rem',
-                backgroundColor: 'rgba(35, 52, 107, 0.3)',
-                border: '1px solid rgba(140, 166, 248, 0.4)',
+                backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
                 borderRadius: '20px',
-                color: '#8CA6F8',
+                color: '#F5D77F',
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.05em',
@@ -445,8 +445,8 @@ export default function AdminSponsorsPage() {
         }}
       >
         <div className="card-sumi" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ width: '44px', height: '44px', borderRadius: '8px', backgroundColor: 'rgba(35, 52, 107, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Handshake size={22} color="#8CA6F8" />
+          <div style={{ width: '44px', height: '44px', borderRadius: '8px', backgroundColor: 'rgba(212, 175, 55, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Handshake size={22} color="#F5D77F" />
           </div>
           <div>
             <p style={{ fontSize: '0.75rem', color: '#9FA6B8', fontWeight: 600, textTransform: 'uppercase' }}>Total Patrocinadores</p>
@@ -528,9 +528,9 @@ export default function AdminSponsorsPage() {
                 padding: '0.4rem 0.75rem',
                 borderRadius: '4px',
                 border: '1px solid',
-                borderColor: tierFilter === t ? '#8CA6F8' : 'rgba(255, 255, 255, 0.08)',
-                backgroundColor: tierFilter === t ? 'rgba(35, 52, 107, 0.35)' : '#161922',
-                color: tierFilter === t ? '#F7F8FA' : '#9FA6B8',
+                borderColor: tierFilter === t ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.08)',
+                backgroundColor: tierFilter === t ? 'rgba(212, 175, 55, 0.2)' : '#0E0F14',
+                color: tierFilter === t ? '#FFFFFF' : '#9FA6B8',
                 fontSize: '0.78rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -669,7 +669,7 @@ export default function AdminSponsorsPage() {
                           alignItems: 'center',
                           gap: '0.3rem',
                           fontSize: '0.8rem',
-                          color: '#8CA6F8',
+                          color: '#F5D77F',
                           textDecoration: 'none',
                         }}
                       >
@@ -771,7 +771,7 @@ export default function AdminSponsorsPage() {
                         transition: 'all 0.15s ease',
                       }}
                     >
-                      <Edit2 size={14} color="#8CA6F8" /> Editar
+                      <Edit2 size={14} color="#F5D77F" /> Editar
                     </button>
 
                     <button
@@ -842,7 +842,7 @@ export default function AdminSponsorsPage() {
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-              <Handshake size={24} color="#8CA6F8" />
+              <Handshake size={24} color="#F5D77F" />
               <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#F7F8FA' }}>
                 {editingSponsor ? 'Editar Patrocinador' : 'Nuevo Patrocinador'}
               </h2>
@@ -861,11 +861,11 @@ export default function AdminSponsorsPage() {
                 <div
                   onClick={() => fileInputRef.current?.click()}
                   style={{
-                    border: '2px dashed rgba(140, 166, 248, 0.3)',
+                    border: '2px dashed rgba(212, 175, 55, 0.35)',
                     borderRadius: '8px',
                     padding: '1.25rem',
                     textAlign: 'center',
-                    backgroundColor: '#12151E',
+                    backgroundColor: '#0E0F14',
                     cursor: 'pointer',
                     transition: 'border-color 0.2s',
                     display: 'flex',
@@ -916,13 +916,13 @@ export default function AdminSponsorsPage() {
                           width: '42px',
                           height: '42px',
                           borderRadius: '50%',
-                          backgroundColor: 'rgba(35, 52, 107, 0.3)',
+                          backgroundColor: 'rgba(212, 175, 55, 0.15)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}
                       >
-                        <Upload size={20} color="#8CA6F8" />
+                        <Upload size={20} color="#F5D77F" />
                       </div>
                       <div>
                         <p style={{ fontSize: '0.85rem', fontWeight: 600, color: '#F7F8FA', margin: 0 }}>

@@ -1,28 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  /* Paleta Oficial Dojo Ying Yang */
-  --color-ying: #23346B;
-  --color-ying-light: #394F9A;
-  --color-ying-glow: rgba(41, 63, 133, 0.35);
+  /* Paleta Oficial Marcial: Dorado, Blanco y Negro */
+  --color-gold: #D4AF37;
+  --color-gold-light: #F5D77F;
+  --color-gold-dark: #AA7C11;
+  --color-gold-glow: rgba(212, 175, 55, 0.28);
+  --color-gold-subtle: rgba(212, 175, 55, 0.12);
 
-  --color-yang: #8E2323;
-  --color-yang-light: #B83131;
-  --color-yang-glow: rgba(168, 38, 38, 0.35);
+  /* Aliases para compatibilidad hacia atrás */
+  --color-ying: #D4AF37;
+  --color-ying-light: #F5D77F;
+  --color-ying-glow: rgba(212, 175, 55, 0.25);
 
-  --bg-main: #0B0C10;
-  --bg-surface: #12151D;
-  --bg-surface-elevated: #191D28;
-  --bg-surface-glass: rgba(18, 21, 29, 0.85);
+  --color-yang: #AA7C11;
+  --color-yang-light: #F5D77F;
+  --color-yang-glow: rgba(255, 255, 255, 0.08);
 
+  /* Fondos: Negro Obsidiana y Carbón */
+  --bg-main: #070709;
+  --bg-surface: #0E0F14;
+  --bg-surface-elevated: #16171E;
+  --bg-surface-glass: rgba(14, 15, 20, 0.88);
+
+  /* Bordes de Lujo Marcial */
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.16);
-  --border-ying: rgba(57, 79, 154, 0.4);
-  --border-yang: rgba(184, 49, 49, 0.4);
+  --border-medium: rgba(212, 175, 55, 0.25);
+  --border-gold: rgba(212, 175, 55, 0.45);
+  --border-gold-glow: rgba(212, 175, 55, 0.7);
+  --border-ying: rgba(212, 175, 55, 0.4);
+  --border-yang: rgba(255, 255, 255, 0.25);
 
-  --text-main: #F7F8FA;
-  --text-secondary: #9FA6B8;
-  --text-muted: #676E80;
+  /* Tipografía Oficial */
+  --text-main: #FFFFFF;
+  --text-secondary: #D1D5DB;
+  --text-muted: #8E929D;
+  --text-gold: #F5D77F;
 
   --font-family-base: var(--font-zen-kaku), system-ui, -apple-system, sans-serif;
   
@@ -54,7 +67,7 @@ body {
   position: relative;
 }
 
-/* Ambient Background Lights - Dual Ying & Yang Energy */
+/* Ambient Background Lights - Halo Dorado y Niebla Blanca */
 body::before {
   content: "";
   position: fixed;
@@ -63,7 +76,7 @@ body::before {
   width: 50vw;
   height: 50vw;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--color-ying-glow) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--color-gold-glow) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
   filter: blur(80px);
@@ -77,7 +90,7 @@ body::after {
   width: 55vw;
   height: 55vw;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--color-yang-glow) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
   filter: blur(90px);
@@ -119,24 +132,25 @@ p {
   justify-content: center;
   gap: 0.75rem;
   padding: 0.85rem 1.85rem;
-  background: linear-gradient(135deg, var(--color-yang) 0%, var(--color-yang-light) 100%);
-  color: #ffffff;
-  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-gold-light) 0%, var(--color-gold) 50%, var(--color-gold-dark) 100%);
+  color: #08080A;
+  font-weight: 800;
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(184, 49, 49, 0.35);
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35);
 }
 
 .btn-martial-primary:hover {
   transform: translateY(-2px);
-  background: linear-gradient(135deg, var(--color-yang-light) 0%, #D43838 100%);
-  box-shadow: 0 6px 28px rgba(184, 49, 49, 0.55);
+  background: linear-gradient(135deg, #FFFFFF 0%, var(--color-gold-light) 50%, var(--color-gold) 100%);
+  color: #000000;
+  box-shadow: 0 6px 30px rgba(212, 175, 55, 0.6);
 }
 
 .btn-martial-secondary {
@@ -145,24 +159,24 @@ p {
   justify-content: center;
   gap: 0.75rem;
   padding: 0.85rem 1.85rem;
-  background: rgba(35, 52, 107, 0.15);
-  color: #ffffff;
+  background: rgba(212, 175, 55, 0.08);
+  color: #FFFFFF;
   font-weight: 700;
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border-radius: 4px;
-  border: 1px solid var(--border-ying);
+  border: 1px solid var(--border-gold);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   text-decoration: none;
 }
 
 .btn-martial-secondary:hover {
-  background: rgba(35, 52, 107, 0.35);
-  border-color: var(--color-ying-light);
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--color-gold-light);
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(41, 63, 133, 0.35);
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
 }
 
 /* Tarjetas con Efecto Cristal / Glassmorphism */
@@ -179,6 +193,7 @@ p {
 
 .glass-panel:hover {
   border-color: var(--border-medium);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.12);
 }
 
 /* Insignias de Cinturón */
@@ -220,10 +235,11 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #242938;
+  background: #1A1C24;
   border-radius: 4px;
+  border: 1px solid rgba(212, 175, 55, 0.15);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #39425A;
+  background: #D4AF37;
 }

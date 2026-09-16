@@ -19,8 +19,8 @@ export default function Footer() {
   return (
     <footer
       style={{
-        backgroundColor: '#07080B',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: '#070709',
+        borderTop: '1px solid rgba(212, 175, 55, 0.18)',
         position: 'relative',
         zIndex: 10,
         paddingTop: '4.5rem',
@@ -46,34 +46,35 @@ export default function Footer() {
                   width: '44px',
                   height: '44px',
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 80%)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: 'radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 80%)',
+                  border: '1.5px solid rgba(212, 175, 55, 0.35)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   overflow: 'hidden',
                   flexShrink: 0,
+                  boxShadow: '0 0 15px rgba(212, 175, 55, 0.15)',
                 }}
               >
                 <Image
-                  src="/images/logos/Logo_Blanco_Color_Transparente.png"
-                  alt="Logo Dojo Ying Yang"
-                  width={38}
-                  height={38}
+                  src="/images/logos/LogoRyukukaiSinFondo.png"
+                  alt="Logo Oficial Ryūko Kai"
+                  width={42}
+                  height={42}
                   style={{ objectFit: 'contain' }}
                 />
               </div>
               <div>
                 <span style={{ display: 'block', fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF', letterSpacing: '0.06em', lineHeight: 1.1 }}>
-                  DOJO <span style={{ color: '#8CA6F8' }}>YING</span> <span style={{ color: '#E55353' }}>YANG</span>
+                  DOJO <span style={{ color: '#D4AF37' }}>YING</span> <span style={{ color: '#FFFFFF' }}>YANG</span>
                 </span>
-                <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 700 }}>
+                <span style={{ fontSize: '0.68rem', color: '#C5A059', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 700 }}>
                   Karate Do Tradicional
                 </span>
               </div>
             </div>
 
-            <p style={{ fontSize: '0.88rem', color: '#9DA3B4', lineHeight: 1.65, marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.88rem', color: '#D1D5DB', lineHeight: 1.65, marginBottom: '1.5rem' }}>
               Forjamos carácter, rectitud moral, autocontrol y fortaleza física y mental a través del camino del Karate Do tradicional y formativo.
             </p>
 
@@ -87,12 +88,12 @@ export default function Footer() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '6px',
-                  backgroundColor: '#131620',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#101116',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#CBD5E1',
+                  color: '#F5D77F',
                   transition: 'all 0.2s',
                 }}
                 aria-label="Instagram Dojo Ying Yang"
@@ -112,12 +113,12 @@ export default function Footer() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '6px',
-                  backgroundColor: '#131620',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#101116',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#CBD5E1',
+                  color: '#F5D77F',
                   transition: 'all 0.2s',
                 }}
                 aria-label="Facebook Dojo Ying Yang"
@@ -135,12 +136,12 @@ export default function Footer() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '6px',
-                  backgroundColor: '#131620',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#101116',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#CBD5E1',
+                  color: '#F5D77F',
                   transition: 'all 0.2s',
                 }}
                 aria-label="YouTube Dojo Ying Yang"
@@ -155,27 +156,27 @@ export default function Footer() {
 
           {/* Columna 2: Navegación & Acceso */}
           <div>
-            <h4 style={{ fontSize: '0.9rem', color: '#F7F8FA', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <h4 style={{ fontSize: '0.9rem', color: '#F5D77F', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               Navegación
             </h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: 0 }}>
               <li>
-                <Link href="/" style={{ color: '#9DA3B4', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
                   Inicio
                 </Link>
               </li>
               <li>
-                <Link href="/nosotros" style={{ color: '#9DA3B4', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/nosotros" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
                   Nosotros & Senseis
                 </Link>
               </li>
               <li>
-                <Link href="/noticias" style={{ color: '#9DA3B4', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/noticias" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
                   Noticias & Redes
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" style={{ color: '#9DA3B4', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/contacto" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
                   Ubicación & Contacto
                 </Link>
               </li>
@@ -185,17 +186,17 @@ export default function Footer() {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: '#8CA6F8',
+                    color: '#F5D77F',
                     cursor: 'pointer',
                     fontSize: '0.88rem',
-                    fontWeight: 600,
+                    fontWeight: 700,
                     padding: 0,
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.4rem',
                   }}
                 >
-                  <Users size={14} /> Acceso Alumnos
+                  <Users size={14} color="#D4AF37" /> Acceso Alumnos
                 </button>
               </li>
             </ul>
@@ -203,10 +204,10 @@ export default function Footer() {
 
           {/* Columna 3: Principios del Dojo (Dojo Kun) */}
           <div>
-            <h4 style={{ fontSize: '0.9rem', color: '#F7F8FA', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <h4 style={{ fontSize: '0.9rem', color: '#F5D77F', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               Dojo Kun (Principios)
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.82rem', color: '#9DA3B4' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.82rem', color: '#D1D5DB' }}>
               <p style={{ margin: 0 }}>• Perfeccionar el carácter personal.</p>
               <p style={{ margin: 0 }}>• Ser leal y mantener el camino de la sinceridad.</p>
               <p style={{ margin: 0 }}>• Cultivar el espíritu de superación constante.</p>
@@ -217,24 +218,24 @@ export default function Footer() {
 
           {/* Columna 4: Contacto Directo */}
           <div>
-            <h4 style={{ fontSize: '0.9rem', color: '#F7F8FA', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <h4 style={{ fontSize: '0.9rem', color: '#F5D77F', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               Horarios & Contacto
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.85rem', color: '#9DA3B4' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.85rem', color: '#D1D5DB' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                <MapPin size={17} color="#E55353" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <MapPin size={17} color="#D4AF37" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>Instalaciones Centrales del Dojo, Área de Tatami Oficial</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <Clock size={17} color="#8CA6F8" style={{ flexShrink: 0 }} />
+                <Clock size={17} color="#D4AF37" style={{ flexShrink: 0 }} />
                 <span>Lun a Vie: 16:00 - 21:30 | Sáb: 08:00 - 13:00</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <Phone size={17} color="#4ADE80" style={{ flexShrink: 0 }} />
+                <Phone size={17} color="#D4AF37" style={{ flexShrink: 0 }} />
                 <span>Informes & WhatsApp Directo</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <Mail size={17} color="#ECC94B" style={{ flexShrink: 0 }} />
+                <Mail size={17} color="#D4AF37" style={{ flexShrink: 0 }} />
                 <span>contacto@dojoyingyang.com</span>
               </div>
             </div>
@@ -245,14 +246,14 @@ export default function Footer() {
         <div
           style={{
             paddingTop: '1.75rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
             flexWrap: 'wrap',
             justifyContent: 'space-between',
             alignItems: 'center',
             gap: '1rem',
             fontSize: '0.8rem',
-            color: '#676E80',
+            color: '#8E929D',
           }}
         >
           <p style={{ margin: 0 }}>
@@ -260,10 +261,10 @@ export default function Footer() {
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <Shield size={14} /> Sistema Autenticado con Google OAuth 2.0
+              <Shield size={14} color="#D4AF37" /> Sistema Autenticado con Google OAuth 2.0
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <Award size={14} color="#ECC94B" /> Grados Oficiales
+              <Award size={14} color="#D4AF37" /> Grados Oficiales
             </span>
           </div>
         </div>
@@ -290,13 +291,13 @@ export default function Footer() {
           <span
             style={{
               fontWeight: 800,
-              color: '#8CA6F8',
+              color: '#F5D77F',
               letterSpacing: '0.14em',
-              backgroundColor: 'rgba(35, 52, 107, 0.25)',
+              backgroundColor: 'rgba(212, 175, 55, 0.12)',
               padding: '0.2rem 0.65rem',
               borderRadius: '4px',
-              border: '1px solid rgba(140, 166, 248, 0.25)',
-              boxShadow: '0 0 12px rgba(35, 52, 107, 0.2)',
+              border: '1px solid rgba(212, 175, 55, 0.35)',
+              boxShadow: '0 0 12px rgba(212, 175, 55, 0.15)',
             }}
           >
             Kumadev.inc

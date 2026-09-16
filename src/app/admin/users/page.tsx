@@ -380,9 +380,9 @@ export default function AdminUsersPage() {
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                backgroundColor: 'rgba(35, 52, 107, 0.4)',
-                border: '1px solid rgba(140, 166, 248, 0.3)',
-                color: '#8CA6F8',
+                backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
+                color: '#F5D77F',
               }}
             >
               <Shield size={12} /> Gestión del Dojo & WKF
@@ -477,14 +477,14 @@ export default function AdminUsersPage() {
               width: '46px',
               height: '46px',
               borderRadius: '10px',
-              backgroundColor: 'rgba(35, 52, 107, 0.4)',
-              border: '1px solid rgba(140, 166, 248, 0.3)',
+              backgroundColor: 'rgba(212, 175, 55, 0.15)',
+              border: '1px solid rgba(212, 175, 55, 0.35)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Users size={22} color="#8CA6F8" />
+            <Users size={22} color="#F5D77F" />
           </div>
           <div>
             <span style={{ fontSize: '0.78rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
@@ -808,9 +808,9 @@ export default function AdminUsersPage() {
                                   style={{
                                     fontSize: '0.62rem',
                                     padding: '0.1rem 0.4rem',
-                                    backgroundColor: 'rgba(142, 35, 35, 0.3)',
-                                    border: '1px solid rgba(184, 49, 49, 0.5)',
-                                    color: '#FF9E9E',
+                                    backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                                    border: '1px solid rgba(212, 175, 55, 0.5)',
+                                    color: '#F5D77F',
                                     borderRadius: '4px',
                                     fontWeight: 700,
                                   }}
@@ -913,12 +913,12 @@ export default function AdminUsersPage() {
                             borderRadius: '4px',
                             fontSize: '0.82rem',
                             fontWeight: 800,
-                            backgroundColor: isDan ? 'rgba(0, 0, 0, 0.6)' : 'rgba(35, 52, 107, 0.35)',
-                            border: `1px solid ${isDan ? '#FACC15' : 'rgba(140, 166, 248, 0.4)'}`,
-                            color: isDan ? '#FACC15' : '#8CA6F8',
+                            backgroundColor: isDan ? 'rgba(0, 0, 0, 0.6)' : 'rgba(212, 175, 55, 0.15)',
+                            border: `1px solid ${isDan ? '#D4AF37' : 'rgba(212, 175, 55, 0.35)'}`,
+                            color: isDan ? '#F5D77F' : '#FFFFFF',
                           }}
                         >
-                          <Award size={13} color={isDan ? '#FACC15' : '#8CA6F8'} />
+                          <Award size={13} color={isDan ? '#F5D77F' : '#D4AF37'} />
                           {u.kyuDan || '9° Kyu'}
                         </span>
                         <span style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginTop: '0.2rem' }}>
@@ -1002,10 +1002,10 @@ export default function AdminUsersPage() {
                               alignItems: 'center',
                               gap: '0.3rem',
                               padding: '0.35rem 0.65rem',
-                              backgroundColor: 'rgba(35, 52, 107, 0.45)',
-                              border: '1px solid rgba(140, 166, 248, 0.35)',
+                              backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                              border: '1px solid rgba(212, 175, 55, 0.35)',
                               borderRadius: '4px',
-                              color: '#8CA6F8',
+                              color: '#F5D77F',
                               fontSize: '0.78rem',
                               fontWeight: 700,
                               cursor: 'pointer',
@@ -1155,14 +1155,14 @@ export default function AdminUsersPage() {
                     width: '32px',
                     height: '32px',
                     borderRadius: '8px',
-                    backgroundColor: 'rgba(35, 52, 107, 0.4)',
-                    border: '1px solid rgba(140, 166, 248, 0.3)',
+                    backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                    border: '1px solid rgba(212, 175, 55, 0.35)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <UserPlus size={16} color="#8CA6F8" />
+                  <UserPlus size={16} color="#F5D77F" />
                 </div>
                 <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#F7F8FA', margin: 0 }}>
                   Registrar Nuevo Estudiante
@@ -1276,7 +1276,7 @@ export default function AdminUsersPage() {
 
               {/* SELECCIÓN DE GRADO: KYU (10 a 1) o DAN (1 a 10) - SIN CINTURÓN MANUAL */}
               <div style={{ padding: '1rem', backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#8CA6F8', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Grado Marcial Oficial (Kyu o Dan)
                 </label>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
@@ -1289,8 +1289,8 @@ export default function AdminUsersPage() {
                     style={{
                       flex: 1,
                       padding: '0.5rem',
-                      backgroundColor: newRankType === 'kyu' ? 'rgba(35, 52, 107, 0.6)' : '#12151E',
-                      border: `1.5px solid ${newRankType === 'kyu' ? '#8CA6F8' : 'rgba(255, 255, 255, 0.12)'}`,
+                      backgroundColor: newRankType === 'kyu' ? 'rgba(212, 175, 55, 0.25)' : '#0E0F14',
+                      border: `1.5px solid ${newRankType === 'kyu' ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.12)'}`,
                       borderRadius: '6px',
                       color: newRankType === 'kyu' ? '#FFF' : '#9FA6B8',
                       fontWeight: 700,
@@ -1428,13 +1428,13 @@ export default function AdminUsersPage() {
                 style={{
                   padding: '0.9rem',
                   borderRadius: '8px',
-                  background: 'linear-gradient(135deg, rgba(35, 52, 107, 0.25) 0%, rgba(20, 24, 35, 0.8) 100%)',
-                  border: '1px solid rgba(140, 166, 248, 0.35)',
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(14, 15, 20, 0.9) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.45rem' }}>
-                  <Sparkles size={14} color="#8CA6F8" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#8CA6F8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <Sparkles size={14} color="#F5D77F" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#F5D77F', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Cálculo Automático WKF (World Karate Federation)
                   </span>
                 </div>
@@ -1527,14 +1527,14 @@ export default function AdminUsersPage() {
                     width: '32px',
                     height: '32px',
                     borderRadius: '8px',
-                    backgroundColor: 'rgba(35, 52, 107, 0.4)',
-                    border: '1px solid rgba(140, 166, 248, 0.3)',
+                    backgroundColor: 'rgba(212, 175, 55, 0.15)',
+                    border: '1px solid rgba(212, 175, 55, 0.35)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <Edit2 size={16} color="#8CA6F8" />
+                  <Edit2 size={16} color="#F5D77F" />
                 </div>
                 <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#F7F8FA', margin: 0 }}>
                   Editar Ficha Marcial & WKF
@@ -1644,7 +1644,7 @@ export default function AdminUsersPage() {
 
               {/* SELECCIÓN DE GRADO: KYU O DAN */}
               <div style={{ padding: '1rem', backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#8CA6F8', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   Grado Marcial Oficial (Kyu o Dan)
                 </label>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
@@ -1657,8 +1657,8 @@ export default function AdminUsersPage() {
                     style={{
                       flex: 1,
                       padding: '0.5rem',
-                      backgroundColor: editRankType === 'kyu' ? 'rgba(35, 52, 107, 0.6)' : '#12151E',
-                      border: `1.5px solid ${editRankType === 'kyu' ? '#8CA6F8' : 'rgba(255, 255, 255, 0.12)'}`,
+                      backgroundColor: editRankType === 'kyu' ? 'rgba(212, 175, 55, 0.25)' : '#0E0F14',
+                      border: `1.5px solid ${editRankType === 'kyu' ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.12)'}`,
                       borderRadius: '6px',
                       color: editRankType === 'kyu' ? '#FFF' : '#9FA6B8',
                       fontWeight: 700,
@@ -1796,13 +1796,13 @@ export default function AdminUsersPage() {
                 style={{
                   padding: '0.9rem',
                   borderRadius: '8px',
-                  background: 'linear-gradient(135deg, rgba(35, 52, 107, 0.25) 0%, rgba(20, 24, 35, 0.8) 100%)',
-                  border: '1px solid rgba(140, 166, 248, 0.35)',
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(14, 15, 20, 0.9) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.45rem' }}>
-                  <Sparkles size={14} color="#8CA6F8" />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#8CA6F8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <Sparkles size={14} color="#F5D77F" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#F5D77F', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Categorías WKF Actualizadas
                   </span>
                 </div>
