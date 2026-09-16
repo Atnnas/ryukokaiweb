@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({
       status: 'pending_password',
       message: 'MongoDB está configurado en el código, pero falta ingresar la contraseña en .env.local reemplazando <TU_PASSWORD>.',
-      database: process.env.MONGODB_DB || 'yingyag_web_db',
+      database: process.env.MONGODB_DB || 'ryokukai_web_db',
     });
   }
 

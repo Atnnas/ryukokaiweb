@@ -41,7 +41,7 @@ if (!uri) {
 
 export default clientPromise;
 
-export async function getDatabase(dbName = process.env.MONGODB_DB || 'yingyag_web_db') {
+export async function getDatabase(dbName = process.env.MONGODB_DB || 'ryokukai_web_db') {
   const client = await clientPromise;
   return client.db(dbName);
 }
