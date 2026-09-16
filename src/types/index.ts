@@ -97,6 +97,12 @@ export interface ExerciseItem {
   reps?: string; // Campo auxiliar
   restSeconds?: number; // Descanso en segundos
   notes?: string;
+
+  // Control de Súper Serie / Circuito (Loop)
+  loopId?: string; // ID único del loop al que pertenece (ej: "loop-1726512345-1")
+  loopName?: string; // Nombre descriptivo (ej: "Súper Serie 1", "Circuito A")
+  loopRounds?: number; // Cantidad de rondas/vueltas del loop completo (ej: 3, 4)
+  loopRestBetweenRounds?: number; // Descanso en segundos al terminar toda la vuelta del loop (ej: 60s)
 }
 
 export interface ExerciseCatalogItem {

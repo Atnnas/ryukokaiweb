@@ -22,6 +22,9 @@ import {
   Target,
   Database,
   Check,
+  Repeat,
+  Zap,
+  Unlink,
 } from 'lucide-react';
 
 export default function AdminRoutinesPage() {
@@ -214,7 +217,7 @@ export default function AdminRoutinesPage() {
     setIsModalOpen(true);
   };
 
-  // Agregar fila de ejercicio
+  // Agregar fila de ejercicio individual
   const addExerciseRow = () => {
     setExercises((prev) => [
       ...prev,
@@ -228,6 +231,153 @@ export default function AdminRoutinesPage() {
         notes: '',
       },
     ]);
+  };
+
+  // Agregar bloque nuevo de Súper Serie (Loop) con un par de ejercicios iniciales
+  const addLoopBlock = () => {
+    const newLoopId = `loop-${Date.now()}`;
+    const existingLoopIds = new Set(exercises.map((e) => e.loopId).filter(Boolean));
+    const loopName = `Súper Serie ${existingLoopIds.size + 1}`;
+
+    setExercises((prev) => [
+      ...prev,
+      {
+        id: `ex-${Date.now()}-1`,
+        name: '',
+        sets: 1,
+        repsOrDurationValue: 12,
+        repsOrDurationUnit: 'repeticiones',
+        restSeconds: 15,
+        notes: '',
+        loopId: newLoopId,
+        loopName,
+        loopRounds: 4,
+        loopRestBetweenRounds: 60,
+      },
+      {
+        id: `ex-${Date.now()}-2`,
+        name: '',
+        sets: 1,
+        repsOrDurationValue: 12,
+        repsOrDurationUnit: 'repeticiones',
+        restSeconds: 0,
+        notes: '',
+        loopId: newLoopId,
+        loopName,
+        loopRounds: 4,
+        loopRestBetweenRounds: 60,
+      },
+    ]);
+  };
+
+  // Agregar otro ejercicio dentro de un loop existente
+  const addExerciseToLoop = (targetLoopId: string) => {
+    const template = exercises.find((e) => e.loopId === targetLoopId);
+    const newEx: ExerciseItem = {
+      id: `ex-${Date.now()}-${exercises.length + 1}`,
+      name: '',
+      sets: 1,
+      repsOrDurationValue: 12,
+      repsOrDurationUnit: 'repeticiones',
+      restSeconds: 15,
+      notes: '',
+      loopId: targetLoopId,
+      loopName: template?.loopName || 'Súper Serie',
+      loopRounds: template?.loopRounds || 4,
+      loopRestBetweenRounds: template?.loopRestBetweenRounds !== undefined ? template.loopRestBetweenRounds : 60,
+    };
+
+    setExercises((prev) => {
+      const lastIdx = prev.map((e) => e.loopId).lastIndexOf(targetLoopId);
+      if (lastIdx === -1) return [...prev, newEx];
+      const next = [...prev];
+      next.splice(lastIdx + 1, 0, newEx);
+      return next;
+    });
+  };
+
+  // Convertir un ejercicio existente en Súper Serie (si tiene un siguiente ejercicio individual, los agrupa juntos)
+  const convertExerciseToLoop = (index: number) => {
+    const newLoopId = `loop-${Date.now()}`;
+    const existingLoopIds = new Set(exercises.map((e) => e.loopId).filter(Boolean));
+    const loopName = `Súper Serie ${existingLoopIds.size + 1}`;
+
+    setExercises((prev) => {
+      const next = [...prev];
+      const current = next[index];
+      if (!current) return prev;
+
+      const hasNextSingle = index + 1 < next.length && !next[index + 1].loopId;
+      const initialRounds = current.sets && current.sets > 1 ? current.sets : 4;
+
+      next[index] = {
+        ...current,
+        sets: 1,
+        restSeconds: current.restSeconds !== undefined ? current.restSeconds : 15,
+        loopId: newLoopId,
+        loopName,
+        loopRounds: initialRounds,
+        loopRestBetweenRounds: 60,
+      };
+
+      if (hasNextSingle) {
+        next[index + 1] = {
+          ...next[index + 1],
+          sets: 1,
+          restSeconds: next[index + 1].restSeconds !== undefined ? next[index + 1].restSeconds : 0,
+          loopId: newLoopId,
+          loopName,
+          loopRounds: initialRounds,
+          loopRestBetweenRounds: 60,
+        };
+      } else {
+        const companionEx: ExerciseItem = {
+          id: `ex-${Date.now()}-companion`,
+          name: '',
+          sets: 1,
+          repsOrDurationValue: 12,
+          repsOrDurationUnit: 'repeticiones',
+          restSeconds: 0,
+          notes: '',
+          loopId: newLoopId,
+          loopName,
+          loopRounds: initialRounds,
+          loopRestBetweenRounds: 60,
+        };
+        next.splice(index + 1, 0, companionEx);
+      }
+
+      return next;
+    });
+  };
+
+  // Desagrupar un loop completo y volver los ejercicios a individuales
+  const ungroupLoop = (targetLoopId: string) => {
+    setExercises((prev) =>
+      prev.map((e) =>
+        e.loopId === targetLoopId
+          ? {
+              ...e,
+              loopId: undefined,
+              loopName: undefined,
+              loopRounds: undefined,
+              loopRestBetweenRounds: undefined,
+              sets: e.loopRounds || 3,
+            }
+          : e
+      )
+    );
+  };
+
+  // Actualizar metadatos de un loop (rondas, descanso fin de ronda, nombre) para todos sus miembros
+  const updateLoopMeta = (
+    targetLoopId: string,
+    field: 'loopName' | 'loopRounds' | 'loopRestBetweenRounds',
+    value: unknown
+  ) => {
+    setExercises((prev) =>
+      prev.map((e) => (e.loopId === targetLoopId ? { ...e, [field]: value } : e))
+    );
   };
 
   // Actualizar campo de un ejercicio
@@ -906,7 +1056,13 @@ export default function AdminRoutinesPage() {
                               title="Ver u ocultar secuencia de ejercicios"
                             >
                               <Layers size={13} />
-                              <span>{exerciseCount} {exerciseCount === 1 ? 'ejercicio' : 'ejercicios'}</span>
+                              <span>
+                                {exerciseCount} {exerciseCount === 1 ? 'ejercicio' : 'ejercicios'}
+                                {(() => {
+                                  const loopSet = new Set((routine.exercises || []).map((e) => e.loopId).filter(Boolean));
+                                  return loopSet.size > 0 ? ` (${loopSet.size} súper ${loopSet.size === 1 ? 'serie' : 'series'})` : '';
+                                })()}
+                              </span>
                               {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                             </button>
 
@@ -1028,68 +1184,227 @@ export default function AdminRoutinesPage() {
                                 </span>
                               </div>
 
-                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
-                                {(routine.exercises || []).map((ex, idx) => {
-                                  const quantity =
-                                    ex.repsOrDurationValue !== undefined
-                                      ? ex.repsOrDurationValue
-                                      : ex.reps
-                                      ? parseInt(ex.reps, 10) || 12
-                                      : 12;
-                                  const unit =
-                                    ex.repsOrDurationUnit ||
-                                    (ex.reps?.toLowerCase().includes('seg') ? 'segundos' : 'repeticiones');
+                              {/* Desglose de ejercicios individuales y bloques de súper series */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                                {(() => {
+                                  interface RoutineRowBlock {
+                                    type: 'single' | 'loop';
+                                    loopId?: string;
+                                    loopName?: string;
+                                    loopRounds?: number;
+                                    loopRestBetweenRounds?: number;
+                                    items: ExerciseItem[];
+                                  }
 
-                                  return (
-                                    <div
-                                      key={ex.id || idx}
-                                      style={{
-                                        padding: '0.75rem 0.9rem',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                                        borderRadius: '6px',
-                                      }}
-                                    >
-                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                                          <span
+                                  const rBlocks: RoutineRowBlock[] = [];
+                                  let currentBlock: RoutineRowBlock | null = null;
+
+                                  (routine.exercises || []).forEach((ex) => {
+                                    if (ex.loopId) {
+                                      if (currentBlock && currentBlock.loopId === ex.loopId) {
+                                        currentBlock.items.push(ex);
+                                      } else {
+                                        currentBlock = {
+                                          type: 'loop',
+                                          loopId: ex.loopId,
+                                          loopName: ex.loopName || 'Súper Serie',
+                                          loopRounds: ex.loopRounds || 4,
+                                          loopRestBetweenRounds: ex.loopRestBetweenRounds !== undefined ? ex.loopRestBetweenRounds : 60,
+                                          items: [ex],
+                                        };
+                                        rBlocks.push(currentBlock);
+                                      }
+                                    } else {
+                                      currentBlock = null;
+                                      rBlocks.push({
+                                        type: 'single',
+                                        items: [ex],
+                                      });
+                                    }
+                                  });
+
+                                  return rBlocks.map((blk, blkIdx) => {
+                                    if (blk.type === 'single') {
+                                      const ex = blk.items[0];
+                                      const quantity =
+                                        ex.repsOrDurationValue !== undefined
+                                          ? ex.repsOrDurationValue
+                                          : ex.reps
+                                          ? parseInt(ex.reps, 10) || 12
+                                          : 12;
+                                      const unit =
+                                        ex.repsOrDurationUnit ||
+                                        (ex.reps?.toLowerCase().includes('seg') ? 'segundos' : 'repeticiones');
+
+                                      return (
+                                        <div
+                                          key={ex.id || blkIdx}
+                                          style={{
+                                            padding: '0.75rem 0.9rem',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                                            borderRadius: '6px',
+                                          }}
+                                        >
+                                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                              <span
+                                                style={{
+                                                  width: '20px',
+                                                  height: '20px',
+                                                  borderRadius: '50%',
+                                                  backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                                                  color: '#F5D77F',
+                                                  fontSize: '0.72rem',
+                                                  fontWeight: 700,
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  flexShrink: 0,
+                                                }}
+                                              >
+                                                {blkIdx + 1}
+                                              </span>
+                                              <span style={{ color: '#FFFFFF', fontSize: '0.88rem', fontWeight: 600 }}>
+                                                {ex.name}
+                                              </span>
+                                            </div>
+
+                                            <span style={{ color: '#F5D77F', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 }}>
+                                              {ex.sets ? `${ex.sets} × ` : ''}{quantity} {unit}
+                                            </span>
+                                          </div>
+
+                                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', paddingLeft: '1.7rem', fontSize: '0.74rem', color: '#9FA6B8' }}>
+                                            {ex.restSeconds !== undefined && (
+                                              <span>⏱ Descanso: <strong style={{ color: '#E2E8F0' }}>{ex.restSeconds}s</strong></span>
+                                            )}
+                                            {ex.notes && (
+                                              <span style={{ fontStyle: 'italic', color: '#CBD5E1' }}>💡 {ex.notes}</span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    } else {
+                                      // Bloque Loop / Súper Serie
+                                      return (
+                                        <div
+                                          key={blk.loopId || blkIdx}
+                                          style={{
+                                            padding: '0.85rem 1rem',
+                                            backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                                            border: '1px solid rgba(212, 175, 55, 0.35)',
+                                            borderRadius: '8px',
+                                          }}
+                                        >
+                                          {/* Cabecera del bloque súper serie */}
+                                          <div
                                             style={{
-                                              width: '20px',
-                                              height: '20px',
-                                              borderRadius: '50%',
-                                              backgroundColor: 'rgba(212, 175, 55, 0.2)',
-                                              color: '#F5D77F',
-                                              fontSize: '0.72rem',
-                                              fontWeight: 700,
                                               display: 'flex',
                                               alignItems: 'center',
-                                              justifyContent: 'center',
-                                              flexShrink: 0,
+                                              justifyContent: 'space-between',
+                                              marginBottom: '0.6rem',
+                                              paddingBottom: '0.4rem',
+                                              borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+                                              flexWrap: 'wrap',
+                                              gap: '0.5rem',
                                             }}
                                           >
-                                            {idx + 1}
-                                          </span>
-                                          <span style={{ color: '#FFFFFF', fontSize: '0.88rem', fontWeight: 600 }}>
-                                            {ex.name}
-                                          </span>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                              <Zap size={14} color="#F5D77F" />
+                                              <span style={{ color: '#F5D77F', fontWeight: 800, fontSize: '0.84rem' }}>
+                                                {blk.loopName || 'SÚPER SERIE'}
+                                              </span>
+                                            </div>
+
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.74rem' }}>
+                                              <span
+                                                style={{
+                                                  color: '#10B981',
+                                                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                                                  padding: '0.15rem 0.45rem',
+                                                  borderRadius: '4px',
+                                                  fontWeight: 700,
+                                                  display: 'inline-flex',
+                                                  alignItems: 'center',
+                                                  gap: '0.25rem',
+                                                }}
+                                              >
+                                                <Repeat size={11} /> {blk.loopRounds} RONDAS
+                                              </span>
+                                              <span style={{ color: '#9FA6B8' }}>
+                                                Pausa entre rondas: <strong style={{ color: '#F5D77F' }}>{blk.loopRestBetweenRounds}s</strong>
+                                              </span>
+                                            </div>
+                                          </div>
+
+                                          {/* Lista de ejercicios dentro de la súper serie */}
+                                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '0.6rem' }}>
+                                            {blk.items.map((ex, stepIdx) => {
+                                              const quantity =
+                                                ex.repsOrDurationValue !== undefined
+                                                  ? ex.repsOrDurationValue
+                                                  : ex.reps
+                                                  ? parseInt(ex.reps, 10) || 12
+                                                  : 12;
+                                              const unit =
+                                                ex.repsOrDurationUnit ||
+                                                (ex.reps?.toLowerCase().includes('seg') ? 'segundos' : 'repeticiones');
+
+                                              return (
+                                                <div
+                                                  key={ex.id || stepIdx}
+                                                  style={{
+                                                    padding: '0.6rem 0.75rem',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                                    border: '1px solid rgba(255, 255, 255, 0.07)',
+                                                    borderRadius: '5px',
+                                                  }}
+                                                >
+                                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', marginBottom: '0.25rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                      <span
+                                                        style={{
+                                                          width: '18px',
+                                                          height: '18px',
+                                                          borderRadius: '50%',
+                                                          backgroundColor: 'rgba(212, 175, 55, 0.3)',
+                                                          color: '#F5D77F',
+                                                          fontSize: '0.68rem',
+                                                          fontWeight: 800,
+                                                          display: 'flex',
+                                                          alignItems: 'center',
+                                                          justifyContent: 'center',
+                                                        }}
+                                                      >
+                                                        {stepIdx + 1}
+                                                      </span>
+                                                      <span style={{ color: '#FFFFFF', fontSize: '0.84rem', fontWeight: 600 }}>
+                                                        {ex.name}
+                                                      </span>
+                                                    </div>
+
+                                                    <span style={{ color: '#F5D77F', fontSize: '0.78rem', fontWeight: 700 }}>
+                                                      {quantity} {unit}
+                                                    </span>
+                                                  </div>
+
+                                                  <div style={{ fontSize: '0.72rem', color: '#9FA6B8', paddingLeft: '1.4rem' }}>
+                                                    {stepIdx < blk.items.length - 1 && ex.restSeconds !== undefined && ex.restSeconds > 0 ? (
+                                                      <span>⏱ Pausa al siguiente: <strong style={{ color: '#E2E8F0' }}>{ex.restSeconds}s</strong></span>
+                                                    ) : (
+                                                      <span>⚡ Pasa continuo al siguiente</span>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
                                         </div>
-
-                                        <span style={{ color: '#F5D77F', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 }}>
-                                          {ex.sets ? `${ex.sets} × ` : ''}{quantity} {unit}
-                                        </span>
-                                      </div>
-
-                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', paddingLeft: '1.7rem', fontSize: '0.74rem', color: '#9FA6B8' }}>
-                                        {ex.restSeconds !== undefined && (
-                                          <span>⏱ Descanso: <strong style={{ color: '#E2E8F0' }}>{ex.restSeconds}s</strong></span>
-                                        )}
-                                        {ex.notes && (
-                                          <span style={{ fontStyle: 'italic', color: '#CBD5E1' }}>💡 {ex.notes}</span>
-                                        )}
-                                      </div>
-                                    </div>
-                                  );
-                                })}
+                                      );
+                                    }
+                                  });
+                                })()}
                               </div>
                             </div>
                           </td>
@@ -1381,402 +1696,1036 @@ export default function AdminRoutinesPage() {
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addExerciseRow}
-                    style={{
-                      padding: '0.4rem 0.8rem',
-                      borderRadius: '6px',
-                      backgroundColor: 'rgba(212, 175, 55, 0.15)',
-                      border: '1px solid rgba(212, 175, 55, 0.3)',
-                      color: '#F5D77F',
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                    }}
-                  >
-                    <Plus size={14} />
-                    <span>Añadir Ejercicio</span>
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <button
+                      type="button"
+                      onClick={addExerciseRow}
+                      style={{
+                        padding: '0.4rem 0.8rem',
+                        borderRadius: '6px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                        border: '1px solid rgba(255, 255, 255, 0.18)',
+                        color: '#FFFFFF',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                    >
+                      <Plus size={14} />
+                      <span>+ Ejercicio Individual</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={addLoopBlock}
+                      style={{
+                        padding: '0.4rem 0.85rem',
+                        borderRadius: '6px',
+                        backgroundColor: 'rgba(212, 175, 55, 0.18)',
+                        border: '1px solid rgba(212, 175, 55, 0.45)',
+                        color: '#F5D77F',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        boxShadow: '0 0 12px rgba(212, 175, 55, 0.12)',
+                      }}
+                      title="Crear un bloque de Súper Serie / Circuito que se repite por rondas"
+                    >
+                      <Zap size={14} />
+                      <span>⚡ Súper Serie (Loop)</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {exercises.map((ex, idx) => {
-                    const searchWord = (ex.name || '').toLowerCase().trim();
-                    const filteredPredictions = catalogExercises.filter((item) =>
-                      searchWord === '' || item.name.toLowerCase().includes(searchWord)
-                    );
-                    const isDropdownOpen = activeComboIndex === idx;
-                    const isSavedDirectly = !!savedExerciseIndices[idx];
+                {/* Agrupación en Bloques (Individuales vs Súper Series / Loops) */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  {(() => {
+                    interface RenderBlock {
+                      type: 'single' | 'loop';
+                      loopId?: string;
+                      loopName?: string;
+                      loopRounds?: number;
+                      loopRestBetweenRounds?: number;
+                      items: { exercise: ExerciseItem; originalIndex: number }[];
+                    }
 
-                    return (
-                      <div
-                        key={ex.id || idx}
-                        style={{
-                          padding: '1rem',
-                          backgroundColor: '#070709',
-                          border: '1px solid rgba(212, 175, 55, 0.18)',
-                          borderRadius: '8px',
-                          position: 'relative',
-                        }}
-                      >
-                        {/* Cabecera del ejercicio con botón de Guardar directo a Base de Datos */}
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginBottom: '0.75rem',
-                          }}
-                        >
-                          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F5D77F' }}>
-                            Ejercicio #{idx + 1}
-                          </span>
+                    const blocks: RenderBlock[] = [];
+                    let currentLoopBlock: RenderBlock | null = null;
 
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                            {/* Botón Guardar directo en Base de Datos */}
-                            {ex.name.trim() && (
-                              <button
-                                type="button"
-                                onClick={() => handleSaveExerciseDirectlyToDB(idx)}
-                                title="Guarda este ejercicio de inmediato en la base de datos para recordarlo en el combo"
-                                style={{
-                                  padding: '0.3rem 0.6rem',
-                                  borderRadius: '5px',
-                                  backgroundColor: isSavedDirectly ? 'rgba(34, 197, 94, 0.2)' : 'rgba(212, 175, 55, 0.12)',
-                                  border: `1px solid ${isSavedDirectly ? '#22C55E' : 'rgba(212, 175, 55, 0.3)'}`,
-                                  color: isSavedDirectly ? '#4ADE80' : '#F5D77F',
-                                  fontSize: '0.74rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '0.3rem',
-                                  transition: 'all 0.15s ease',
-                                }}
-                              >
-                                {isSavedDirectly ? <Check size={12} /> : <Database size={12} />}
-                                <span>{isSavedDirectly ? 'Guardado en BD' : 'Guardar en BD'}</span>
-                              </button>
-                            )}
+                    exercises.forEach((ex, idx) => {
+                      if (ex.loopId) {
+                        if (currentLoopBlock && currentLoopBlock.loopId === ex.loopId) {
+                          currentLoopBlock.items.push({ exercise: ex, originalIndex: idx });
+                        } else {
+                          currentLoopBlock = {
+                            type: 'loop',
+                            loopId: ex.loopId,
+                            loopName: ex.loopName || 'Súper Serie',
+                            loopRounds: ex.loopRounds || 4,
+                            loopRestBetweenRounds: ex.loopRestBetweenRounds !== undefined ? ex.loopRestBetweenRounds : 60,
+                            items: [{ exercise: ex, originalIndex: idx }],
+                          };
+                          blocks.push(currentLoopBlock);
+                        }
+                      } else {
+                        currentLoopBlock = null;
+                        blocks.push({
+                          type: 'single',
+                          items: [{ exercise: ex, originalIndex: idx }],
+                        });
+                      }
+                    });
 
-                            {/* Botón Quitar */}
-                            <button
-                              type="button"
-                              onClick={() => removeExerciseRow(idx)}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#F87171',
-                                cursor: 'pointer',
-                                fontSize: '0.78rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.2rem',
-                              }}
-                            >
-                              <Trash2 size={13} />
-                              <span>Quitar</span>
-                            </button>
-                          </div>
-                        </div>
+                    return blocks.map((block, blockIdx) => {
+                      if (block.type === 'single') {
+                        const { exercise: ex, originalIndex: idx } = block.items[0];
+                        const searchWord = (ex.name || '').toLowerCase().trim();
+                        const filteredPredictions = catalogExercises.filter((item) =>
+                          searchWord === '' || item.name.toLowerCase().includes(searchWord)
+                        );
+                        const isDropdownOpen = activeComboIndex === idx;
+                        const isSavedDirectly = !!savedExerciseIndices[idx];
 
-                        {/* COMBOBOX PREDICTIVO: Describir o Seleccionar del Combo */}
-                        <div
-                          ref={(el) => {
-                            comboContainerRefs.current[idx] = el;
-                          }}
-                          style={{ position: 'relative', marginBottom: '0.75rem' }}
-                        >
-                          <label style={{ display: 'block', fontSize: '0.76rem', color: '#9FA6B8', marginBottom: '0.3rem' }}>
-                            Nombre del Ejercicio (escribe para predecir o haz clic en la flecha para elegir del combo)
-                          </label>
-
-                          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                            <input
-                              type="text"
-                              required
-                              placeholder="Escribe o describe el ejercicio (ej: Burpees, Flexiones, Sentadillas...)"
-                              value={ex.name}
-                              onChange={(e) => {
-                                updateExerciseField(idx, 'name', e.target.value);
-                                setActiveComboIndex(idx);
-                              }}
-                              onFocus={() => setActiveComboIndex(idx)}
-                              style={{
-                                width: '100%',
-                                padding: '0.65rem 2.4rem 0.65rem 0.85rem',
-                                borderRadius: '6px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                border: isDropdownOpen
-                                  ? '1px solid #D4AF37'
-                                  : '1px solid rgba(212, 175, 55, 0.25)',
-                                color: '#FFFFFF',
-                                fontSize: '0.88rem',
-                                outline: 'none',
-                              }}
-                            />
-
-                            {/* Botón flecha para abrir o cerrar el combo de la base de datos */}
-                            <button
-                              type="button"
-                              onClick={() => setActiveComboIndex(isDropdownOpen ? null : idx)}
-                              title="Ver listado de ejercicios de la base de datos"
-                              style={{
-                                position: 'absolute',
-                                right: '6px',
-                                background: 'none',
-                                border: 'none',
-                                color: '#D4AF37',
-                                cursor: 'pointer',
-                                padding: '0.35rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <ChevronDown
-                                size={18}
-                                style={{
-                                  transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
-                                  transition: 'transform 0.15s ease',
-                                }}
-                              />
-                            </button>
-                          </div>
-
-                          {/* MENÚ DESPLEGABLE PREDICTIVO */}
-                          {isDropdownOpen && (
+                        return (
+                          <div
+                            key={ex.id || idx}
+                            style={{
+                              padding: '1rem',
+                              backgroundColor: '#070709',
+                              border: '1px solid rgba(212, 175, 55, 0.18)',
+                              borderRadius: '8px',
+                              position: 'relative',
+                            }}
+                          >
+                            {/* Cabecera del ejercicio individual con botón de Convertir en Súper Serie */}
                             <div
                               style={{
-                                position: 'absolute',
-                                top: 'calc(100% + 4px)',
-                                left: 0,
-                                right: 0,
-                                zIndex: 60,
-                                backgroundColor: '#0E0F14',
-                                border: '1px solid rgba(212, 175, 55, 0.4)',
-                                borderRadius: '8px',
-                                boxShadow: '0 12px 30px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.1)',
-                                maxHeight: '220px',
-                                overflowY: 'auto',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginBottom: '0.75rem',
                               }}
                             >
-                              <div
-                                style={{
-                                  padding: '0.4rem 0.75rem',
-                                  fontSize: '0.72rem',
-                                  color: '#F5D77F',
-                                  fontWeight: 700,
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.05em',
-                                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                                  backgroundColor: 'rgba(212, 175, 55, 0.06)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'space-between',
-                                }}
-                              >
-                                <span>Predicciones en Base de Datos ({filteredPredictions.length})</span>
-                                <span style={{ color: '#9FA6B8', fontWeight: 400, textTransform: 'none' }}>
-                                  Clic para autocompletar
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#F5D77F' }}>
+                                  Ejercicio #{idx + 1}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: '0.7rem',
+                                    color: '#9FA6B8',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                    padding: '0.1rem 0.4rem',
+                                    borderRadius: '4px',
+                                  }}
+                                >
+                                  Individual
                                 </span>
                               </div>
 
-                              {filteredPredictions.length === 0 ? (
-                                <div style={{ padding: '0.85rem 1rem', color: '#9FA6B8', fontSize: '0.82rem' }}>
-                                  <span>No hay coincidencias exactas.</span>
-                                  <div style={{ marginTop: '0.3rem', color: '#F5D77F', fontSize: '0.78rem' }}>
-                                    ✨ Puedes describir este nuevo ejercicio libremente y al guardar se registrará en la base de datos.
-                                  </div>
-                                </div>
-                              ) : (
-                                filteredPredictions.map((catItem) => (
-                                  <div
-                                    key={catItem.id || catItem.name}
-                                    onClick={() => handleSelectFromCatalog(idx, catItem)}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                {/* Botón Convertir en Súper Serie */}
+                                <button
+                                  type="button"
+                                  onClick={() => convertExerciseToLoop(idx)}
+                                  style={{
+                                    padding: '0.28rem 0.55rem',
+                                    borderRadius: '5px',
+                                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                                    color: '#F5D77F',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.3rem',
+                                  }}
+                                  title="Agrupar en una Súper Serie (Loop) que se repite por rondas"
+                                >
+                                  <Zap size={12} />
+                                  <span>Crear Súper Serie</span>
+                                </button>
+
+                                {/* Botón Guardar directo en Base de Datos */}
+                                {ex.name.trim() && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSaveExerciseDirectlyToDB(idx)}
+                                    title="Guarda este ejercicio de inmediato en la base de datos para recordarlo en el combo"
                                     style={{
-                                      padding: '0.65rem 0.85rem',
+                                      padding: '0.28rem 0.55rem',
+                                      borderRadius: '5px',
+                                      backgroundColor: isSavedDirectly ? 'rgba(34, 197, 94, 0.2)' : 'rgba(212, 175, 55, 0.12)',
+                                      border: `1px solid ${isSavedDirectly ? '#22C55E' : 'rgba(212, 175, 55, 0.3)'}`,
+                                      color: isSavedDirectly ? '#4ADE80' : '#F5D77F',
+                                      fontSize: '0.74rem',
+                                      fontWeight: 600,
                                       cursor: 'pointer',
                                       display: 'flex',
                                       alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                      borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                                      transition: 'background-color 0.15s ease',
-                                    }}
-                                    onMouseEnter={(e) => {
-                                      e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.12)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                      e.currentTarget.style.backgroundColor = 'transparent';
+                                      gap: '0.3rem',
+                                      transition: 'all 0.15s ease',
                                     }}
                                   >
-                                    <span style={{ color: '#FFFFFF', fontSize: '0.86rem', fontWeight: 600 }}>
-                                      {catItem.name}
-                                    </span>
+                                    {isSavedDirectly ? <Check size={12} /> : <Database size={12} />}
+                                    <span>{isSavedDirectly ? 'Guardado en BD' : 'Guardar en BD'}</span>
+                                  </button>
+                                )}
 
-                                    {(catItem.defaultRepsOrDurationValue || catItem.defaultSets) && (
-                                      <span
+                                {/* Botón Quitar */}
+                                <button
+                                  type="button"
+                                  onClick={() => removeExerciseRow(idx)}
+                                  style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#F87171',
+                                    cursor: 'pointer',
+                                    fontSize: '0.78rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.2rem',
+                                  }}
+                                >
+                                  <Trash2 size={13} />
+                                  <span>Quitar</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* COMBOBOX PREDICTIVO */}
+                            <div
+                              ref={(el) => {
+                                comboContainerRefs.current[idx] = el;
+                              }}
+                              style={{ position: 'relative', marginBottom: '0.75rem' }}
+                            >
+                              <label style={{ display: 'block', fontSize: '0.76rem', color: '#9FA6B8', marginBottom: '0.3rem' }}>
+                                Nombre del Ejercicio (escribe para predecir o haz clic en la flecha para elegir del combo)
+                              </label>
+
+                              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                <input
+                                  type="text"
+                                  required
+                                  placeholder="Escribe o describe el ejercicio (ej: Burpees, Flexiones, Sentadillas...)"
+                                  value={ex.name}
+                                  onChange={(e) => {
+                                    updateExerciseField(idx, 'name', e.target.value);
+                                    setActiveComboIndex(idx);
+                                  }}
+                                  onFocus={() => setActiveComboIndex(idx)}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.65rem 2.4rem 0.65rem 0.85rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                    border: isDropdownOpen
+                                      ? '1px solid #D4AF37'
+                                      : '1px solid rgba(212, 175, 55, 0.25)',
+                                    color: '#FFFFFF',
+                                    fontSize: '0.88rem',
+                                    outline: 'none',
+                                  }}
+                                />
+
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveComboIndex(isDropdownOpen ? null : idx)}
+                                  title="Ver listado de ejercicios de la base de datos"
+                                  style={{
+                                    position: 'absolute',
+                                    right: '6px',
+                                    background: 'none',
+                                    border: 'none',
+                                    color: '#D4AF37',
+                                    cursor: 'pointer',
+                                    padding: '0.35rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <ChevronDown
+                                    size={18}
+                                    style={{
+                                      transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
+                                      transition: 'transform 0.15s ease',
+                                    }}
+                                  />
+                                </button>
+                              </div>
+
+                              {/* MENÚ DESPLEGABLE PREDICTIVO */}
+                              {isDropdownOpen && (
+                                <div
+                                  style={{
+                                    position: 'absolute',
+                                    top: 'calc(100% + 4px)',
+                                    left: 0,
+                                    right: 0,
+                                    zIndex: 60,
+                                    backgroundColor: '#0E0F14',
+                                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.15)',
+                                    maxHeight: '220px',
+                                    overflowY: 'auto',
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      padding: '0.5rem 0.75rem',
+                                      fontSize: '0.72rem',
+                                      color: '#D4AF37',
+                                      fontWeight: 700,
+                                      borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                    }}
+                                  >
+                                    <span>Catálogo Guardado en Base de Datos</span>
+                                    {catalogLoading && <span style={{ color: '#9FA6B8' }}>Cargando...</span>}
+                                  </div>
+
+                                  {filteredPredictions.length === 0 ? (
+                                    <div style={{ padding: '0.85rem 1rem', fontSize: '0.82rem', color: '#9FA6B8', textAlign: 'center' }}>
+                                      {ex.name.trim() ? (
+                                        <>
+                                          No hay coincidencias para &quot;{ex.name}&quot;.
+                                          <br />
+                                          <span style={{ color: '#F5D77F', fontSize: '0.76rem' }}>
+                                            Puedes guardarlo haciendo clic en &quot;Guardar en BD&quot;.
+                                          </span>
+                                        </>
+                                      ) : (
+                                        'No hay ejercicios registrados en el catálogo aún.'
+                                      )}
+                                    </div>
+                                  ) : (
+                                    filteredPredictions.map((catItem) => (
+                                      <div
+                                        key={catItem.id || catItem._id || catItem.name}
+                                        onClick={() => handleSelectFromCatalog(idx, catItem)}
                                         style={{
-                                          fontSize: '0.74rem',
-                                          color: '#F5D77F',
-                                          backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                                          padding: '0.15rem 0.45rem',
-                                          borderRadius: '4px',
+                                          padding: '0.6rem 0.85rem',
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
+                                          borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                                          transition: 'background-color 0.15s ease',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.12)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                          e.currentTarget.style.backgroundColor = 'transparent';
                                         }}
                                       >
-                                        {catItem.defaultSets ? `${catItem.defaultSets}x ` : ''}
-                                        {catItem.defaultRepsOrDurationValue || 12}{' '}
-                                        {catItem.defaultRepsOrDurationUnit || 'reps'}
-                                      </span>
-                                    )}
-                                  </div>
-                                ))
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                          <Dumbbell size={13} color="#F5D77F" />
+                                          <span style={{ fontSize: '0.86rem', color: '#FFFFFF', fontWeight: 600 }}>
+                                            {catItem.name}
+                                          </span>
+                                        </div>
+
+                                        {(catItem.defaultRepsOrDurationValue || catItem.defaultSets) && (
+                                          <span
+                                            style={{
+                                              fontSize: '0.74rem',
+                                              color: '#F5D77F',
+                                              backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                                              padding: '0.15rem 0.45rem',
+                                              borderRadius: '4px',
+                                            }}
+                                          >
+                                            {catItem.defaultSets ? `${catItem.defaultSets}x ` : ''}
+                                            {catItem.defaultRepsOrDurationValue || 12}{' '}
+                                            {catItem.defaultRepsOrDurationUnit || 'reps'}
+                                          </span>
+                                        )}
+                                      </div>
+                                    ))
+                                  )}
+                                </div>
                               )}
                             </div>
-                          )}
-                        </div>
 
-                        {/* Series, Número (Cantidad), Combo Unidad (Repeticiones / Segundos) y Descanso */}
-                        <div
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                            gap: '0.65rem',
-                            marginBottom: '0.65rem',
-                          }}
-                        >
-                          {/* Series */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
-                              Series
-                            </label>
-                            <input
-                              type="number"
-                              min={1}
-                              placeholder="4"
-                              value={ex.sets || ''}
-                              onChange={(e) => updateExerciseField(idx, 'sets', Number(e.target.value))}
+                            {/* Series, Número, Tipo y Descanso */}
+                            <div
                               style={{
-                                width: '100%',
-                                padding: '0.55rem 0.65rem',
-                                borderRadius: '6px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                                border: '1px solid rgba(255, 255, 255, 0.15)',
-                                color: '#FFFFFF',
-                                fontSize: '0.86rem',
-                                outline: 'none',
-                              }}
-                              title="Número de series"
-                            />
-                          </div>
-
-                          {/* Número / Cantidad */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
-                              Cantidad (número)
-                            </label>
-                            <input
-                              type="number"
-                              min={1}
-                              placeholder="15"
-                              value={ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : ''}
-                              onChange={(e) => updateExerciseField(idx, 'repsOrDurationValue', Number(e.target.value))}
-                              style={{
-                                width: '100%',
-                                padding: '0.55rem 0.65rem',
-                                borderRadius: '6px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                                border: '1px solid rgba(255, 255, 255, 0.15)',
-                                color: '#FFFFFF',
-                                fontSize: '0.86rem',
-                                outline: 'none',
-                              }}
-                              title="Cantidad numérica de repeticiones o segundos"
-                            />
-                          </div>
-
-                          {/* Combo selector: Segundos o Repeticiones */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
-                              Tipo / Unidad
-                            </label>
-                            <select
-                              value={ex.repsOrDurationUnit || 'repeticiones'}
-                              onChange={(e) => updateExerciseField(idx, 'repsOrDurationUnit', e.target.value as ExerciseMeasureUnit)}
-                              style={{
-                                width: '100%',
-                                padding: '0.55rem 0.65rem',
-                                borderRadius: '6px',
-                                backgroundColor: '#0E0F14',
-                                border: '1px solid rgba(212, 175, 55, 0.3)',
-                                color: '#F5D77F',
-                                fontSize: '0.86rem',
-                                fontWeight: 600,
-                                outline: 'none',
-                                cursor: 'pointer',
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                                gap: '0.65rem',
+                                marginBottom: '0.65rem',
                               }}
                             >
-                              <option value="repeticiones">Repeticiones</option>
-                              <option value="segundos">Segundos</option>
-                            </select>
-                          </div>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                  Series
+                                </label>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  placeholder="4"
+                                  value={ex.sets || ''}
+                                  onChange={(e) => updateExerciseField(idx, 'sets', Number(e.target.value))}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.55rem 0.65rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                                    color: '#FFFFFF',
+                                    fontSize: '0.86rem',
+                                    outline: 'none',
+                                  }}
+                                  title="Número de series"
+                                />
+                              </div>
 
-                          {/* Descanso */}
-                          <div>
-                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
-                              Descanso (seg)
-                            </label>
-                            <input
-                              type="number"
-                              min={0}
-                              placeholder="45"
-                              value={ex.restSeconds !== undefined ? ex.restSeconds : ''}
-                              onChange={(e) => updateExerciseField(idx, 'restSeconds', Number(e.target.value))}
-                              style={{
-                                width: '100%',
-                                padding: '0.55rem 0.65rem',
-                                borderRadius: '6px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                                border: '1px solid rgba(255, 255, 255, 0.15)',
-                                color: '#FFFFFF',
-                                fontSize: '0.86rem',
-                                outline: 'none',
-                              }}
-                              title="Descanso en segundos"
-                            />
-                          </div>
-                        </div>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                  Cantidad (número)
+                                </label>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  placeholder="15"
+                                  value={ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : ''}
+                                  onChange={(e) => updateExerciseField(idx, 'repsOrDurationValue', Number(e.target.value))}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.55rem 0.65rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                                    color: '#FFFFFF',
+                                    fontSize: '0.86rem',
+                                    outline: 'none',
+                                  }}
+                                  title="Cantidad numérica de repeticiones o segundos"
+                                />
+                              </div>
 
-                        {/* Notas técnicas */}
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
-                            Indicaciones o notas técnicas (opcional)
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="Ej: Cuidar alineación de espalda y control respiratorio"
-                            value={ex.notes || ''}
-                            onChange={(e) => updateExerciseField(idx, 'notes', e.target.value)}
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                  Tipo / Unidad
+                                </label>
+                                <select
+                                  value={ex.repsOrDurationUnit || 'repeticiones'}
+                                  onChange={(e) => updateExerciseField(idx, 'repsOrDurationUnit', e.target.value as ExerciseMeasureUnit)}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.55rem 0.65rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: '#0E0F14',
+                                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                                    color: '#F5D77F',
+                                    fontSize: '0.86rem',
+                                    fontWeight: 600,
+                                    outline: 'none',
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <option value="repeticiones">Repeticiones</option>
+                                  <option value="segundos">Segundos</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                  Descanso (seg)
+                                </label>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  placeholder="45"
+                                  value={ex.restSeconds !== undefined ? ex.restSeconds : ''}
+                                  onChange={(e) => updateExerciseField(idx, 'restSeconds', Number(e.target.value))}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.55rem 0.65rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                                    color: '#FFFFFF',
+                                    fontSize: '0.86rem',
+                                    outline: 'none',
+                                  }}
+                                  title="Descanso en segundos"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Notas técnicas */}
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                Indicaciones o notas técnicas (opcional)
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Ej: Cuidar alineación de espalda y control respiratorio"
+                                value={ex.notes || ''}
+                                onChange={(e) => updateExerciseField(idx, 'notes', e.target.value)}
+                                style={{
+                                  width: '100%',
+                                  padding: '0.5rem 0.65rem',
+                                  borderRadius: '6px',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                                  color: '#CBD5E1',
+                                  fontSize: '0.82rem',
+                                  outline: 'none',
+                                  fontStyle: 'italic',
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      } else {
+                        // BLOQUE SÚPER SERIE / CIRCUITO (LOOP)
+                        return (
+                          <div
+                            key={block.loopId || blockIdx}
                             style={{
-                              width: '100%',
-                              padding: '0.5rem 0.65rem',
-                              borderRadius: '6px',
-                              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
-                              color: '#CBD5E1',
-                              fontSize: '0.82rem',
-                              outline: 'none',
-                              fontStyle: 'italic',
+                              padding: '1.15rem',
+                              backgroundColor: 'rgba(212, 175, 55, 0.03)',
+                              border: '1px solid rgba(212, 175, 55, 0.45)',
+                              borderRadius: '12px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '1rem',
+                              boxShadow: '0 4px 25px rgba(0, 0, 0, 0.45), inset 0 0 15px rgba(212, 175, 55, 0.06)',
                             }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
+                          >
+                            {/* Cabecera de la Súper Serie */}
+                            <div
+                              style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: '0.75rem',
+                                paddingBottom: '0.75rem',
+                                borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'rgba(212, 175, 55, 0.22)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#F5D77F',
+                                  }}
+                                >
+                                  <Zap size={16} />
+                                </span>
+                                <input
+                                  type="text"
+                                  value={block.loopName || 'Súper Serie'}
+                                  onChange={(e) => updateLoopMeta(block.loopId!, 'loopName', e.target.value)}
+                                  placeholder="Nombre de la Súper Serie..."
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    borderBottom: '1px dashed rgba(212, 175, 55, 0.5)',
+                                    color: '#F5D77F',
+                                    fontWeight: 800,
+                                    fontSize: '0.98rem',
+                                    outline: 'none',
+                                    padding: '0.15rem 0.35rem',
+                                    minWidth: '150px',
+                                  }}
+                                />
+                                <span
+                                  style={{
+                                    fontSize: '0.72rem',
+                                    color: '#9FA6B8',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                    padding: '0.15rem 0.5rem',
+                                    borderRadius: '4px',
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  Loop: {block.items.length} ejercicios
+                                </span>
+                              </div>
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+                                {/* Selector de Rondas / Vueltas */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                  <label style={{ fontSize: '0.76rem', fontWeight: 700, color: '#F5D77F', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <Repeat size={13} /> Rondas / Vueltas:
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    max={30}
+                                    value={block.loopRounds || 4}
+                                    onChange={(e) => updateLoopMeta(block.loopId!, 'loopRounds', Math.max(1, Number(e.target.value)))}
+                                    style={{
+                                      width: '54px',
+                                      padding: '0.25rem 0.35rem',
+                                      borderRadius: '6px',
+                                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                                      border: '1px solid rgba(212, 175, 55, 0.35)',
+                                      color: '#FFFFFF',
+                                      fontWeight: 700,
+                                      fontSize: '0.85rem',
+                                      textAlign: 'center',
+                                      outline: 'none',
+                                    }}
+                                    title="Número de vueltas completas de la súper serie"
+                                  />
+                                </div>
+
+                                {/* Pausa entre rondas */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                  <label style={{ fontSize: '0.76rem', fontWeight: 700, color: '#9FA6B8', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <Clock size={13} /> Pausa entre vueltas:
+                                  </label>
+                                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={600}
+                                      value={block.loopRestBetweenRounds !== undefined ? block.loopRestBetweenRounds : 60}
+                                      onChange={(e) => updateLoopMeta(block.loopId!, 'loopRestBetweenRounds', Math.max(0, Number(e.target.value)))}
+                                      style={{
+                                        width: '64px',
+                                        padding: '0.25rem 1.3rem 0.25rem 0.35rem',
+                                        borderRadius: '6px',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                                        color: '#FFFFFF',
+                                        fontWeight: 700,
+                                        fontSize: '0.85rem',
+                                        textAlign: 'center',
+                                        outline: 'none',
+                                      }}
+                                      title="Segundos de recuperación al terminar toda la vuelta del bucle"
+                                    />
+                                    <span style={{ position: 'absolute', right: '5px', fontSize: '0.7rem', color: '#9FA6B8', pointerEvents: 'none' }}>
+                                      s
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Desagrupar Súper Serie */}
+                                <button
+                                  type="button"
+                                  onClick={() => ungroupLoop(block.loopId!)}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.3rem',
+                                    padding: '0.3rem 0.6rem',
+                                    borderRadius: '5px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                                    color: '#CBD5E1',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                  }}
+                                  title="Separar los ejercicios de este loop en ejercicios individuales"
+                                >
+                                  <Unlink size={12} />
+                                  <span>Desagrupar</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Ejercicios dentro del loop */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                              {block.items.map(({ exercise: ex, originalIndex: idx }, itemIdx) => {
+                                const isDropdownOpen = activeComboIndex === idx;
+                                const isSavedDirectly = !!savedExerciseIndices[idx];
+                                const searchWord = (ex.name || '').toLowerCase().trim();
+                                const filteredPredictions = catalogExercises.filter((item) =>
+                                  searchWord === '' || item.name.toLowerCase().includes(searchWord)
+                                );
+                                const isLastInLoop = itemIdx === block.items.length - 1;
+
+                                return (
+                                  <div
+                                    key={ex.id || idx}
+                                    style={{
+                                      padding: '0.9rem',
+                                      backgroundColor: '#070709',
+                                      border: '1px solid rgba(212, 175, 55, 0.22)',
+                                      borderRadius: '8px',
+                                      position: 'relative',
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0.7rem',
+                                      }}
+                                    >
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span
+                                          style={{
+                                            width: '22px',
+                                            height: '22px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'rgba(212, 175, 55, 0.25)',
+                                            color: '#F5D77F',
+                                            fontSize: '0.74rem',
+                                            fontWeight: 800,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                          }}
+                                        >
+                                          {itemIdx + 1}
+                                        </span>
+                                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#FFFFFF' }}>
+                                          Paso #{itemIdx + 1} de la Súper Serie
+                                        </span>
+                                        <span
+                                          style={{
+                                            fontSize: '0.7rem',
+                                            color: '#F5D77F',
+                                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                                            padding: '0.1rem 0.45rem',
+                                            borderRadius: '4px',
+                                          }}
+                                        >
+                                          1 serie por vuelta (× {block.loopRounds} rondas)
+                                        </span>
+                                      </div>
+
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        {ex.name.trim() && (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleSaveExerciseDirectlyToDB(idx)}
+                                            style={{
+                                              padding: '0.28rem 0.55rem',
+                                              borderRadius: '5px',
+                                              backgroundColor: isSavedDirectly ? 'rgba(34, 197, 94, 0.2)' : 'rgba(212, 175, 55, 0.12)',
+                                              border: `1px solid ${isSavedDirectly ? '#22C55E' : 'rgba(212, 175, 55, 0.3)'}`,
+                                              color: isSavedDirectly ? '#4ADE80' : '#F5D77F',
+                                              fontSize: '0.74rem',
+                                              fontWeight: 600,
+                                              cursor: 'pointer',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: '0.3rem',
+                                            }}
+                                          >
+                                            {isSavedDirectly ? <Check size={12} /> : <Database size={12} />}
+                                            <span>{isSavedDirectly ? 'Guardado' : 'Guardar en BD'}</span>
+                                          </button>
+                                        )}
+
+                                        <button
+                                          type="button"
+                                          onClick={() => removeExerciseRow(idx)}
+                                          style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            color: '#F87171',
+                                            cursor: 'pointer',
+                                            fontSize: '0.78rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.2rem',
+                                          }}
+                                          title="Quitar este ejercicio del loop"
+                                        >
+                                          <Trash2 size={13} />
+                                          <span>Quitar</span>
+                                        </button>
+                                      </div>
+                                    </div>
+
+                                    {/* Combobox predictivo para ejercicio del loop */}
+                                    <div
+                                      ref={(el) => {
+                                        comboContainerRefs.current[idx] = el;
+                                      }}
+                                      style={{ position: 'relative', marginBottom: '0.75rem' }}
+                                    >
+                                      <label style={{ display: 'block', fontSize: '0.76rem', color: '#9FA6B8', marginBottom: '0.3rem' }}>
+                                        Nombre del Ejercicio
+                                      </label>
+
+                                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                        <input
+                                          type="text"
+                                          required
+                                          placeholder="Escribe o selecciona del catálogo..."
+                                          value={ex.name}
+                                          onChange={(e) => {
+                                            updateExerciseField(idx, 'name', e.target.value);
+                                            setActiveComboIndex(idx);
+                                          }}
+                                          onFocus={() => setActiveComboIndex(idx)}
+                                          style={{
+                                            width: '100%',
+                                            padding: '0.65rem 2.4rem 0.65rem 0.85rem',
+                                            borderRadius: '6px',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                            border: isDropdownOpen
+                                              ? '1px solid #D4AF37'
+                                              : '1px solid rgba(212, 175, 55, 0.25)',
+                                            color: '#FFFFFF',
+                                            fontSize: '0.88rem',
+                                            outline: 'none',
+                                          }}
+                                        />
+
+                                        <button
+                                          type="button"
+                                          onClick={() => setActiveComboIndex(isDropdownOpen ? null : idx)}
+                                          title="Ver listado del catálogo"
+                                          style={{
+                                            position: 'absolute',
+                                            right: '6px',
+                                            background: 'none',
+                                            border: 'none',
+                                            color: '#D4AF37',
+                                            cursor: 'pointer',
+                                            padding: '0.35rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                          }}
+                                        >
+                                          <ChevronDown
+                                            size={18}
+                                            style={{
+                                              transform: isDropdownOpen ? 'rotate(180deg)' : 'none',
+                                              transition: 'transform 0.15s ease',
+                                            }}
+                                          />
+                                        </button>
+                                      </div>
+
+                                      {/* Menú Desplegable predictivo */}
+                                      {isDropdownOpen && (
+                                        <div
+                                          style={{
+                                            position: 'absolute',
+                                            top: 'calc(100% + 4px)',
+                                            left: 0,
+                                            right: 0,
+                                            zIndex: 60,
+                                            backgroundColor: '#0E0F14',
+                                            border: '1px solid rgba(212, 175, 55, 0.4)',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.15)',
+                                            maxHeight: '200px',
+                                            overflowY: 'auto',
+                                          }}
+                                        >
+                                          {filteredPredictions.length === 0 ? (
+                                            <div style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: '#9FA6B8', textAlign: 'center' }}>
+                                              No hay coincidencias en el catálogo.
+                                            </div>
+                                          ) : (
+                                            filteredPredictions.map((catItem) => (
+                                              <div
+                                                key={catItem.id || catItem._id || catItem.name}
+                                                onClick={() => handleSelectFromCatalog(idx, catItem)}
+                                                style={{
+                                                  padding: '0.55rem 0.85rem',
+                                                  cursor: 'pointer',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'space-between',
+                                                  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                  e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.12)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                              >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                                  <Dumbbell size={13} color="#F5D77F" />
+                                                  <span style={{ fontSize: '0.84rem', color: '#FFFFFF', fontWeight: 600 }}>
+                                                    {catItem.name}
+                                                  </span>
+                                                </div>
+                                                <span
+                                                  style={{
+                                                    fontSize: '0.72rem',
+                                                    color: '#F5D77F',
+                                                    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                                                    padding: '0.1rem 0.4rem',
+                                                    borderRadius: '4px',
+                                                  }}
+                                                >
+                                                  {catItem.defaultRepsOrDurationValue || 12}{' '}
+                                                  {catItem.defaultRepsOrDurationUnit || 'reps'}
+                                                </span>
+                                              </div>
+                                            ))
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Cantidad, Tipo y Pausa hacia el siguiente */}
+                                    <div
+                                      style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                                        gap: '0.65rem',
+                                        marginBottom: '0.65rem',
+                                      }}
+                                    >
+                                      <div>
+                                        <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                          Cantidad (número)
+                                        </label>
+                                        <input
+                                          type="number"
+                                          min={1}
+                                          placeholder="12"
+                                          value={ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : ''}
+                                          onChange={(e) => updateExerciseField(idx, 'repsOrDurationValue', Number(e.target.value))}
+                                          style={{
+                                            width: '100%',
+                                            padding: '0.55rem 0.65rem',
+                                            borderRadius: '6px',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                                            color: '#FFFFFF',
+                                            fontSize: '0.86rem',
+                                            outline: 'none',
+                                          }}
+                                        />
+                                      </div>
+
+                                      <div>
+                                        <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                          Tipo / Unidad
+                                        </label>
+                                        <select
+                                          value={ex.repsOrDurationUnit || 'repeticiones'}
+                                          onChange={(e) => updateExerciseField(idx, 'repsOrDurationUnit', e.target.value as ExerciseMeasureUnit)}
+                                          style={{
+                                            width: '100%',
+                                            padding: '0.55rem 0.65rem',
+                                            borderRadius: '6px',
+                                            backgroundColor: '#0E0F14',
+                                            border: '1px solid rgba(212, 175, 55, 0.3)',
+                                            color: '#F5D77F',
+                                            fontSize: '0.86rem',
+                                            fontWeight: 600,
+                                            outline: 'none',
+                                            cursor: 'pointer',
+                                          }}
+                                        >
+                                          <option value="repeticiones">Repeticiones</option>
+                                          <option value="segundos">Segundos</option>
+                                        </select>
+                                      </div>
+
+                                      <div>
+                                        <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                                          {isLastInLoop ? 'Pausa fin de vuelta' : 'Pausa al sig. ejercicio (seg)'}
+                                        </label>
+                                        <input
+                                          type="number"
+                                          min={0}
+                                          disabled={isLastInLoop}
+                                          placeholder={isLastInLoop ? `${block.loopRestBetweenRounds || 60}s (en cabecera)` : '15'}
+                                          value={isLastInLoop ? '' : (ex.restSeconds !== undefined ? ex.restSeconds : '')}
+                                          onChange={(e) => updateExerciseField(idx, 'restSeconds', Number(e.target.value))}
+                                          style={{
+                                            width: '100%',
+                                            padding: '0.55rem 0.65rem',
+                                            borderRadius: '6px',
+                                            backgroundColor: isLastInLoop ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.04)',
+                                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                                            color: isLastInLoop ? '#9FA6B8' : '#FFFFFF',
+                                            fontSize: '0.86rem',
+                                            outline: 'none',
+                                            cursor: isLastInLoop ? 'not-allowed' : 'text',
+                                          }}
+                                          title={isLastInLoop ? `Se usa el descanso de fin de ronda configurado en la cabecera (${block.loopRestBetweenRounds}s)` : 'Descanso entre ejercicios del bucle'}
+                                        />
+                                      </div>
+                                    </div>
+
+                                    {/* Notas técnicas */}
+                                    <div>
+                                      <input
+                                        type="text"
+                                        placeholder="Indicaciones o notas técnicas de este paso..."
+                                        value={ex.notes || ''}
+                                        onChange={(e) => updateExerciseField(idx, 'notes', e.target.value)}
+                                        style={{
+                                          width: '100%',
+                                          padding: '0.45rem 0.65rem',
+                                          borderRadius: '6px',
+                                          backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                                          color: '#CBD5E1',
+                                          fontSize: '0.8rem',
+                                          outline: 'none',
+                                          fontStyle: 'italic',
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Botón para añadir ejercicio a esta Súper Serie */}
+                            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                              <button
+                                type="button"
+                                onClick={() => addExerciseToLoop(block.loopId!)}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  padding: '0.4rem 0.8rem',
+                                  borderRadius: '6px',
+                                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                                  border: '1px dashed rgba(212, 175, 55, 0.45)',
+                                  color: '#F5D77F',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease',
+                                }}
+                              >
+                                <Plus size={13} />
+                                <span>+ Añadir ejercicio a esta {block.loopName || 'Súper Serie'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      }
+                    });
+                  })()}
                 </div>
               </div>
 

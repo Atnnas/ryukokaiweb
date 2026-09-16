@@ -98,6 +98,11 @@ function sanitizeExerciseList(rawList: unknown[]): ExerciseItem[] {
           ? parseInt(ex.reps, 10) || 12
           : 12;
 
+      const loopId = typeof ex.loopId === 'string' && ex.loopId.trim().length > 0 ? ex.loopId.trim() : undefined;
+      const loopName = typeof ex.loopName === 'string' && ex.loopName.trim().length > 0 ? ex.loopName.trim() : undefined;
+      const loopRounds = ex.loopRounds !== undefined && !isNaN(Number(ex.loopRounds)) ? Math.max(1, Number(ex.loopRounds)) : undefined;
+      const loopRestBetweenRounds = ex.loopRestBetweenRounds !== undefined && !isNaN(Number(ex.loopRestBetweenRounds)) ? Math.max(0, Number(ex.loopRestBetweenRounds)) : undefined;
+
       return {
         id: (ex.id as string) || `ex-${Date.now()}-${idx}`,
         name: (ex.name as string).trim(),
@@ -107,6 +112,7 @@ function sanitizeExerciseList(rawList: unknown[]): ExerciseItem[] {
         reps: `${numVal} ${unit}`,
         restSeconds: ex.restSeconds !== undefined ? Number(ex.restSeconds) : 45,
         notes: ex.notes ? String(ex.notes).trim() : undefined,
+        ...(loopId ? { loopId, loopName, loopRounds, loopRestBetweenRounds } : {}),
       };
     });
 }

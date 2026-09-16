@@ -13,15 +13,36 @@ export interface RoutineDurationCalculation {
 }
 
 /**
+ * Helper para calcular los segundos de trabajo activo de una serie individual.
+ */
+export function getExerciseWorkSecondsPerSet(ex: Partial<ExerciseItem>): number {
+  const unit: ExerciseMeasureUnit =
+    ex.repsOrDurationUnit === 'segundos' ||
+    (typeof ex.reps === 'string' && ex.reps.toLowerCase().includes('seg'))
+      ? 'segundos'
+      : 'repeticiones';
+
+  const numVal =
+    ex.repsOrDurationValue !== undefined && !isNaN(Number(ex.repsOrDurationValue))
+      ? Math.max(1, Number(ex.repsOrDurationValue))
+      : typeof ex.reps === 'string'
+      ? parseInt(ex.reps, 10) || 12
+      : 12;
+
+  if (unit === 'segundos') {
+    return Math.max(5, numVal);
+  }
+  // Repeticiones: 4s por repetición técnica + 10s de preparación por serie
+  return Math.max(15, numVal * 4 + 10);
+}
+
+/**
  * Calcula la duración estimada de una rutina a partir de sus ejercicios con cadencia deportiva/marcial:
- * - series: número de series por ejercicio (mínimo 1)
- * - si unidad === 'segundos': el trabajo activo es el valor en segundos (mínimo 5s)
- * - si unidad === 'repeticiones': cada repetición se estima a 4 segundos de ejecución técnica
- *   + 10 segundos de preparación de postura/respiración por serie (mínimo 15s de trabajo por serie)
- * - descanso: segundos de pausa por serie (por defecto 45s)
- * - transiciones: 45s entre estaciones/ejercicios diferentes
- * - calentamiento base: 300s (5 min) para la sesión dojo
- * Duración total = Σ (series * (trabajo + descanso)) + transiciones + calentamiento
+ * - Soporta ejercicios individuales y bloques de "Loop" (Súper Series / Circuitos por rondas).
+ * - En ejercicios individuales: series * (trabajo + descanso)
+ * - En Loops / Súper Series: rondas * (Σ trabajo_ejercicios + Σ descansos_intermedios + descanso_fin_ronda)
+ * - Transiciones: 45s entre bloques distintos
+ * - Calentamiento base: 300s (5 min) para la sesión dojo
  */
 export function calculateRoutineDuration(
   exercises?: Partial<ExerciseItem>[] | null
@@ -37,51 +58,107 @@ export function calculateRoutineDuration(
 
   // Considerar ejercicios que tengan nombre o datos asignados
   const validExercises = exercises.filter(
-    (ex) => !!ex && ((ex.name && ex.name.trim().length > 0) || (ex.sets && Number(ex.sets) > 0))
+    (ex) => !!ex && ((ex.name && ex.name.trim().length > 0) || (ex.sets && Number(ex.sets) > 0) || !!ex.loopId)
   );
 
   const listToCalculate = validExercises.length > 0 ? validExercises : exercises;
 
-  let totalWorkSeconds = 0;
-  let totalRestSeconds = 0;
+  type Block =
+    | { type: 'single'; exercise: Partial<ExerciseItem> }
+    | {
+        type: 'loop';
+        loopId: string;
+        loopName?: string;
+        loopRounds: number;
+        loopRestBetweenRounds: number;
+        exercises: Partial<ExerciseItem>[];
+      };
+
+  const blocks: Block[] = [];
+  const loopMap = new Map<string, {
+    type: 'loop';
+    loopId: string;
+    loopName?: string;
+    loopRounds: number;
+    loopRestBetweenRounds: number;
+    exercises: Partial<ExerciseItem>[];
+  }>();
 
   for (const ex of listToCalculate) {
     if (!ex) continue;
-    const sets = Math.max(1, Number(ex.sets) || 1);
-
-    const unit: ExerciseMeasureUnit =
-      ex.repsOrDurationUnit === 'segundos' ||
-      (typeof ex.reps === 'string' && ex.reps.toLowerCase().includes('seg'))
-        ? 'segundos'
-        : 'repeticiones';
-
-    const numVal =
-      ex.repsOrDurationValue !== undefined && !isNaN(Number(ex.repsOrDurationValue))
-        ? Math.max(1, Number(ex.repsOrDurationValue))
-        : typeof ex.reps === 'string'
-        ? parseInt(ex.reps, 10) || 12
-        : 12;
-
-    const restSec =
-      ex.restSeconds !== undefined && !isNaN(Number(ex.restSeconds))
-        ? Math.max(0, Number(ex.restSeconds))
-        : 45;
-
-    // Cálculo estimado de trabajo por serie
-    let workSecondsPerSet: number;
-    if (unit === 'segundos') {
-      workSecondsPerSet = Math.max(5, numVal);
+    if (ex.loopId) {
+      let loopBlock = loopMap.get(ex.loopId);
+      if (!loopBlock) {
+        loopBlock = {
+          type: 'loop',
+          loopId: ex.loopId,
+          loopName: ex.loopName || 'Súper Serie',
+          loopRounds: Math.max(1, Number(ex.loopRounds) || 3),
+          loopRestBetweenRounds:
+            ex.loopRestBetweenRounds !== undefined && !isNaN(Number(ex.loopRestBetweenRounds))
+              ? Math.max(0, Number(ex.loopRestBetweenRounds))
+              : 60,
+          exercises: [],
+        };
+        loopMap.set(ex.loopId, loopBlock);
+        blocks.push(loopBlock);
+      }
+      loopBlock.exercises.push(ex);
+      if (ex.loopRounds && Number(ex.loopRounds) > 0) loopBlock.loopRounds = Number(ex.loopRounds);
+      if (ex.loopRestBetweenRounds !== undefined && !isNaN(Number(ex.loopRestBetweenRounds))) {
+        loopBlock.loopRestBetweenRounds = Math.max(0, Number(ex.loopRestBetweenRounds));
+      }
+      if (ex.loopName) loopBlock.loopName = ex.loopName;
     } else {
-      // Repeticiones: 4s por repetición técnica + 10s de preparación por serie
-      workSecondsPerSet = Math.max(15, numVal * 4 + 10);
+      blocks.push({ type: 'single', exercise: ex });
     }
-
-    totalWorkSeconds += sets * workSecondsPerSet;
-    totalRestSeconds += sets * restSec;
   }
 
-  // Transición entre ejercicios (45s entre cada ejercicio)
-  const transitionsSeconds = Math.max(0, listToCalculate.length - 1) * 45;
+  let totalWorkSeconds = 0;
+  let totalRestSeconds = 0;
+
+  for (const block of blocks) {
+    if (block.type === 'single') {
+      const ex = block.exercise;
+      const sets = Math.max(1, Number(ex.sets) || 1);
+      const workSecondsPerSet = getExerciseWorkSecondsPerSet(ex);
+      const restSec =
+        ex.restSeconds !== undefined && !isNaN(Number(ex.restSeconds))
+          ? Math.max(0, Number(ex.restSeconds))
+          : 45;
+
+      totalWorkSeconds += sets * workSecondsPerSet;
+      totalRestSeconds += sets * restSec;
+    } else {
+      // Bloque Loop / Súper Serie
+      const rounds = Math.max(1, block.loopRounds || 3);
+      let roundWork = 0;
+      let roundRest = 0;
+
+      for (let i = 0; i < block.exercises.length; i++) {
+        const ex = block.exercises[i];
+        roundWork += getExerciseWorkSecondsPerSet(ex);
+
+        const isLastInLoop = i === block.exercises.length - 1;
+        if (!isLastInLoop) {
+          // Descanso rápido entre ejercicios dentro de la ronda
+          roundRest +=
+            ex.restSeconds !== undefined && !isNaN(Number(ex.restSeconds))
+              ? Math.max(0, Number(ex.restSeconds))
+              : 15;
+        } else {
+          // Descanso de recuperación completa al terminar la vuelta
+          roundRest += block.loopRestBetweenRounds;
+        }
+      }
+
+      totalWorkSeconds += rounds * roundWork;
+      totalRestSeconds += rounds * roundRest;
+    }
+  }
+
+  // Transición entre bloques distintos (45s entre cada bloque)
+  const transitionsSeconds = Math.max(0, blocks.length - 1) * 45;
 
   // Calentamiento y acondicionamiento marcial inicial (5 min = 300s si hay ejercicios)
   const warmupSeconds = listToCalculate.length > 0 ? 300 : 0;
