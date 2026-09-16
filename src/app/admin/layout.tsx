@@ -9,6 +9,7 @@ import {
   Users,
   CalendarCheck,
   Handshake,
+  Dumbbell,
   ArrowLeft,
   RefreshCw,
   Lock,
@@ -197,6 +198,7 @@ export default function AdminLayout({
     pathname === '/admin/users' || pathname === '/admin';
   const isAttendanceActive = pathname?.startsWith('/admin/attendance');
   const isSponsorsActive = pathname?.startsWith('/admin/sponsors');
+  const isRoutinesActive = pathname?.startsWith('/admin/routines');
 
   return (
     <div
@@ -399,6 +401,43 @@ export default function AdminLayout({
                 color={isSponsorsActive ? '#F5D77F' : '#9FA6B8'}
               />
               <span>Patrocinadores</span>
+            </div>
+          </Link>
+
+          {/* Tab 4: /admin/routines */}
+          <Link
+            href="/admin/routines"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.85rem 1rem',
+              borderRadius: '8px',
+              border: isRoutinesActive
+                ? '1px solid rgba(212, 175, 55, 0.4)'
+                : '1px solid transparent',
+              backgroundColor: isRoutinesActive
+                ? 'rgba(212, 175, 55, 0.15)'
+                : 'transparent',
+              color: isRoutinesActive ? '#FFFFFF' : '#9FA6B8',
+              fontSize: '0.9rem',
+              fontWeight: isRoutinesActive ? 700 : 500,
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+              }}
+            >
+              <Dumbbell
+                size={18}
+                color={isRoutinesActive ? '#F5D77F' : '#9FA6B8'}
+              />
+              <span>Rutinas</span>
             </div>
           </Link>
         </nav>

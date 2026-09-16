@@ -85,3 +85,41 @@ export interface Sponsor {
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
+
+export type RoutineCategory =
+  | 'kata'
+  | 'kumite'
+  | 'kihon'
+  | 'conditioning'
+  | 'flexibility'
+  | 'warmup';
+
+export type RoutineDifficulty =
+  | 'all-levels'
+  | 'beginner'
+  | 'intermediate'
+  | 'advanced';
+
+export interface ExerciseItem {
+  id: string;
+  name: string;
+  sets?: number;
+  reps?: string; // Ej: "15 reps", "45 seg", "Al fallo", "3 vueltas"
+  restSeconds?: number; // Descanso en segundos
+  notes?: string;
+}
+
+export interface Routine {
+  id?: string;
+  _id?: string;
+  title: string;
+  description: string;
+  category: RoutineCategory;
+  difficulty: RoutineDifficulty;
+  targetBelt?: string; // Ej: "Todos los cinturones", "Blanca a Naranja", "Verde a Marrón", "Cintas Negras"
+  durationMinutes: number; // Duración estimada en minutos
+  exercises: ExerciseItem[];
+  createdBy?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
