@@ -86,11 +86,15 @@ export interface Sponsor {
   updatedAt?: string | Date;
 }
 
+export type ExerciseMeasureUnit = 'repeticiones' | 'segundos';
+
 export interface ExerciseItem {
   id: string;
   name: string;
   sets?: number;
-  reps?: string; // Ej: "15 reps", "45 seg", "Al fallo", "3 vueltas"
+  repsOrDurationValue?: number; // Solo el número (ej: 15, 30, 45)
+  repsOrDurationUnit?: ExerciseMeasureUnit; // 'repeticiones' | 'segundos'
+  reps?: string; // Campo auxiliar
   restSeconds?: number; // Descanso en segundos
   notes?: string;
 }
@@ -100,6 +104,8 @@ export interface ExerciseCatalogItem {
   _id?: string;
   name: string;
   defaultSets?: number;
+  defaultRepsOrDurationValue?: number;
+  defaultRepsOrDurationUnit?: ExerciseMeasureUnit;
   defaultReps?: string;
   defaultRestSeconds?: number;
   defaultNotes?: string;

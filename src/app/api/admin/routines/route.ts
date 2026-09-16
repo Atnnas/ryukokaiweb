@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDatabase } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
-import { Routine } from '@/types';
+import { Routine, ExerciseItem, ExerciseMeasureUnit } from '@/types';
 
 const SUPER_ADMINS = [
   'david.artavia.rodriguez@gmail.com',
@@ -33,6 +33,81 @@ async function verifyAdmin() {
   }
 
   return { authorized: false, reason: 'Privilegios insuficientes de administrador' };
+}
+
+// Helper para sincronizar y guardar ejercicios directamente en la colección Exercises de MongoDB
+async function syncExercisesToCatalog(exercises: ExerciseItem[]) {
+  if (!Array.isArray(exercises) || exercises.length === 0) return;
+  try {
+    const db = await getDatabase();
+    const collection = db.collection('Exercises');
+    for (const ex of exercises) {
+      if (ex.name && ex.name.trim()) {
+        const cleanName = ex.name.trim();
+        const unit: ExerciseMeasureUnit =
+          ex.repsOrDurationUnit === 'segundos' ? 'segundos' : 'repeticiones';
+        const val =
+          ex.repsOrDurationValue !== undefined && !isNaN(Number(ex.repsOrDurationValue))
+            ? Number(ex.repsOrDurationValue)
+            : 12;
+
+        await collection.updateOne(
+          { name: { $regex: `^${cleanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } },
+          {
+            $set: {
+              name: cleanName,
+              defaultSets: ex.sets || 3,
+              defaultRepsOrDurationValue: val,
+              defaultRepsOrDurationUnit: unit,
+              defaultReps: `${val} ${unit}`,
+              defaultRestSeconds: ex.restSeconds !== undefined ? ex.restSeconds : 45,
+              defaultNotes: ex.notes || '',
+              updatedAt: new Date(),
+            },
+            $setOnInsert: {
+              createdAt: new Date(),
+            },
+          },
+          { upsert: true }
+        );
+      }
+    }
+  } catch (err) {
+    console.error('Error al sincronizar ejercicios al catálogo:', err);
+  }
+}
+
+// Sanitizar array de ejercicios soportando número y combo de unidad
+function sanitizeExerciseList(rawList: unknown[]): ExerciseItem[] {
+  if (!Array.isArray(rawList)) return [];
+
+  return (rawList as Record<string, unknown>[])
+    .filter((ex) => !!ex && typeof ex.name === 'string' && ex.name.trim().length > 0)
+    .map((ex, idx) => {
+      const unit: ExerciseMeasureUnit =
+        ex.repsOrDurationUnit === 'segundos' ||
+        (typeof ex.reps === 'string' && ex.reps.toLowerCase().includes('seg'))
+          ? 'segundos'
+          : 'repeticiones';
+
+      const numVal =
+        ex.repsOrDurationValue !== undefined && !isNaN(Number(ex.repsOrDurationValue))
+          ? Number(ex.repsOrDurationValue)
+          : typeof ex.reps === 'string'
+          ? parseInt(ex.reps, 10) || 12
+          : 12;
+
+      return {
+        id: (ex.id as string) || `ex-${Date.now()}-${idx}`,
+        name: (ex.name as string).trim(),
+        sets: ex.sets ? Number(ex.sets) : 3,
+        repsOrDurationValue: numVal,
+        repsOrDurationUnit: unit,
+        reps: `${numVal} ${unit}`,
+        restSeconds: ex.restSeconds !== undefined ? Number(ex.restSeconds) : 45,
+        notes: ex.notes ? String(ex.notes).trim() : undefined,
+      };
+    });
 }
 
 // GET: Listar rutinas con búsqueda
@@ -67,7 +142,7 @@ export async function GET(request: NextRequest) {
       title: r.title || 'Rutina sin título',
       description: r.description || '',
       durationMinutes: Number(r.durationMinutes) || 45,
-      exercises: Array.isArray(r.exercises) ? r.exercises : [],
+      exercises: sanitizeExerciseList(r.exercises || []),
       createdBy: r.createdBy || 'Sensei',
       createdAt: r.createdAt || new Date(),
       updatedAt: r.updatedAt || new Date(),
@@ -77,41 +152,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error al obtener rutinas:', error);
     return NextResponse.json({ error: 'Error interno del servidor al consultar rutinas' }, { status: 500 });
-  }
-}
-
-// Helper para sincronizar y guardar ejercicios directamente en la colección Exercises de MongoDB
-async function syncExercisesToCatalog(
-  exercises: { name: string; sets?: number; reps?: string; restSeconds?: number; notes?: string }[]
-) {
-  if (!Array.isArray(exercises) || exercises.length === 0) return;
-  try {
-    const db = await getDatabase();
-    const collection = db.collection('Exercises');
-    for (const ex of exercises) {
-      if (ex.name && ex.name.trim()) {
-        const cleanName = ex.name.trim();
-        await collection.updateOne(
-          { name: { $regex: `^${cleanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } },
-          {
-            $set: {
-              name: cleanName,
-              defaultSets: ex.sets || undefined,
-              defaultReps: ex.reps || undefined,
-              defaultRestSeconds: ex.restSeconds || undefined,
-              defaultNotes: ex.notes || undefined,
-              updatedAt: new Date(),
-            },
-            $setOnInsert: {
-              createdAt: new Date(),
-            },
-          },
-          { upsert: true }
-        );
-      }
-    }
-  } catch (err) {
-    console.error('Error al sincronizar ejercicios al catálogo:', err);
   }
 }
 
@@ -135,18 +175,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'El nombre de la rutina es obligatorio' }, { status: 400 });
     }
 
-    const sanitizedExercises = Array.isArray(exercises)
-      ? exercises
-          .filter((ex) => ex && typeof ex.name === 'string' && ex.name.trim())
-          .map((ex, idx) => ({
-            id: ex.id || `ex-${Date.now()}-${idx}`,
-            name: ex.name.trim(),
-            sets: ex.sets ? Number(ex.sets) : undefined,
-            reps: ex.reps ? String(ex.reps).trim() : undefined,
-            restSeconds: ex.restSeconds ? Number(ex.restSeconds) : undefined,
-            notes: ex.notes ? String(ex.notes).trim() : undefined,
-          }))
-      : [];
+    const sanitizedExercises = sanitizeExerciseList(exercises || []);
 
     const newRoutineDoc = {
       title: title.trim(),
@@ -161,7 +190,7 @@ export async function POST(request: NextRequest) {
     const db = await getDatabase();
     const result = await db.collection('Routines').insertOne(newRoutineDoc);
 
-    // Guardar los ejercicios en el catálogo general de la base de datos
+    // Guardar los ejercicios directamente en la colección Exercises de MongoDB
     await syncExercisesToCatalog(sanitizedExercises);
 
     const createdRoutine: Routine = {
@@ -216,16 +245,9 @@ export async function PATCH(request: NextRequest) {
     if (durationMinutes !== undefined) updateFields.durationMinutes = Number(durationMinutes);
 
     if (Array.isArray(exercises)) {
-      updateFields.exercises = exercises
-        .filter((ex) => ex && typeof ex.name === 'string' && ex.name.trim())
-        .map((ex, idx) => ({
-          id: ex.id || `ex-${Date.now()}-${idx}`,
-          name: ex.name.trim(),
-          sets: ex.sets ? Number(ex.sets) : undefined,
-          reps: ex.reps ? String(ex.reps).trim() : undefined,
-          restSeconds: ex.restSeconds ? Number(ex.restSeconds) : undefined,
-          notes: ex.notes ? String(ex.notes).trim() : undefined,
-        }));
+      const sanitized = sanitizeExerciseList(exercises);
+      updateFields.exercises = sanitized;
+      await syncExercisesToCatalog(sanitized);
     }
 
     const db = await getDatabase();
@@ -237,10 +259,6 @@ export async function PATCH(request: NextRequest) {
 
     if (!result) {
       return NextResponse.json({ error: 'Rutina no encontrada' }, { status: 404 });
-    }
-
-    if (Array.isArray(updateFields.exercises)) {
-      await syncExercisesToCatalog(updateFields.exercises as any);
     }
 
     return NextResponse.json({

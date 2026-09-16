@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Routine, ExerciseItem, ExerciseCatalogItem } from '@/types';
+import { Routine, ExerciseItem, ExerciseCatalogItem, ExerciseMeasureUnit } from '@/types';
 import {
   Dumbbell,
   Plus,
@@ -20,7 +20,6 @@ import {
   Sparkles,
   Target,
   Database,
-  Save,
   Check,
 } from 'lucide-react';
 
@@ -52,7 +51,15 @@ export default function AdminRoutinesPage() {
   const [description, setDescription] = useState('');
   const [durationMinutes, setDurationMinutes] = useState(45);
   const [exercises, setExercises] = useState<ExerciseItem[]>([
-    { id: '1', name: '', sets: 3, reps: '12 reps', restSeconds: 45, notes: '' },
+    {
+      id: '1',
+      name: '',
+      sets: 4,
+      repsOrDurationValue: 15,
+      repsOrDurationUnit: 'repeticiones',
+      restSeconds: 45,
+      notes: '',
+    },
   ]);
 
   const [submitting, setSubmitting] = useState(false);
@@ -130,7 +137,15 @@ export default function AdminRoutinesPage() {
     setDescription('');
     setDurationMinutes(45);
     setExercises([
-      { id: `ex-${Date.now()}-1`, name: '', sets: 4, reps: '15 reps', restSeconds: 45, notes: '' },
+      {
+        id: `ex-${Date.now()}-1`,
+        name: '',
+        sets: 4,
+        repsOrDurationValue: 15,
+        repsOrDurationUnit: 'repeticiones',
+        restSeconds: 45,
+        notes: '',
+      },
     ]);
     setActiveComboIndex(null);
     setSavedExerciseIndices({});
@@ -145,8 +160,29 @@ export default function AdminRoutinesPage() {
     setDurationMinutes(routine.durationMinutes || 45);
     setExercises(
       routine.exercises && routine.exercises.length > 0
-        ? routine.exercises.map((ex) => ({ ...ex }))
-        : [{ id: `ex-${Date.now()}-1`, name: '', sets: 3, reps: '12 reps', restSeconds: 45, notes: '' }]
+        ? routine.exercises.map((ex) => ({
+            ...ex,
+            repsOrDurationValue:
+              ex.repsOrDurationValue !== undefined
+                ? ex.repsOrDurationValue
+                : ex.reps
+                ? parseInt(ex.reps, 10) || 12
+                : 12,
+            repsOrDurationUnit:
+              ex.repsOrDurationUnit ||
+              (ex.reps?.toLowerCase().includes('seg') ? 'segundos' : 'repeticiones'),
+          }))
+        : [
+            {
+              id: `ex-${Date.now()}-1`,
+              name: '',
+              sets: 4,
+              repsOrDurationValue: 15,
+              repsOrDurationUnit: 'repeticiones',
+              restSeconds: 45,
+              notes: '',
+            },
+          ]
     );
     setActiveComboIndex(null);
     setSavedExerciseIndices({});
@@ -161,7 +197,8 @@ export default function AdminRoutinesPage() {
         id: `ex-${Date.now()}-${prev.length + 1}`,
         name: '',
         sets: 3,
-        reps: '12 reps',
+        repsOrDurationValue: 12,
+        repsOrDurationUnit: 'repeticiones',
         restSeconds: 45,
         notes: '',
       },
@@ -182,11 +219,16 @@ export default function AdminRoutinesPage() {
     setExercises((prev) => {
       const next = [...prev];
       const current = next[index];
+      const val = item.defaultRepsOrDurationValue || 12;
+      const unit: ExerciseMeasureUnit = item.defaultRepsOrDurationUnit || 'repeticiones';
+
       next[index] = {
         ...current,
         name: item.name,
         sets: current.sets || item.defaultSets || 3,
-        reps: current.reps || item.defaultReps || '12 reps',
+        repsOrDurationValue: val,
+        repsOrDurationUnit: unit,
+        reps: `${val} ${unit}`,
         restSeconds: current.restSeconds !== undefined ? current.restSeconds : (item.defaultRestSeconds || 45),
         notes: current.notes || item.defaultNotes || '',
       };
@@ -195,7 +237,7 @@ export default function AdminRoutinesPage() {
     setActiveComboIndex(null);
   };
 
-  // Guardar un ejercicio individual directamente en la base de datos (Colección Exercises)
+  // Guardar un ejercicio individual directamente en la base de datos
   const handleSaveExerciseDirectlyToDB = async (index: number) => {
     const ex = exercises[index];
     if (!ex || !ex.name.trim()) {
@@ -211,7 +253,8 @@ export default function AdminRoutinesPage() {
         body: JSON.stringify({
           name: ex.name.trim(),
           sets: ex.sets,
-          reps: ex.reps,
+          repsOrDurationValue: ex.repsOrDurationValue,
+          repsOrDurationUnit: ex.repsOrDurationUnit,
           restSeconds: ex.restSeconds,
           notes: ex.notes,
         }),
@@ -441,7 +484,7 @@ export default function AdminRoutinesPage() {
             Rutinas de Ejercicio
           </h1>
           <p style={{ color: '#9FA6B8', fontSize: '0.95rem', margin: 0 }}>
-            Describe o selecciona ejercicios con predicción inteligente y almacena sesiones completas en la base de datos.
+            Describe o selecciona ejercicios con combo numérico (repeticiones o segundos) y guarda directo en la base de datos.
           </p>
         </div>
 
@@ -698,7 +741,7 @@ export default function AdminRoutinesPage() {
           <p style={{ color: '#9FA6B8', fontSize: '0.9rem', maxWidth: '450px', margin: '0 auto 1.5rem' }}>
             {searchTerm
               ? 'No se encontraron resultados para tu búsqueda.'
-              : 'Comienza creando la primera rutina de entrenamiento con el constructor interactivo.'}
+              : 'Comienza creando la primera rutina de entrenamiento con el combo de ejercicios.'}
           </p>
           <button onClick={openCreateModal} className="btn-martial-primary">
             <Plus size={16} /> Crear Rutina Ahora
@@ -869,84 +912,96 @@ export default function AdminRoutinesPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {(routine.exercises || [])
                         .slice(0, isExpanded ? undefined : 2)
-                        .map((ex, idx) => (
-                          <div
-                            key={ex.id || idx}
-                            style={{
-                              padding: '0.65rem 0.75rem',
-                              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                              border: '1px solid rgba(255, 255, 255, 0.06)',
-                              borderRadius: '6px',
-                            }}
-                          >
+                        .map((ex, idx) => {
+                          const quantity =
+                            ex.repsOrDurationValue !== undefined
+                              ? ex.repsOrDurationValue
+                              : ex.reps
+                              ? parseInt(ex.reps, 10) || 12
+                              : 12;
+                          const unit =
+                            ex.repsOrDurationUnit ||
+                            (ex.reps?.toLowerCase().includes('seg') ? 'segundos' : 'repeticiones');
+
+                          return (
                             <div
+                              key={ex.id || idx}
                               style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                gap: '0.5rem',
+                                padding: '0.65rem 0.75rem',
+                                backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                                border: '1px solid rgba(255, 255, 255, 0.06)',
+                                borderRadius: '6px',
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  gap: '0.5rem',
+                                }}
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                  <span
+                                    style={{
+                                      width: '20px',
+                                      height: '20px',
+                                      borderRadius: '50%',
+                                      backgroundColor: 'rgba(212, 175, 55, 0.18)',
+                                      color: '#F5D77F',
+                                      fontSize: '0.7rem',
+                                      fontWeight: 700,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    {idx + 1}
+                                  </span>
+                                  <span style={{ color: '#FFFFFF', fontSize: '0.86rem', fontWeight: 600 }}>
+                                    {ex.name}
+                                  </span>
+                                </div>
+
                                 <span
                                   style={{
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    backgroundColor: 'rgba(212, 175, 55, 0.18)',
                                     color: '#F5D77F',
-                                    fontSize: '0.7rem',
-                                    fontWeight: 700,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
+                                    fontSize: '0.78rem',
+                                    fontWeight: 600,
                                     flexShrink: 0,
                                   }}
                                 >
-                                  {idx + 1}
-                                </span>
-                                <span style={{ color: '#FFFFFF', fontSize: '0.86rem', fontWeight: 600 }}>
-                                  {ex.name}
+                                  {ex.sets ? `${ex.sets} x ` : ''}
+                                  {quantity} {unit}
                                 </span>
                               </div>
 
-                              <span
-                                style={{
-                                  color: '#F5D77F',
-                                  fontSize: '0.78rem',
-                                  fontWeight: 600,
-                                  flexShrink: 0,
-                                }}
-                              >
-                                {ex.sets ? `${ex.sets} x ` : ''}
-                                {ex.reps || '1 serie'}
-                              </span>
+                              {(ex.notes || ex.restSeconds) && (
+                                <div
+                                  style={{
+                                    marginTop: '0.35rem',
+                                    paddingLeft: '1.75rem',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '0.2rem',
+                                  }}
+                                >
+                                  {ex.restSeconds && (
+                                    <span style={{ fontSize: '0.72rem', color: '#9FA6B8' }}>
+                                      ⏱ Descanso: {ex.restSeconds}s
+                                    </span>
+                                  )}
+                                  {ex.notes && (
+                                    <span style={{ fontSize: '0.74rem', color: '#A0AEC0', fontStyle: 'italic' }}>
+                                      💡 {ex.notes}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </div>
-
-                            {(ex.notes || ex.restSeconds) && (
-                              <div
-                                style={{
-                                  marginTop: '0.35rem',
-                                  paddingLeft: '1.75rem',
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  gap: '0.2rem',
-                                }}
-                              >
-                                {ex.restSeconds && (
-                                  <span style={{ fontSize: '0.72rem', color: '#9FA6B8' }}>
-                                    ⏱ Descanso: {ex.restSeconds}s
-                                  </span>
-                                )}
-                                {ex.notes && (
-                                  <span style={{ fontSize: '0.74rem', color: '#A0AEC0', fontStyle: 'italic' }}>
-                                    💡 {ex.notes}
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                          );
+                        })}
 
                       {!isExpanded && routine.exercises && routine.exercises.length > 2 && (
                         <div
@@ -1086,7 +1141,7 @@ export default function AdminRoutinesPage() {
               border: '1px solid rgba(212, 175, 55, 0.35)',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 175, 55, 0.12)',
               borderRadius: '14px',
-              maxWidth: '740px',
+              maxWidth: '760px',
               width: '100%',
               maxHeight: '92vh',
               display: 'flex',
@@ -1124,7 +1179,7 @@ export default function AdminRoutinesPage() {
                     {editingRoutine ? 'Editar Rutina de Ejercicio' : 'Nueva Rutina de Ejercicio'}
                   </h2>
                   <span style={{ fontSize: '0.76rem', color: '#9FA6B8' }}>
-                    Puedes describir un ejercicio libremente o elegir del combo con predicción. Todo se guardará en la base de datos.
+                    Describe ejercicios o selecciónalos del combo con predicción. Se guardan directo en la base de datos.
                   </span>
                 </div>
               </div>
@@ -1163,7 +1218,7 @@ export default function AdminRoutinesPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Ej: Acondicionamiento Físico y Movilidad"
+                    placeholder="Ej: Acondicionamiento Físico y Coordinación"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     style={{
@@ -1227,7 +1282,7 @@ export default function AdminRoutinesPage() {
                 />
               </div>
 
-              {/* Constructor de Ejercicios con Combobox Predictivo */}
+              {/* Constructor de Ejercicios con Combobox Predictivo y Unidad Numérica */}
               <div
                 style={{
                   padding: '1rem',
@@ -1275,7 +1330,6 @@ export default function AdminRoutinesPage() {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {exercises.map((ex, idx) => {
-                    // Filtrar sugerencias predictivas para este ejercicio
                     const searchWord = (ex.name || '').toLowerCase().trim();
                     const filteredPredictions = catalogExercises.filter((item) =>
                       searchWord === '' || item.name.toLowerCase().includes(searchWord)
@@ -1370,7 +1424,7 @@ export default function AdminRoutinesPage() {
                             <input
                               type="text"
                               required
-                              placeholder="Escribe o describe el ejercicio (ej: Burpees, Sentadillas, Flexiones...)"
+                              placeholder="Escribe o describe el ejercicio (ej: Burpees, Flexiones, Sentadillas...)"
                               value={ex.name}
                               onChange={(e) => {
                                 updateExerciseField(idx, 'name', e.target.value);
@@ -1489,7 +1543,7 @@ export default function AdminRoutinesPage() {
                                       {catItem.name}
                                     </span>
 
-                                    {(catItem.defaultSets || catItem.defaultReps) && (
+                                    {(catItem.defaultRepsOrDurationValue || catItem.defaultSets) && (
                                       <span
                                         style={{
                                           fontSize: '0.74rem',
@@ -1500,7 +1554,8 @@ export default function AdminRoutinesPage() {
                                         }}
                                       >
                                         {catItem.defaultSets ? `${catItem.defaultSets}x ` : ''}
-                                        {catItem.defaultReps || ''}
+                                        {catItem.defaultRepsOrDurationValue || 12}{' '}
+                                        {catItem.defaultRepsOrDurationUnit || 'reps'}
                                       </span>
                                     )}
                                   </div>
@@ -1510,8 +1565,16 @@ export default function AdminRoutinesPage() {
                           )}
                         </div>
 
-                        {/* Series, Repeticiones y Descanso */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1.5fr', gap: '0.6rem', marginBottom: '0.6rem' }}>
+                        {/* Series, Número (Cantidad), Combo Unidad (Repeticiones / Segundos) y Descanso */}
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                            gap: '0.65rem',
+                            marginBottom: '0.65rem',
+                          }}
+                        >
+                          {/* Series */}
                           <div>
                             <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
                               Series
@@ -1519,45 +1582,75 @@ export default function AdminRoutinesPage() {
                             <input
                               type="number"
                               min={1}
-                              placeholder="3"
+                              placeholder="4"
                               value={ex.sets || ''}
                               onChange={(e) => updateExerciseField(idx, 'sets', Number(e.target.value))}
                               style={{
                                 width: '100%',
-                                padding: '0.5rem 0.6rem',
+                                padding: '0.55rem 0.65rem',
                                 borderRadius: '6px',
                                 backgroundColor: 'rgba(255, 255, 255, 0.04)',
                                 border: '1px solid rgba(255, 255, 255, 0.15)',
                                 color: '#FFFFFF',
-                                fontSize: '0.84rem',
+                                fontSize: '0.86rem',
                                 outline: 'none',
                               }}
                               title="Número de series"
                             />
                           </div>
 
+                          {/* Número / Cantidad */}
                           <div>
                             <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
-                              Repeticiones / Tiempo
+                              Cantidad (número)
                             </label>
                             <input
-                              type="text"
-                              placeholder="12 reps o 45 seg"
-                              value={ex.reps || ''}
-                              onChange={(e) => updateExerciseField(idx, 'reps', e.target.value)}
+                              type="number"
+                              min={1}
+                              placeholder="15"
+                              value={ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : ''}
+                              onChange={(e) => updateExerciseField(idx, 'repsOrDurationValue', Number(e.target.value))}
                               style={{
                                 width: '100%',
-                                padding: '0.5rem 0.6rem',
+                                padding: '0.55rem 0.65rem',
                                 borderRadius: '6px',
                                 backgroundColor: 'rgba(255, 255, 255, 0.04)',
                                 border: '1px solid rgba(255, 255, 255, 0.15)',
                                 color: '#FFFFFF',
-                                fontSize: '0.84rem',
+                                fontSize: '0.86rem',
                                 outline: 'none',
                               }}
+                              title="Cantidad numérica de repeticiones o segundos"
                             />
                           </div>
 
+                          {/* Combo selector: Segundos o Repeticiones */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
+                              Tipo / Unidad
+                            </label>
+                            <select
+                              value={ex.repsOrDurationUnit || 'repeticiones'}
+                              onChange={(e) => updateExerciseField(idx, 'repsOrDurationUnit', e.target.value as ExerciseMeasureUnit)}
+                              style={{
+                                width: '100%',
+                                padding: '0.55rem 0.65rem',
+                                borderRadius: '6px',
+                                backgroundColor: '#0E0F14',
+                                border: '1px solid rgba(212, 175, 55, 0.3)',
+                                color: '#F5D77F',
+                                fontSize: '0.86rem',
+                                fontWeight: 600,
+                                outline: 'none',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <option value="repeticiones">Repeticiones</option>
+                              <option value="segundos">Segundos</option>
+                            </select>
+                          </div>
+
+                          {/* Descanso */}
                           <div>
                             <label style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', marginBottom: '0.2rem' }}>
                               Descanso (seg)
@@ -1566,16 +1659,16 @@ export default function AdminRoutinesPage() {
                               type="number"
                               min={0}
                               placeholder="45"
-                              value={ex.restSeconds || ''}
+                              value={ex.restSeconds !== undefined ? ex.restSeconds : ''}
                               onChange={(e) => updateExerciseField(idx, 'restSeconds', Number(e.target.value))}
                               style={{
                                 width: '100%',
-                                padding: '0.5rem 0.6rem',
+                                padding: '0.55rem 0.65rem',
                                 borderRadius: '6px',
                                 backgroundColor: 'rgba(255, 255, 255, 0.04)',
                                 border: '1px solid rgba(255, 255, 255, 0.15)',
                                 color: '#FFFFFF',
-                                fontSize: '0.84rem',
+                                fontSize: '0.86rem',
                                 outline: 'none',
                               }}
                               title="Descanso en segundos"
@@ -1590,12 +1683,12 @@ export default function AdminRoutinesPage() {
                           </label>
                           <input
                             type="text"
-                            placeholder="Ej: Cuidar alineación de rodilla y respiración profunda"
+                            placeholder="Ej: Cuidar alineación de espalda y control respiratorio"
                             value={ex.notes || ''}
                             onChange={(e) => updateExerciseField(idx, 'notes', e.target.value)}
                             style={{
                               width: '100%',
-                              padding: '0.5rem 0.6rem',
+                              padding: '0.5rem 0.65rem',
                               borderRadius: '6px',
                               backgroundColor: 'rgba(255, 255, 255, 0.04)',
                               border: '1px solid rgba(255, 255, 255, 0.15)',

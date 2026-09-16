@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDatabase } from '@/lib/mongodb';
-import { ExerciseCatalogItem } from '@/types';
+import { ExerciseCatalogItem, ExerciseMeasureUnit } from '@/types';
 
 const SUPER_ADMINS = [
   'david.artavia.rodriguez@gmail.com',
@@ -34,23 +34,23 @@ async function verifyAdmin() {
   return { authorized: false, reason: 'Privilegios insuficientes de administrador' };
 }
 
-// Catálogo base para predicciones iniciales
+// Catálogo base para predicciones iniciales con número y combo de unidad (repeticiones o segundos)
 const BASE_EXERCISES: Omit<ExerciseCatalogItem, 'id' | '_id'>[] = [
-  { name: 'Flexiones de pecho (Push-ups)', defaultSets: 4, defaultReps: '15 reps', defaultRestSeconds: 45, defaultNotes: 'Mantener el torso recto y codos a 45 grados' },
-  { name: 'Burpees explosivos', defaultSets: 3, defaultReps: '12 reps', defaultRestSeconds: 60, defaultNotes: 'Extensión completa en el salto vertical' },
-  { name: 'Sentadillas pliométricas con salto', defaultSets: 4, defaultReps: '15 reps', defaultRestSeconds: 45, defaultNotes: 'Amortiguar la caída sobre la punta y talón' },
-  { name: 'Plancha isométrica abdominal', defaultSets: 3, defaultReps: '45 seg', defaultRestSeconds: 30, defaultNotes: 'Alineación de cadera y activación de core' },
-  { name: 'Abdominales en V (V-Ups)', defaultSets: 4, defaultReps: '15 reps', defaultRestSeconds: 45, defaultNotes: 'Control excéntrico en el descenso' },
-  { name: 'Saltos al cajón o elevación sobre banco', defaultSets: 4, defaultReps: '10 reps', defaultRestSeconds: 60, defaultNotes: 'Enfoque en potencia explosiva de despegue' },
-  { name: 'Zancadas dinámicas alternas (Lunges)', defaultSets: 3, defaultReps: '12 por pierna', defaultRestSeconds: 45, defaultNotes: 'Rodilla delantera en ángulo de 90 grados' },
-  { name: 'Fondos de tríceps en paralelas o banco', defaultSets: 3, defaultReps: '12 reps', defaultRestSeconds: 45, defaultNotes: 'Bajar hasta que los codos queden a 90 grados' },
-  { name: 'Escaladores (Mountain Climbers)', defaultSets: 4, defaultReps: '40 seg', defaultRestSeconds: 30, defaultNotes: 'Ritmo constante sin levantar excesivamente la pelvis' },
-  { name: 'Jumping Jacks (Tijeras con salto)', defaultSets: 3, defaultReps: '60 seg', defaultRestSeconds: 30, defaultNotes: 'Apertura fluida de brazos y piernas' },
-  { name: 'Desplazamientos laterales con banda elástica', defaultSets: 3, defaultReps: '15 cada lado', defaultRestSeconds: 30, defaultNotes: 'Mantener tensión constante en glúteo medio' },
-  { name: 'Elevación de talones / Gemelos', defaultSets: 4, defaultReps: '20 reps', defaultRestSeconds: 30, defaultNotes: 'Pausa isométrica de 1 segundo arriba' },
+  { name: 'Flexiones de pecho (Push-ups)', defaultSets: 4, defaultRepsOrDurationValue: 15, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '15 repeticiones', defaultRestSeconds: 45, defaultNotes: 'Torso recto y codos a 45 grados' },
+  { name: 'Burpees explosivos', defaultSets: 3, defaultRepsOrDurationValue: 12, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '12 repeticiones', defaultRestSeconds: 60, defaultNotes: 'Extensión completa en el salto' },
+  { name: 'Sentadillas pliométricas con salto', defaultSets: 4, defaultRepsOrDurationValue: 15, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '15 repeticiones', defaultRestSeconds: 45, defaultNotes: 'Amortiguar caída suavemente' },
+  { name: 'Plancha isométrica abdominal', defaultSets: 3, defaultRepsOrDurationValue: 45, defaultRepsOrDurationUnit: 'segundos', defaultReps: '45 segundos', defaultRestSeconds: 30, defaultNotes: 'Alineación de cadera y activación de core' },
+  { name: 'Abdominales en V (V-Ups)', defaultSets: 4, defaultRepsOrDurationValue: 15, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '15 repeticiones', defaultRestSeconds: 45, defaultNotes: 'Control excéntrico en descenso' },
+  { name: 'Saltos al cajón o banco', defaultSets: 4, defaultRepsOrDurationValue: 10, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '10 repeticiones', defaultRestSeconds: 60, defaultNotes: 'Potencia explosiva de despegue' },
+  { name: 'Zancadas dinámicas (Lunges)', defaultSets: 3, defaultRepsOrDurationValue: 12, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '12 repeticiones', defaultRestSeconds: 45, defaultNotes: 'Rodilla delantera en 90 grados' },
+  { name: 'Fondos de tríceps en paralelas o banco', defaultSets: 3, defaultRepsOrDurationValue: 12, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '12 repeticiones', defaultRestSeconds: 45, defaultNotes: 'Codos flexionados a 90 grados' },
+  { name: 'Escaladores (Mountain Climbers)', defaultSets: 4, defaultRepsOrDurationValue: 40, defaultRepsOrDurationUnit: 'segundos', defaultReps: '40 segundos', defaultRestSeconds: 30, defaultNotes: 'Ritmo constante sin elevar la cadera' },
+  { name: 'Jumping Jacks (Tijeras con salto)', defaultSets: 3, defaultRepsOrDurationValue: 60, defaultRepsOrDurationUnit: 'segundos', defaultReps: '60 segundos', defaultRestSeconds: 30, defaultNotes: 'Apertura fluida de extremidades' },
+  { name: 'Desplazamientos laterales con banda', defaultSets: 3, defaultRepsOrDurationValue: 15, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '15 repeticiones', defaultRestSeconds: 30, defaultNotes: 'Tensión constante en glúteos' },
+  { name: 'Elevación de talones / Gemelos', defaultSets: 4, defaultRepsOrDurationValue: 20, defaultRepsOrDurationUnit: 'repeticiones', defaultReps: '20 repeticiones', defaultRestSeconds: 30, defaultNotes: 'Pausa de 1 segundo arriba' },
 ];
 
-// GET: Obtener todos los ejercicios del catálogo para autocompletado y predicción
+// GET: Obtener ejercicios del catálogo
 export async function GET(request: NextRequest) {
   try {
     const auth = await verifyAdmin();
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
     const db = await getDatabase();
     const collection = db.collection('Exercises');
 
-    // Sembrar catálogo inicial si la colección está vacía
+    // Sembrar catálogo inicial si está vacío
     const count = await collection.countDocuments();
     if (count === 0) {
       await collection.insertMany(
@@ -82,16 +82,29 @@ export async function GET(request: NextRequest) {
 
     const raw = await collection.find(filter).sort({ name: 1 }).toArray();
 
-    const exercises: ExerciseCatalogItem[] = raw.map((doc) => ({
-      id: doc._id.toString(),
-      _id: doc._id.toString(),
-      name: doc.name,
-      defaultSets: doc.defaultSets,
-      defaultReps: doc.defaultReps,
-      defaultRestSeconds: doc.defaultRestSeconds,
-      defaultNotes: doc.defaultNotes,
-      createdAt: doc.createdAt,
-    }));
+    const exercises: ExerciseCatalogItem[] = raw.map((doc) => {
+      const unit: ExerciseMeasureUnit =
+        doc.defaultRepsOrDurationUnit === 'segundos' ? 'segundos' : 'repeticiones';
+      const val =
+        doc.defaultRepsOrDurationValue !== undefined
+          ? Number(doc.defaultRepsOrDurationValue)
+          : doc.defaultReps
+          ? parseInt(doc.defaultReps, 10) || 12
+          : 12;
+
+      return {
+        id: doc._id.toString(),
+        _id: doc._id.toString(),
+        name: doc.name,
+        defaultSets: doc.defaultSets || 3,
+        defaultRepsOrDurationValue: val,
+        defaultRepsOrDurationUnit: unit,
+        defaultReps: doc.defaultReps || `${val} ${unit}`,
+        defaultRestSeconds: doc.defaultRestSeconds || 45,
+        defaultNotes: doc.defaultNotes || '',
+        createdAt: doc.createdAt,
+      };
+    });
 
     return NextResponse.json({ success: true, exercises });
   } catch (error) {
@@ -109,13 +122,21 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, sets, reps, restSeconds, notes } = body;
+    const { name, sets, repsOrDurationValue, repsOrDurationUnit, restSeconds, notes } = body;
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       return NextResponse.json({ error: 'El nombre del ejercicio es obligatorio' }, { status: 400 });
     }
 
     const cleanName = name.trim();
+    const cleanUnit: ExerciseMeasureUnit =
+      repsOrDurationUnit === 'segundos' ? 'segundos' : 'repeticiones';
+    const cleanValue =
+      repsOrDurationValue !== undefined && !isNaN(Number(repsOrDurationValue))
+        ? Number(repsOrDurationValue)
+        : 12;
+    const formattedReps = `${cleanValue} ${cleanUnit}`;
+
     const db = await getDatabase();
     const collection = db.collection('Exercises');
 
@@ -124,20 +145,18 @@ export async function POST(request: NextRequest) {
       name: { $regex: `^${cleanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' },
     });
 
+    const updateData = {
+      defaultSets: sets ? Number(sets) : 3,
+      defaultRepsOrDurationValue: cleanValue,
+      defaultRepsOrDurationUnit: cleanUnit,
+      defaultReps: formattedReps,
+      defaultRestSeconds: restSeconds !== undefined ? Number(restSeconds) : 45,
+      defaultNotes: notes ? String(notes).trim() : '',
+      updatedAt: new Date(),
+    };
+
     if (existing) {
-      // Actualizar defaults si se pasaron nuevos valores
-      await collection.updateOne(
-        { _id: existing._id },
-        {
-          $set: {
-            defaultSets: sets ? Number(sets) : existing.defaultSets,
-            defaultReps: reps ? String(reps) : existing.defaultReps,
-            defaultRestSeconds: restSeconds ? Number(restSeconds) : existing.defaultRestSeconds,
-            defaultNotes: notes ? String(notes) : existing.defaultNotes,
-            updatedAt: new Date(),
-          },
-        }
-      );
+      await collection.updateOne({ _id: existing._id }, { $set: updateData });
 
       return NextResponse.json({
         success: true,
@@ -145,23 +164,15 @@ export async function POST(request: NextRequest) {
           id: existing._id.toString(),
           _id: existing._id.toString(),
           name: existing.name,
-          defaultSets: sets ? Number(sets) : existing.defaultSets,
-          defaultReps: reps ? String(reps) : existing.defaultReps,
-          defaultRestSeconds: restSeconds ? Number(restSeconds) : existing.defaultRestSeconds,
-          defaultNotes: notes ? String(notes) : existing.defaultNotes,
+          ...updateData,
         },
       });
     }
 
-    // Insertar nuevo ejercicio en catálogo
     const newDoc = {
       name: cleanName,
-      defaultSets: sets ? Number(sets) : undefined,
-      defaultReps: reps ? String(reps).trim() : undefined,
-      defaultRestSeconds: restSeconds ? Number(restSeconds) : undefined,
-      defaultNotes: notes ? String(notes).trim() : undefined,
+      ...updateData,
       createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
     const res = await collection.insertOne(newDoc);
