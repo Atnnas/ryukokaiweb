@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Routine, RoutineCategory, RoutineDifficulty, ExerciseItem } from '@/types';
+import { Routine, RoutineDifficulty, ExerciseItem } from '@/types';
 import {
   Dumbbell,
   Plus,
@@ -14,30 +14,20 @@ import {
   X,
   CheckCircle,
   AlertTriangle,
-  Flame,
-  Activity,
   Layers,
   Award,
   ChevronDown,
   ChevronUp,
   Sparkles,
-  Zap,
+  Target,
+  Flame,
 } from 'lucide-react';
 
-const CATEGORY_LABELS: Record<RoutineCategory, { name: string; color: string; bg: string }> = {
-  kata: { name: 'Kata / Formas', color: '#F5D77F', bg: 'rgba(212, 175, 55, 0.15)' },
-  kumite: { name: 'Kumite Deportivo', color: '#FF7B7B', bg: 'rgba(255, 80, 80, 0.15)' },
-  kihon: { name: 'Kihon / Fundamentos', color: '#7BE1FF', bg: 'rgba(56, 189, 248, 0.15)' },
-  conditioning: { name: 'Acondicionamiento Físico', color: '#86EFAC', bg: 'rgba(74, 222, 128, 0.15)' },
-  flexibility: { name: 'Flexibilidad & Movilidad', color: '#D8B4FE', bg: 'rgba(192, 132, 252, 0.15)' },
-  warmup: { name: 'Calentamiento & Activación', color: '#FDE047', bg: 'rgba(250, 204, 21, 0.15)' },
-};
-
-const DIFFICULTY_LABELS: Record<RoutineDifficulty, { name: string; badge: string }> = {
-  'all-levels': { name: 'Todos los Niveles', badge: 'bg-neutral' },
-  beginner: { name: 'Principiante', badge: 'bg-green' },
-  intermediate: { name: 'Intermedio', badge: 'bg-yellow' },
-  advanced: { name: 'Avanzado / Competidor', badge: 'bg-red' },
+const DIFFICULTY_LABELS: Record<RoutineDifficulty, { name: string; color: string; bg: string }> = {
+  'all-levels': { name: 'Todos los Niveles', color: '#CBD5E1', bg: 'rgba(255, 255, 255, 0.08)' },
+  beginner: { name: 'Principiante', color: '#86EFAC', bg: 'rgba(74, 222, 128, 0.15)' },
+  intermediate: { name: 'Intermedio', color: '#FDE047', bg: 'rgba(250, 204, 21, 0.15)' },
+  advanced: { name: 'Avanzado / Competidor', color: '#F87171', bg: 'rgba(248, 113, 113, 0.15)' },
 };
 
 export default function AdminRoutinesPage() {
@@ -47,7 +37,6 @@ export default function AdminRoutinesPage() {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<'all' | RoutineCategory>('all');
   const [difficultyFilter, setDifficultyFilter] = useState<'all' | RoutineDifficulty>('all');
 
   // Estado para expandir ejercicios en las tarjetas
@@ -60,7 +49,6 @@ export default function AdminRoutinesPage() {
   // Formulario
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<RoutineCategory>('kihon');
   const [difficulty, setDifficulty] = useState<RoutineDifficulty>('all-levels');
   const [targetBelt, setTargetBelt] = useState('Todos los niveles');
   const [durationMinutes, setDurationMinutes] = useState(45);
@@ -72,7 +60,7 @@ export default function AdminRoutinesPage() {
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  // Cargar rutinas desde la API
+  // Cargar rutinas desde la API (MongoDB)
   const fetchRoutines = useCallback(async () => {
     setLoading(true);
     try {
@@ -109,7 +97,6 @@ export default function AdminRoutinesPage() {
     setEditingRoutine(null);
     setTitle('');
     setDescription('');
-    setCategory('kihon');
     setDifficulty('all-levels');
     setTargetBelt('Todos los niveles');
     setDurationMinutes(45);
@@ -124,7 +111,6 @@ export default function AdminRoutinesPage() {
     setEditingRoutine(routine);
     setTitle(routine.title || '');
     setDescription(routine.description || '');
-    setCategory(routine.category || 'kihon');
     setDifficulty(routine.difficulty || 'all-levels');
     setTargetBelt(routine.targetBelt || 'Todos los niveles');
     setDurationMinutes(routine.durationMinutes || 45);
@@ -170,12 +156,12 @@ export default function AdminRoutinesPage() {
     setExercises((prev) => prev.filter((_, idx) => idx !== index));
   };
 
-  // Guardar rutina (Crear o Actualizar)
+  // Guardar rutina en Base de Datos (Crear o Actualizar)
   const handleSubmitRoutine = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title.trim()) {
-      setActionMessage({ type: 'error', text: 'Por favor ingresa un título para la rutina.' });
+      setActionMessage({ type: 'error', text: 'Por favor ingresa un nombre para la rutina.' });
       setTimeout(() => setActionMessage(null), 3500);
       return;
     }
@@ -196,7 +182,6 @@ export default function AdminRoutinesPage() {
         ...(editingRoutine ? { id: editingRoutine.id || editingRoutine._id } : {}),
         title: title.trim(),
         description: description.trim(),
-        category,
         difficulty,
         targetBelt: targetBelt.trim(),
         durationMinutes: Number(durationMinutes) || 45,
@@ -214,7 +199,7 @@ export default function AdminRoutinesPage() {
       if (res.ok && data.success) {
         setActionMessage({
           type: 'success',
-          text: editingRoutine ? 'Rutina actualizada exitosamente' : 'Rutina creada exitosamente',
+          text: editingRoutine ? 'Rutina actualizada en la base de datos' : 'Rutina guardada en la base de datos',
         });
         setIsModalOpen(false);
         await fetchRoutines();
@@ -230,7 +215,7 @@ export default function AdminRoutinesPage() {
     }
   };
 
-  // Eliminar rutina
+  // Eliminar rutina de la base de datos
   const handleDeleteRoutine = async (id: string) => {
     setSubmitting(true);
     try {
@@ -239,7 +224,7 @@ export default function AdminRoutinesPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setActionMessage({ type: 'success', text: 'Rutina eliminada correctamente' });
+        setActionMessage({ type: 'success', text: 'Rutina eliminada de la base de datos' });
         setDeleteConfirmId(null);
         await fetchRoutines();
       } else {
@@ -256,7 +241,6 @@ export default function AdminRoutinesPage() {
 
   // Filtrar rutinas en frontend
   const filteredRoutines = routines.filter((item) => {
-    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
     const matchesDifficulty = difficultyFilter === 'all' || item.difficulty === difficultyFilter;
     const matchesSearch =
       !searchTerm.trim() ||
@@ -265,14 +249,17 @@ export default function AdminRoutinesPage() {
       item.targetBelt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.exercises.some((e) => e.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return matchesCategory && matchesDifficulty && matchesSearch;
+    return matchesDifficulty && matchesSearch;
   });
 
-  // Estadísticas rápidas
+  // Estadísticas
   const totalRoutines = routines.length;
-  const kataKihonCount = routines.filter((r) => r.category === 'kata' || r.category === 'kihon').length;
-  const kumiteCount = routines.filter((r) => r.category === 'kumite').length;
-  const conditioningCount = routines.filter((r) => r.category === 'conditioning' || r.category === 'flexibility').length;
+  const totalExercises = routines.reduce((acc, r) => acc + (r.exercises?.length || 0), 0);
+  const avgDuration =
+    totalRoutines > 0
+      ? Math.round(routines.reduce((acc, r) => acc + (r.durationMinutes || 0), 0) / totalRoutines)
+      : 0;
+  const advancedCount = routines.filter((r) => r.difficulty === 'advanced').length;
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -340,7 +327,7 @@ export default function AdminRoutinesPage() {
                 color: '#F5D77F',
               }}
             >
-              Sistema de Entrenamiento & Acondicionamiento
+              Base de Datos Ryoku Kai
             </span>
           </div>
 
@@ -360,7 +347,7 @@ export default function AdminRoutinesPage() {
             Rutinas de Ejercicio
           </h1>
           <p style={{ color: '#9FA6B8', fontSize: '0.95rem', margin: 0 }}>
-            Planifica, edita y organiza las sesiones técnicas de Kata, Kumite, Kihon y preparación física para dojo Ryoku Kai.
+            Crea, almacena y administra sesiones de entrenamiento y preparación física directamente en la base de datos.
           </p>
         </div>
 
@@ -377,7 +364,7 @@ export default function AdminRoutinesPage() {
               fontSize: '0.88rem',
               borderRadius: '8px',
             }}
-            title="Refrescar listado"
+            title="Refrescar datos desde la base de datos"
           >
             <RefreshCw size={16} className={loading ? 'spin-animation' : ''} />
             <span className="hide-mobile">Actualizar</span>
@@ -402,7 +389,7 @@ export default function AdminRoutinesPage() {
         </div>
       </div>
 
-      {/* Tarjetas de Métricas de Rutinas */}
+      {/* Tarjetas de Métricas */}
       <div
         style={{
           display: 'grid',
@@ -467,11 +454,11 @@ export default function AdminRoutinesPage() {
               color: '#7BE1FF',
             }}
           >
-            <Award size={24} />
+            <Target size={24} />
           </div>
           <div>
-            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Kata & Kihon</span>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{kataKihonCount}</div>
+            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Ejercicios Totales</span>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{totalExercises}</div>
           </div>
         </div>
 
@@ -491,51 +478,51 @@ export default function AdminRoutinesPage() {
               width: '46px',
               height: '46px',
               borderRadius: '10px',
-              backgroundColor: 'rgba(255, 80, 80, 0.12)',
-              border: '1px solid rgba(255, 80, 80, 0.25)',
+              backgroundColor: 'rgba(250, 204, 21, 0.12)',
+              border: '1px solid rgba(250, 204, 21, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#FF7B7B',
+              color: '#FDE047',
+            }}
+          >
+            <Clock size={24} />
+          </div>
+          <div>
+            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Duración Promedio</span>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{avgDuration} min</div>
+          </div>
+        </div>
+
+        <div
+          className="card-sumi"
+          style={{
+            padding: '1.25rem',
+            backgroundColor: '#0E0F14',
+            border: '1px solid rgba(212, 175, 55, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+          }}
+        >
+          <div
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(248, 113, 113, 0.12)',
+              border: '1px solid rgba(248, 113, 113, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#F87171',
             }}
           >
             <Flame size={24} />
           </div>
           <div>
-            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Kumite Deportivo</span>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{kumiteCount}</div>
-          </div>
-        </div>
-
-        <div
-          className="card-sumi"
-          style={{
-            padding: '1.25rem',
-            backgroundColor: '#0E0F14',
-            border: '1px solid rgba(212, 175, 55, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-          }}
-        >
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(74, 222, 128, 0.12)',
-              border: '1px solid rgba(74, 222, 128, 0.25)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#86EFAC',
-            }}
-          >
-            <Activity size={24} />
-          </div>
-          <div>
-            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Acondic. & Movilidad</span>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{conditioningCount}</div>
+            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Nivel Avanzado</span>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#FFFFFF' }}>{advancedCount}</div>
           </div>
         </div>
       </div>
@@ -571,7 +558,7 @@ export default function AdminRoutinesPage() {
           />
           <input
             type="text"
-            placeholder="Buscar por nombre, ejercicio o cinta..."
+            placeholder="Buscar rutina por nombre, ejercicios o cinta..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -602,58 +589,28 @@ export default function AdminRoutinesPage() {
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          {/* Selector de Categoría */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Categoría:</span>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value as 'all' | RoutineCategory)}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '8px',
-                backgroundColor: '#0E0F14',
-                border: '1px solid rgba(212, 175, 55, 0.25)',
-                color: '#FFFFFF',
-                fontSize: '0.88rem',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              <option value="all">Todas las categorías</option>
-              <option value="kata">Kata / Formas</option>
-              <option value="kumite">Kumite Deportivo</option>
-              <option value="kihon">Kihon / Fundamentos</option>
-              <option value="conditioning">Acondicionamiento Físico</option>
-              <option value="flexibility">Flexibilidad & Movilidad</option>
-              <option value="warmup">Calentamiento & Activación</option>
-            </select>
-          </div>
-
-          {/* Selector de Dificultad */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Dificultad:</span>
-            <select
-              value={difficultyFilter}
-              onChange={(e) => setDifficultyFilter(e.target.value as 'all' | RoutineDifficulty)}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '8px',
-                backgroundColor: '#0E0F14',
-                border: '1px solid rgba(212, 175, 55, 0.25)',
-                color: '#FFFFFF',
-                fontSize: '0.88rem',
-                outline: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              <option value="all">Todas las dificultades</option>
-              <option value="all-levels">Todos los niveles</option>
-              <option value="beginner">Principiante</option>
-              <option value="intermediate">Intermedio</option>
-              <option value="advanced">Avanzado / Competidor</option>
-            </select>
-          </div>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.8rem', color: '#9FA6B8', fontWeight: 600 }}>Dificultad / Nivel:</span>
+          <select
+            value={difficultyFilter}
+            onChange={(e) => setDifficultyFilter(e.target.value as 'all' | RoutineDifficulty)}
+            style={{
+              padding: '0.6rem 0.85rem',
+              borderRadius: '8px',
+              backgroundColor: '#0E0F14',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              color: '#FFFFFF',
+              fontSize: '0.88rem',
+              outline: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">Todos los niveles</option>
+            <option value="all-levels">Todos los grados</option>
+            <option value="beginner">Principiante</option>
+            <option value="intermediate">Intermedio</option>
+            <option value="advanced">Avanzado / Competidor</option>
+          </select>
         </div>
       </div>
 
@@ -675,12 +632,12 @@ export default function AdminRoutinesPage() {
         >
           <Dumbbell size={48} color="#9FA6B8" style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
           <h3 style={{ color: '#FFFFFF', fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-            No se encontraron rutinas
+            No hay rutinas registradas en la base de datos
           </h3>
           <p style={{ color: '#9FA6B8', fontSize: '0.9rem', maxWidth: '450px', margin: '0 auto 1.5rem' }}>
-            {searchTerm || categoryFilter !== 'all' || difficultyFilter !== 'all'
+            {searchTerm || difficultyFilter !== 'all'
               ? 'Prueba modificando tus filtros o término de búsqueda para ver más resultados.'
-              : 'Empieza creando la primera rutina técnica o física para tus alumnos del dojo.'}
+              : 'Comienza creando la primera rutina de entrenamiento para tus atletas.'}
           </p>
           <button onClick={openCreateModal} className="btn-martial-primary">
             <Plus size={16} /> Crear Rutina Ahora
@@ -695,7 +652,6 @@ export default function AdminRoutinesPage() {
           }}
         >
           {filteredRoutines.map((routine) => {
-            const catInfo = CATEGORY_LABELS[routine.category] || CATEGORY_LABELS.kihon;
             const diffInfo = DIFFICULTY_LABELS[routine.difficulty] || DIFFICULTY_LABELS['all-levels'];
             const routineId = routine.id || routine._id || '';
             const isExpanded = !!expandedRoutineIds[routineId];
@@ -717,7 +673,7 @@ export default function AdminRoutinesPage() {
                   transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
                 }}
               >
-                {/* Acento lateral decorativo */}
+                {/* Acento superior en dorado marcial */}
                 <div
                   style={{
                     position: 'absolute',
@@ -725,16 +681,15 @@ export default function AdminRoutinesPage() {
                     left: 0,
                     right: 0,
                     height: '3px',
-                    backgroundColor: catInfo.color,
+                    backgroundColor: '#D4AF37',
                   }}
                 />
 
                 <div>
-                  {/* Fila superior: Badges */}
+                  {/* Fila superior: Dificultad y Duración */}
                   <div
                     style={{
                       display: 'flex',
-                      flexWrap: 'wrap',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       gap: '0.5rem',
@@ -747,32 +702,29 @@ export default function AdminRoutinesPage() {
                         fontWeight: 700,
                         padding: '0.25rem 0.65rem',
                         borderRadius: '20px',
-                        backgroundColor: catInfo.bg,
-                        color: catInfo.color,
-                        border: `1px solid ${catInfo.color}33`,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
+                        backgroundColor: diffInfo.bg,
+                        color: diffInfo.color,
+                        border: `1px solid ${diffInfo.color}33`,
                       }}
                     >
-                      <Zap size={12} />
-                      {catInfo.name}
+                      {diffInfo.name}
                     </span>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <span
-                        style={{
-                          fontSize: '0.72rem',
-                          fontWeight: 600,
-                          padding: '0.2rem 0.55rem',
-                          borderRadius: '6px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                          color: '#CBD5E1',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                        }}
-                      >
-                        {diffInfo.name}
-                      </span>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.3rem',
+                        fontSize: '0.76rem',
+                        color: '#F5D77F',
+                        backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(212, 175, 55, 0.2)',
+                      }}
+                    >
+                      <Clock size={13} />
+                      <span>{routine.durationMinutes} min</span>
                     </div>
                   </div>
 
@@ -803,31 +755,26 @@ export default function AdminRoutinesPage() {
                     </p>
                   )}
 
-                  {/* Metadatos: Tiempo y Cinta sugerida */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                      fontSize: '0.8rem',
-                      color: '#D4AF37',
-                      padding: '0.6rem 0.8rem',
-                      backgroundColor: 'rgba(212, 175, 55, 0.06)',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(212, 175, 55, 0.15)',
-                      marginBottom: '1.25rem',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                      <Clock size={15} color="#F5D77F" />
-                      <span style={{ color: '#FFFFFF', fontWeight: 600 }}>{routine.durationMinutes} min</span>
+                  {/* Cinta sugerida */}
+                  {routine.targetBelt && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        fontSize: '0.78rem',
+                        color: '#CBD5E1',
+                        padding: '0.5rem 0.75rem',
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        marginBottom: '1.25rem',
+                      }}
+                    >
+                      <Award size={14} color="#F5D77F" />
+                      <span>Grado sugerido: <strong style={{ color: '#FFFFFF' }}>{routine.targetBelt}</strong></span>
                     </div>
-                    <span>•</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                      <Award size={15} color="#F5D77F" />
-                      <span style={{ color: '#E2E8F0' }}>{routine.targetBelt || 'Todos los niveles'}</span>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Lista de Ejercicios */}
                   <div style={{ marginBottom: '1.25rem' }}>
@@ -1138,7 +1085,7 @@ export default function AdminRoutinesPage() {
                     {editingRoutine ? 'Editar Rutina de Ejercicio' : 'Nueva Rutina de Ejercicio'}
                   </h2>
                   <span style={{ fontSize: '0.76rem', color: '#9FA6B8' }}>
-                    Configura las especificaciones técnicas y listado dinámico de movimientos.
+                    Todos los datos se guardarán directamente en la base de datos de Ryoku Kai.
                   </span>
                 </div>
               </div>
@@ -1168,7 +1115,7 @@ export default function AdminRoutinesPage() {
                 gap: '1.25rem',
               }}
             >
-              {/* Título */}
+              {/* Nombre de la Rutina */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.4rem' }}>
                   Nombre de la Rutina *
@@ -1176,7 +1123,7 @@ export default function AdminRoutinesPage() {
                 <input
                   type="text"
                   required
-                  placeholder="Ej: Acondicionamiento Explosivo para Kumite WKF"
+                  placeholder="Ej: Acondicionamiento Explosivo y Velocidad de Reacción"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   style={{
@@ -1192,38 +1139,11 @@ export default function AdminRoutinesPage() {
                 />
               </div>
 
-              {/* Categoría y Dificultad en 2 columnas */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              {/* Dificultad, Grado y Duración en 3 columnas */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.4rem' }}>
-                    Categoría *
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value as RoutineCategory)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 0.85rem',
-                      borderRadius: '8px',
-                      backgroundColor: '#0E0F14',
-                      border: '1px solid rgba(212, 175, 55, 0.25)',
-                      color: '#FFFFFF',
-                      fontSize: '0.9rem',
-                      outline: 'none',
-                    }}
-                  >
-                    <option value="kihon">Kihon / Fundamentos</option>
-                    <option value="kata">Kata / Formas</option>
-                    <option value="kumite">Kumite Deportivo</option>
-                    <option value="conditioning">Acondicionamiento Físico</option>
-                    <option value="flexibility">Flexibilidad & Movilidad</option>
-                    <option value="warmup">Calentamiento & Activación</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.4rem' }}>
-                    Dificultad *
+                    Dificultad / Nivel *
                   </label>
                   <select
                     value={difficulty}
@@ -1245,17 +1165,14 @@ export default function AdminRoutinesPage() {
                     <option value="advanced">Avanzado / Competidor</option>
                   </select>
                 </div>
-              </div>
 
-              {/* Cinta objetivo y Duración estimada */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.4rem' }}>
                     Cintas / Grados Sugeridos
                   </label>
                   <input
                     type="text"
-                    placeholder="Ej: Cinta Blanca a Naranja o Cintas Negras"
+                    placeholder="Ej: Todos los grados, Cintas Negras..."
                     value={targetBelt}
                     onChange={(e) => setTargetBelt(e.target.value)}
                     style={{
@@ -1273,7 +1190,7 @@ export default function AdminRoutinesPage() {
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.4rem' }}>
-                    Duración Estimada (Minutos)
+                    Duración Estimada (Min)
                   </label>
                   <input
                     type="number"
@@ -1298,11 +1215,11 @@ export default function AdminRoutinesPage() {
               {/* Descripción */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#F5D77F', marginBottom: '0.4rem' }}>
-                  Descripción u Objetivo de la Sesión
+                  Descripción u Objetivo
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Explica brevemente el foco técnico o metabólico de la rutina..."
+                  placeholder="Detalles sobre el enfoque técnico o físico de la rutina..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   style={{
@@ -1339,7 +1256,7 @@ export default function AdminRoutinesPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Layers size={18} color="#F5D77F" />
                     <span style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '0.92rem' }}>
-                      Secuencia de Ejercicios ({exercises.length})
+                      Ejercicios de la Rutina ({exercises.length})
                     </span>
                   </div>
 
@@ -1413,7 +1330,7 @@ export default function AdminRoutinesPage() {
                         <input
                           type="text"
                           required
-                          placeholder="Nombre del ejercicio (Ej: Oi Tsuki con desplazamiento)"
+                          placeholder="Nombre del ejercicio (Ej: Saltos al cajón + Golpe Gyaku Tsuki)"
                           value={ex.name}
                           onChange={(e) => updateExerciseField(idx, 'name', e.target.value)}
                           style={{
@@ -1497,7 +1414,7 @@ export default function AdminRoutinesPage() {
                       <div>
                         <input
                           type="text"
-                          placeholder="Consejo técnico o punto clave (opcional)"
+                          placeholder="Indicaciones o detalles técnicos (opcional)"
                           value={ex.notes || ''}
                           onChange={(e) => updateExerciseField(idx, 'notes', e.target.value)}
                           style={{
@@ -1562,7 +1479,7 @@ export default function AdminRoutinesPage() {
                   }}
                 >
                   {submitting && <RefreshCw size={16} className="spin-animation" />}
-                  <span>{editingRoutine ? 'Guardar Cambios' : 'Crear Rutina'}</span>
+                  <span>{editingRoutine ? 'Guardar Cambios' : 'Guardar en Base de Datos'}</span>
                 </button>
               </div>
             </form>

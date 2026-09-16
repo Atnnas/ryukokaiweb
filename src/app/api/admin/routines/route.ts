@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDatabase } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
-import { Routine, RoutineCategory, RoutineDifficulty } from '@/types';
+import { Routine, RoutineDifficulty } from '@/types';
 
 const SUPER_ADMINS = [
   'david.artavia.rodriguez@gmail.com',
@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search')?.toLowerCase().trim() || '';
-    const categoryFilter = searchParams.get('category') || '';
     const difficultyFilter = searchParams.get('difficulty') || '';
 
     const db = await getDatabase();
@@ -53,9 +52,6 @@ export async function GET(request: NextRequest) {
 
     const query: Record<string, unknown> = {};
 
-    if (categoryFilter && categoryFilter !== 'all') {
-      query.category = categoryFilter;
-    }
     if (difficultyFilter && difficultyFilter !== 'all') {
       query.difficulty = difficultyFilter;
     }
@@ -75,7 +71,6 @@ export async function GET(request: NextRequest) {
       _id: r._id.toString(),
       title: r.title || 'Rutina sin título',
       description: r.description || '',
-      category: (r.category as RoutineCategory) || 'kihon',
       difficulty: (r.difficulty as RoutineDifficulty) || 'all-levels',
       targetBelt: r.targetBelt || 'Todos los niveles',
       durationMinutes: Number(r.durationMinutes) || 45,
@@ -92,7 +87,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Crear una nueva rutina de ejercicio
+// POST: Crear una nueva rutina de ejercicio (guardada en MongoDB)
 export async function POST(request: NextRequest) {
   try {
     const auth = await verifyAdmin();
@@ -104,7 +99,6 @@ export async function POST(request: NextRequest) {
     const {
       title,
       description,
-      category,
       difficulty,
       targetBelt,
       durationMinutes,
@@ -113,10 +107,6 @@ export async function POST(request: NextRequest) {
 
     if (!title || typeof title !== 'string' || !title.trim()) {
       return NextResponse.json({ error: 'El título de la rutina es obligatorio' }, { status: 400 });
-    }
-
-    if (!category) {
-      return NextResponse.json({ error: 'La categoría es obligatoria' }, { status: 400 });
     }
 
     const sanitizedExercises = Array.isArray(exercises)
@@ -135,7 +125,6 @@ export async function POST(request: NextRequest) {
     const newRoutineDoc = {
       title: title.trim(),
       description: (description || '').trim(),
-      category: (category as RoutineCategory) || 'kihon',
       difficulty: (difficulty as RoutineDifficulty) || 'all-levels',
       targetBelt: (targetBelt || 'Todos los niveles').trim(),
       durationMinutes: Number(durationMinutes) > 0 ? Number(durationMinutes) : 45,
@@ -175,7 +164,6 @@ export async function PATCH(request: NextRequest) {
       _id,
       title,
       description,
-      category,
       difficulty,
       targetBelt,
       durationMinutes,
@@ -200,7 +188,6 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof title === 'string') updateFields.title = title.trim();
     if (typeof description === 'string') updateFields.description = description.trim();
-    if (category) updateFields.category = category;
     if (difficulty) updateFields.difficulty = difficulty;
     if (typeof targetBelt === 'string') updateFields.targetBelt = targetBelt.trim();
     if (durationMinutes !== undefined) updateFields.durationMinutes = Number(durationMinutes);

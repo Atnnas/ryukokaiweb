@@ -86,14 +86,6 @@ export interface Sponsor {
   updatedAt?: string | Date;
 }
 
-export type RoutineCategory =
-  | 'kata'
-  | 'kumite'
-  | 'kihon'
-  | 'conditioning'
-  | 'flexibility'
-  | 'warmup';
-
 export type RoutineDifficulty =
   | 'all-levels'
   | 'beginner'
@@ -114,7 +106,6 @@ export interface Routine {
   _id?: string;
   title: string;
   description: string;
-  category: RoutineCategory;
   difficulty: RoutineDifficulty;
   targetBelt?: string; // Ej: "Todos los cinturones", "Blanca a Naranja", "Verde a Marrón", "Cintas Negras"
   durationMinutes: number; // Duración estimada en minutos
