@@ -119,7 +119,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || 'dojo_yingyang_auth_super_secret_key_88921471',
+  secret: process.env.NEXTAUTH_SECRET || 'ryokukai_auth_super_secret_key_88921471',
 };
 
 const handler = NextAuth(authOptions);
