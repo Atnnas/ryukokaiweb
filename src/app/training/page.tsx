@@ -1645,67 +1645,47 @@ export default function TrainingPage() {
                   animation: 'fadeIn 0.3s ease',
                 }}
               >
-                {/* Imagen del Árbitro WKF Sacando el Dedo Índice */}
+                {/* Caricatura del Árbitro WKF Sacando el Dedo Índice con CHUI */}
                 <div
                   style={{
                     position: 'relative',
-                    width: 'min(190px, 48vw)',
-                    height: 'min(190px, 48vw)',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
-                    border: '3px solid #EF4444',
-                    boxShadow: '0 0 35px rgba(239, 68, 68, 0.45)',
-                    marginBottom: '0.85rem',
-                    backgroundColor: '#0E0F14',
+                    width: 'min(230px, 56vw)',
+                    height: 'min(230px, 56vw)',
+                    margin: '0 auto 0.4rem',
+                    filter: 'drop-shadow(0 12px 30px rgba(239, 68, 68, 0.45))',
                   }}
                 >
                   <Image
-                    src="/images/wkf_referee_chui.jpg"
-                    alt="Árbitro WKF marcando falta Chui con el dedo índice"
+                    src="/images/wkf_referee_chui.png"
+                    alt="Árbitro WKF de caricatura dictaminando Chui con su dedo índice"
                     fill
-                    sizes="(max-width: 768px) 190px, 190px"
-                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 768px) 230px, 230px"
+                    style={{ objectFit: 'contain' }}
                     priority
                   />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
-                      padding: '0.35rem 0.5rem',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <span style={{ fontSize: '0.65rem', fontWeight: 900, color: '#FCA5A5', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                      Arbitraje Oficial WKF
-                    </span>
-                  </div>
                 </div>
 
-                {/* Badge Grande de CHUI */}
+                {/* Badge de Falta WKF */}
                 <div
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    padding: '0.35rem 1.15rem',
+                    padding: '0.25rem 0.9rem',
                     borderRadius: '999px',
                     backgroundColor: 'rgba(239, 68, 68, 0.18)',
-                    border: '2px solid #EF4444',
+                    border: '1.5px solid #EF4444',
                     color: '#F87171',
-                    marginBottom: '0.5rem',
-                    boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)',
+                    marginBottom: '0.4rem',
                   }}
                 >
-                  <AlertTriangle size={20} color="#EF4444" />
-                  <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.1em' }}>
-                    ¡CHŪI! (注意)
+                  <AlertTriangle size={15} color="#EF4444" />
+                  <span style={{ fontSize: '0.82rem', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    Penalización WKF • Chūi (注意)
                   </span>
                 </div>
 
-                <h2 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.45rem)', fontWeight: 900, color: '#FFFFFF', margin: '0 0 0.35rem 0' }}>
+                <h2 style={{ fontSize: 'clamp(1.15rem, 4.5vw, 1.4rem)', fontWeight: 900, color: '#FFFFFF', margin: '0 0 0.35rem 0' }}>
                   Falta al Espíritu del Karate
                 </h2>
 
