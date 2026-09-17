@@ -1541,10 +1541,10 @@ export default function TrainingPage() {
       style={{
         minHeight: '90vh',
         backgroundColor: '#070709',
-        padding: '2.5rem 1rem 5rem',
+        padding: '2.5rem 0 5rem',
       }}
     >
-      <div className="container-dojo" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="container-dojo" style={{ width: '100%' }}>
         {/* Cabecera Principal con Kanji y Atmósfera Marcial */}
         <div
           style={{
@@ -1558,7 +1558,7 @@ export default function TrainingPage() {
             borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
           }}
         >
-          <div>
+          <div style={{ flex: 1, minWidth: '280px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
               <span
                 style={{
@@ -1601,7 +1601,7 @@ export default function TrainingPage() {
               Rutinas de Entrenamiento
             </h1>
 
-            <p style={{ color: '#9FA6B8', fontSize: '0.95rem', maxWidth: '650px', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ color: '#9FA6B8', fontSize: '0.95rem', maxWidth: '850px', margin: 0, lineHeight: 1.5 }}>
               Selecciona una rutina creada por el Sensei para iniciar tu sesión guiada. El sistema controlará tus tiempos activos y las pausas entre series y súper series en tiempo real.
             </p>
           </div>
@@ -1658,7 +1658,7 @@ export default function TrainingPage() {
           }}
         >
           {/* Input de Búsqueda */}
-          <div style={{ position: 'relative', maxWidth: '380px', width: '100%' }}>
+          <div style={{ position: 'relative', flex: 1, maxWidth: '480px', minWidth: '240px' }}>
             <Search
               size={17}
               style={{
@@ -1858,7 +1858,7 @@ export default function TrainingPage() {
                                     )}
                                   </div>
                                   {routine.description ? (
-                                    <p style={{ color: '#9FA6B8', fontSize: '0.82rem', margin: 0, lineHeight: 1.45, maxWidth: '420px' }}>
+                                    <p style={{ color: '#9FA6B8', fontSize: '0.82rem', margin: 0, lineHeight: 1.45, maxWidth: '650px' }}>
                                       {routine.description}
                                     </p>
                                   ) : (
@@ -1920,9 +1920,9 @@ export default function TrainingPage() {
                                 </button>
 
                                 {!isExpanded && routine.exercises && routine.exercises.length > 0 && (
-                                  <span style={{ fontSize: '0.78rem', color: '#9FA6B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px' }}>
-                                    {routine.exercises.slice(0, 2).map((e) => e.name).join(', ')}
-                                    {routine.exercises.length > 2 ? '...' : ''}
+                                  <span style={{ fontSize: '0.78rem', color: '#9FA6B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '450px' }}>
+                                    {routine.exercises.slice(0, 4).map((e) => e.name).join(', ')}
+                                    {routine.exercises.length > 4 ? '...' : ''}
                                   </span>
                                 )}
                               </div>
