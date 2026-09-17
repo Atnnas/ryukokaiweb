@@ -712,78 +712,97 @@ export default function TrainingPage() {
       <div
         ref={runnerRef}
         style={{
-          minHeight: '100vh',
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9999,
+          height: '100dvh',
+          width: '100vw',
           backgroundColor: '#050608',
           color: '#FFFFFF',
           display: 'flex',
           flexDirection: 'column',
-          position: isFullscreen ? 'fixed' : 'relative',
-          inset: isFullscreen ? 0 : 'auto',
-          zIndex: isFullscreen ? 9999 : 40,
+          overflow: 'hidden',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingLeft: 'env(safe-area-inset-left, 0px)',
+          paddingRight: 'env(safe-area-inset-right, 0px)',
         }}
       >
-        {/* Barra superior de control del entrenamiento */}
+        {/* Barra superior de control del entrenamiento (Compacta y responsive) */}
         <div
           style={{
-            padding: '1rem 1.5rem',
+            padding: '0.6rem 0.85rem',
             backgroundColor: '#0A0B0F',
-            borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
+            borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '1rem',
+            gap: '0.5rem',
+            flexShrink: 0,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          {/* Botón Salir y Título con Truncado Elegante */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', minWidth: 0, flex: 1 }}>
             <button
               onClick={exitWorkoutRunner}
               style={{
-                background: 'none',
-                border: 'none',
-                color: '#9FA6B8',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#CBD5E1',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                padding: '0.4rem 0.6rem',
-                borderRadius: '6px',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                flexShrink: 0,
+                transition: 'all 0.15s ease',
               }}
               title="Salir del entrenamiento"
             >
-              <ArrowLeft size={16} />
-              <span className="hide-mobile">Salir</span>
+              <ArrowLeft size={18} />
             </button>
 
-            <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#F5D77F', margin: 0 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <h3
+                style={{
+                  fontSize: '0.85rem',
+                  fontWeight: 800,
+                  color: '#F5D77F',
+                  margin: 0,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  lineHeight: 1.2,
+                }}
+              >
                 {activeWorkoutRoutine.title}
               </h3>
-              <span style={{ fontSize: '0.74rem', color: '#9FA6B8' }}>
+              <span style={{ fontSize: '0.68rem', color: '#9FA6B8', display: 'block' }}>
                 Paso {currentStepIndex + 1} de {workoutSteps.length}
               </span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* Controles: Cronómetro Global, Sonido, Pantalla Completa */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
             {/* Cronómetro Global de la Sesión */}
             <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.4rem',
-                padding: '0.4rem 0.8rem',
+                gap: '0.25rem',
+                padding: '0.25rem 0.55rem',
                 borderRadius: '999px',
                 backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                border: '1px solid rgba(212, 175, 55, 0.3)',
+                border: '1px solid rgba(212, 175, 55, 0.28)',
                 color: '#F5D77F',
                 fontWeight: 800,
-                fontSize: '0.9rem',
+                fontSize: '0.78rem',
+                fontVariantNumeric: 'tabular-nums',
               }}
             >
-              <Clock size={15} />
+              <Clock size={12} />
               <span>{formatTime(totalElapsedSeconds)}</span>
             </div>
 
@@ -791,36 +810,48 @@ export default function TrainingPage() {
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               style={{
-                background: 'none',
-                border: 'none',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: soundEnabled ? '#F5D77F' : '#64748B',
                 cursor: 'pointer',
-                padding: '0.4rem',
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
               title={soundEnabled ? 'Silenciar señales acústicas' : 'Activar sonido marcial'}
             >
-              {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+              {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             </button>
 
-            {/* Pantalla completa */}
+            {/* Pantalla completa nativa */}
             <button
               onClick={toggleFullscreen}
               style={{
-                background: 'none',
-                border: 'none',
-                color: '#9FA6B8',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#CBD5E1',
                 cursor: 'pointer',
-                padding: '0.4rem',
+                width: '34px',
+                height: '34px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
               title="Pantalla Completa"
             >
-              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
             </button>
           </div>
         </div>
 
         {/* Barra de Progreso Superior */}
-        <div style={{ width: '100%', height: '4px', backgroundColor: 'rgba(255, 255, 255, 0.08)' }}>
+        <div style={{ width: '100%', height: '3px', backgroundColor: 'rgba(255, 255, 255, 0.08)', flexShrink: 0 }}>
           <div
             style={{
               height: '100%',
@@ -842,65 +873,82 @@ export default function TrainingPage() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '2rem',
+              padding: '1.5rem 1rem',
               textAlign: 'center',
+              overflowY: 'auto',
             }}
           >
             <span
               style={{
-                fontSize: '0.9rem',
+                fontSize: '0.8rem',
                 fontWeight: 800,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 color: '#D4AF37',
                 textTransform: 'uppercase',
-                marginBottom: '1rem',
+                marginBottom: '0.8rem',
               }}
             >
               Comienza en breve • Hajime! (はじめ)
             </span>
 
-            {/* Contador Regresivo Gigante */}
+            {/* Contador Regresivo Gigante Responsivo */}
             <div
               style={{
-                width: '140px',
-                height: '140px',
+                width: 'min(130px, 35vw)',
+                height: 'min(130px, 35vw)',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(212, 175, 55, 0.1)',
                 border: '3px solid #D4AF37',
-                boxShadow: '0 0 50px rgba(212, 175, 55, 0.35)',
+                boxShadow: '0 0 40px rgba(212, 175, 55, 0.35)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '4.5rem',
+                fontSize: 'clamp(3.5rem, 12vw, 4.5rem)',
                 fontWeight: 900,
                 color: '#F5D77F',
-                marginBottom: '2rem',
-                animation: 'pulse 1s infinite',
+                marginBottom: '1.5rem',
               }}
             >
               {secondsRemaining}
             </div>
 
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '0.5rem' }}>
-              Primer Ejercicio: {currentStep?.exerciseName}
-            </h2>
-
-            <p style={{ color: '#9FA6B8', fontSize: '1.1rem', marginBottom: '2rem' }}>
-              Objetivo: <strong>{currentStep?.targetQuantity} {currentStep?.targetUnit}</strong>
-            </p>
+            <div style={{ maxWidth: '450px', width: '100%', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '0.75rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Primer Ejercicio:
+              </span>
+              <h2 style={{ fontSize: 'clamp(1.4rem, 5vw, 1.8rem)', fontWeight: 800, color: '#FFFFFF', margin: '0.2rem 0 0.5rem' }}>
+                {currentStep?.exerciseName}
+              </h2>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  padding: '0.35rem 0.85rem',
+                  borderRadius: '999px',
+                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  color: '#F5D77F',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                }}
+              >
+                <span>Objetivo: <strong>{currentStep?.targetQuantity} {currentStep?.targetUnit}</strong></span>
+              </div>
+            </div>
 
             <button
               onClick={() => beginWorkPhase(currentStep)}
               className="btn-martial-primary"
-              style={{ padding: '0.9rem 2.2rem', fontSize: '1rem', fontWeight: 800 }}
+              style={{ padding: '0.85rem 2rem', fontSize: '0.95rem', fontWeight: 800 }}
             >
-              <Play size={18} /> ¡Comenzar Ahora!
+              <Play size={17} /> ¡Comenzar Ahora!
             </button>
           </div>
         )}
 
         {/* ================================================================= */}
-        {/* PANTALLA: FASE DE TRABAJO ACTIVO (ACTIVE WORKOUT)                 */}
+        {/* PANTALLA: FASE DE TRABAJO ACTIVO (ACTIVE WORKOUT RUNNER)          */}
         {/* ================================================================= */}
         {workoutPhase === 'work' && currentStep && (
           <div
@@ -908,196 +956,289 @@ export default function TrainingPage() {
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between',
-              padding: '2rem 1.5rem',
-              maxWidth: '850px',
-              width: '100%',
-              margin: '0 auto',
+              minHeight: 0,
+              overflow: 'hidden',
             }}
           >
-            {/* Cabecera del paso: Distintivo de Súper Serie o Serie Normal */}
-            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-              {currentStep.isLoop ? (
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.45rem 1.1rem',
-                    borderRadius: '999px',
-                    backgroundColor: 'rgba(212, 175, 55, 0.15)',
-                    border: '1px solid rgba(212, 175, 55, 0.45)',
-                    color: '#F5D77F',
-                    fontSize: '0.88rem',
-                    fontWeight: 800,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    marginBottom: '1rem',
-                    boxShadow: '0 0 15px rgba(212, 175, 55, 0.15)',
-                  }}
-                >
-                  <Zap size={16} />
-                  <span>
-                    {currentStep.loopName || 'Súper Serie'} • Ronda {currentStep.currentRound} de {currentStep.totalRounds} • Paso {currentStep.stepInRound} de {currentStep.totalStepsInRound}
-                  </span>
-                </div>
-              ) : (
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.35rem 0.9rem',
-                    borderRadius: '999px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.18)',
-                    color: '#E2E8F0',
-                    fontSize: '0.84rem',
-                    fontWeight: 700,
-                    marginBottom: '1rem',
-                  }}
-                >
-                  <Layers size={14} color="#D4AF37" />
-                  <span>Serie {currentStep.currentSet} de {currentStep.totalSets}</span>
-                </div>
-              )}
-
-              {/* Nombre Gigante del Ejercicio */}
-              <h1
-                style={{
-                  fontSize: 'clamp(2rem, 5vw, 3.2rem)',
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  margin: '0.3rem 0',
-                  lineHeight: 1.15,
-                  textShadow: '0 4px 15px rgba(0,0,0,0.8)',
-                }}
-              >
-                {currentStep.exerciseName}
-              </h1>
-
-              {currentStep.exerciseNotes && (
-                <p
-                  style={{
-                    color: '#F5D77F',
-                    fontSize: '0.95rem',
-                    maxWidth: '550px',
-                    margin: '0.6rem auto 0',
-                    fontStyle: 'italic',
-                  }}
-                >
-                  💡 {currentStep.exerciseNotes}
-                </p>
-              )}
-            </div>
-
-            {/* Display Central: Temporizador o Conteo de Repeticiones */}
-            <div style={{ textAlign: 'center', margin: 'auto 0' }}>
-              {currentStep.targetUnit === 'segundos' ? (
-                <div>
-                  <span style={{ fontSize: '0.85rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    Tiempo Restante
-                  </span>
-                  <div
-                    style={{
-                      fontSize: 'clamp(4.5rem, 12vw, 7.5rem)',
-                      fontWeight: 900,
-                      color: secondsRemaining <= 5 ? '#EF4444' : '#10B981',
-                      fontVariantNumeric: 'tabular-nums',
-                      lineHeight: 1,
-                      margin: '0.5rem 0',
-                      textShadow: '0 0 40px rgba(16, 185, 129, 0.25)',
-                    }}
-                  >
-                    {formatTime(secondsRemaining)}
-                  </div>
-                  <span style={{ fontSize: '0.9rem', color: '#9FA6B8' }}>
-                    Meta: {currentStep.targetQuantity} segundos de trabajo
-                  </span>
-                </div>
-              ) : (
-                <div>
-                  <span style={{ fontSize: '0.88rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-                    Meta de Ejecución Técnica
-                  </span>
-                  <div
-                    style={{
-                      fontSize: 'clamp(4rem, 11vw, 6.5rem)',
-                      fontWeight: 900,
-                      color: '#F5D77F',
-                      lineHeight: 1,
-                      margin: '0.5rem 0',
-                      textShadow: '0 0 35px rgba(212, 175, 55, 0.3)',
-                    }}
-                  >
-                    {currentStep.targetQuantity}{' '}
-                    <span style={{ fontSize: '2rem', fontWeight: 600, color: '#FFFFFF' }}>reps</span>
-                  </div>
-                  <span style={{ fontSize: '0.9rem', color: '#9FA6B8' }}>
-                    Ejecuta a tu ritmo técnico y pulsa &quot;Completar Serie&quot; al terminar
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Preview del Siguiente Paso */}
+            {/* Scrollable Center Content Area */}
             <div
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '10px',
-                padding: '0.85rem 1.25rem',
+                flex: 1,
+                overflowY: 'auto',
                 display: 'flex',
-                alignItems: 'center',
+                flexDirection: 'column',
                 justifyContent: 'space-between',
-                marginBottom: '1.5rem',
+                padding: '1rem 1rem 0.5rem 1rem',
+                maxWidth: '750px',
+                width: '100%',
+                margin: '0 auto',
+                WebkitOverflowScrolling: 'touch',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <span style={{ fontSize: '0.74rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  A continuación:
-                </span>
-                <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF' }}>
-                  {currentStepIndex + 1 < workoutSteps.length
-                    ? workoutSteps[currentStepIndex + 1].exerciseName
-                    : '🏁 ¡Final de la rutina!'}
-                </span>
+              {/* Cabecera del paso: Distintivo Súper Serie o Serie Normal */}
+              <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                {currentStep.isLoop ? (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '999px',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        color: '#F87171',
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      <Zap size={11} /> {currentStep.loopName || 'Súper Serie'}
+                    </span>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        padding: '0.2rem 0.6rem',
+                        borderRadius: '999px',
+                        backgroundColor: 'rgba(212, 175, 55, 0.14)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        color: '#F5D77F',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                      }}
+                    >
+                      <Repeat size={11} /> Vuelta {currentStep.currentRound}/{currentStep.totalRounds} • Paso {currentStep.stepInRound}/{currentStep.totalStepsInRound}
+                    </span>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        padding: '0.2rem 0.75rem',
+                        borderRadius: '999px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                        border: '1px solid rgba(255, 255, 255, 0.18)',
+                        color: '#E2E8F0',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                      }}
+                    >
+                      <Layers size={12} color="#D4AF37" /> Serie {currentStep.currentSet} de {currentStep.totalSets}
+                    </span>
+                  </div>
+                )}
+
+                {/* Nombre Principal del Ejercicio */}
+                <h1
+                  style={{
+                    fontSize: 'clamp(1.5rem, 5.5vw, 2.5rem)',
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    margin: '0.1rem 0',
+                    lineHeight: 1.18,
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {currentStep.exerciseName}
+                </h1>
+
+                {/* Notas / Coaching Tip */}
+                {currentStep.exerciseNotes && (
+                  <div
+                    style={{
+                      display: 'inline-block',
+                      margin: '0.4rem auto 0',
+                      padding: '0.3rem 0.75rem',
+                      backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                      border: '1px solid rgba(212, 175, 55, 0.22)',
+                      borderRadius: '6px',
+                      color: '#F5D77F',
+                      fontSize: '0.78rem',
+                      fontStyle: 'italic',
+                      maxWidth: '450px',
+                    }}
+                  >
+                    💡 {currentStep.exerciseNotes}
+                  </div>
+                )}
               </div>
 
-              <span style={{ fontSize: '0.78rem', color: '#F5D77F', fontWeight: 600 }}>
-                {currentStep.isEndOfLoopRound
-                  ? `⚡ Pausa fin de vuelta: ${currentStep.restSecondsAfter}s`
-                  : currentStep.restSecondsAfter > 0
-                  ? `Pausa: ${currentStep.restSecondsAfter}s`
-                  : 'Paso continuo'}
-              </span>
-            </div>
+              {/* Display Central: Temporizador o Conteo de Repeticiones */}
+              <div style={{ textAlign: 'center', margin: 'auto 0', padding: '0.75rem 0' }}>
+                {currentStep.targetUnit === 'segundos' ? (
+                  <div>
+                    <span style={{ fontSize: '0.76rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
+                      Tiempo Restante
+                    </span>
+                    <div
+                      style={{
+                        fontSize: 'clamp(3.8rem, 16vw, 6.8rem)',
+                        fontWeight: 900,
+                        color: secondsRemaining <= 5 ? '#EF4444' : '#10B981',
+                        fontVariantNumeric: 'tabular-nums',
+                        lineHeight: 1,
+                        margin: '0.3rem 0',
+                        textShadow: secondsRemaining <= 5
+                          ? '0 0 35px rgba(239, 68, 68, 0.45)'
+                          : '0 0 35px rgba(16, 185, 129, 0.3)',
+                      }}
+                    >
+                      {formatTime(secondsRemaining)}
+                    </div>
 
-            {/* Botón Principal de Acción para el Atleta */}
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <button
-                onClick={completeCurrentExercise}
-                className="btn-martial-primary"
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '0.82rem', color: '#9FA6B8' }}>
+                        Meta: <strong style={{ color: '#FFFFFF' }}>{currentStep.targetQuantity}s</strong> de trabajo
+                      </span>
+
+                      {/* Botón de Pausa / Reanudar en tiempo real */}
+                      <button
+                        onClick={() => setIsTimerRunning(!isTimerRunning)}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.08)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          borderRadius: '6px',
+                          color: '#F5D77F',
+                          padding: '0.25rem 0.6rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                        }}
+                      >
+                        {isTimerRunning ? <Pause size={12} /> : <Play size={12} />}
+                        <span>{isTimerRunning ? 'Pausar' : 'Reanudar'}</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <span style={{ fontSize: '0.78rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
+                      Meta de Ejecución Técnica
+                    </span>
+                    <div
+                      style={{
+                        fontSize: 'clamp(3.8rem, 15vw, 6.2rem)',
+                        fontWeight: 900,
+                        color: '#F5D77F',
+                        lineHeight: 1,
+                        margin: '0.3rem 0',
+                        textShadow: '0 0 30px rgba(212, 175, 55, 0.35)',
+                      }}
+                    >
+                      {currentStep.targetQuantity}{' '}
+                      <span style={{ fontSize: 'clamp(1.3rem, 5vw, 1.8rem)', fontWeight: 700, color: '#FFFFFF' }}>reps</span>
+                    </div>
+                    <span style={{ fontSize: '0.8rem', color: '#9FA6B8' }}>
+                      Ejecuta a tu ritmo técnico y pulsa &quot;Completar Serie&quot;
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Preview del Siguiente Paso (Compacto y responsivo) */}
+              <div
                 style={{
-                  flex: 1,
-                  padding: '1.25rem 2rem',
-                  fontSize: '1.2rem',
-                  fontWeight: 900,
+                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '10px',
+                  padding: '0.65rem 0.9rem',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.75rem',
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 30px rgba(212, 175, 55, 0.25)',
+                  justifyContent: 'space-between',
+                  gap: '0.5rem',
+                  marginTop: 'auto',
+                  marginBottom: '0.4rem',
                 }}
               >
-                <CheckCircle size={24} />
-                <span>
-                  {currentStepIndex === workoutSteps.length - 1
-                    ? '¡Finalizar Rutina!'
-                    : '✓ Completar Serie y Descansar'}
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <span style={{ fontSize: '0.66rem', color: '#9FA6B8', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
+                    A continuación:
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.84rem',
+                      fontWeight: 700,
+                      color: '#FFFFFF',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: 'block',
+                    }}
+                  >
+                    {currentStepIndex + 1 < workoutSteps.length
+                      ? workoutSteps[currentStepIndex + 1].exerciseName
+                      : '🏁 ¡Final de la rutina!'}
+                  </span>
+                </div>
+
+                <span
+                  style={{
+                    fontSize: '0.74rem',
+                    color: '#F5D77F',
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    padding: '0.2rem 0.5rem',
+                    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                    border: '1px solid rgba(212, 175, 55, 0.25)',
+                    borderRadius: '6px',
+                  }}
+                >
+                  {currentStep.isEndOfLoopRound
+                    ? `⚡ Fin vuelta: ${currentStep.restSecondsAfter}s`
+                    : currentStep.restSecondsAfter > 0
+                    ? `Pausa: ${currentStep.restSecondsAfter}s`
+                    : 'Continuo'}
                 </span>
-              </button>
+              </div>
+            </div>
+
+            {/* BARRA INFERIOR DE ACCIÓN (Pinned al fondo con Safe-Area) */}
+            <div
+              style={{
+                padding: '0.75rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px)) 1rem',
+                backgroundColor: '#0A0B0F',
+                borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+                flexShrink: 0,
+                width: '100%',
+              }}
+            >
+              <div style={{ maxWidth: '750px', margin: '0 auto', width: '100%' }}>
+                <button
+                  onClick={completeCurrentExercise}
+                  className="btn-martial-primary"
+                  style={{
+                    width: '100%',
+                    padding: '1.05rem 1.5rem',
+                    fontSize: 'clamp(1rem, 4vw, 1.15rem)',
+                    fontWeight: 900,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.65rem',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 25px rgba(212, 175, 55, 0.35)',
+                    touchAction: 'manipulation',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <CheckCircle size={22} />
+                  <span>
+                    {currentStepIndex === workoutSteps.length - 1
+                      ? '¡Finalizar Rutina!'
+                      : '✓ Completar Serie y Descansar'}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1111,114 +1252,147 @@ export default function TrainingPage() {
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '2rem 1.5rem',
-              textAlign: 'center',
+              minHeight: 0,
+              overflow: 'hidden',
             }}
           >
-            <span
-              style={{
-                fontSize: '0.85rem',
-                fontWeight: 800,
-                letterSpacing: '0.15em',
-                color: '#10B981',
-                textTransform: 'uppercase',
-                marginBottom: '0.8rem',
-              }}
-            >
-              {currentStep.isEndOfLoopRound
-                ? '⚡ ¡Vuelta Completada! Recuperación del Circuito'
-                : 'Recuperación • Respira y Mantén Zanshin'}
-            </span>
-
+            {/* Scrollable Center Area */}
             <div
               style={{
-                width: '180px',
-                height: '180px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                border: '4px solid #10B981',
-                boxShadow: '0 0 45px rgba(16, 185, 129, 0.25)',
+                flex: 1,
+                overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '2rem',
+                padding: '1rem 1rem 0.5rem 1rem',
+                textAlign: 'center',
+                maxWidth: '600px',
+                width: '100%',
+                margin: '0 auto',
+                WebkitOverflowScrolling: 'touch',
               }}
             >
-              <span style={{ fontSize: '0.78rem', color: '#9FA6B8', textTransform: 'uppercase' }}>
-                Pausa
-              </span>
-              <div
+              <span
                 style={{
-                  fontSize: '3.6rem',
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  color: '#10B981',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.75rem',
                 }}
               >
-                {formatTime(secondsRemaining)}
+                {currentStep.isEndOfLoopRound
+                  ? '⚡ ¡Vuelta Completada! Recuperación del Circuito'
+                  : 'Recuperación • Respira y Mantén Zanshin'}
+              </span>
+
+              {/* Círculo de Descanso Responsivo */}
+              <div
+                style={{
+                  width: 'min(150px, 38vw)',
+                  height: 'min(150px, 38vw)',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                  border: '3px solid #10B981',
+                  boxShadow: '0 0 35px rgba(16, 185, 129, 0.25)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '1.25rem',
+                }}
+              >
+                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700 }}>
+                  Pausa
+                </span>
+                <div
+                  style={{
+                    fontSize: 'clamp(2.5rem, 9vw, 3.4rem)',
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {formatTime(secondsRemaining)}
+                </div>
+              </div>
+
+              {/* Siguiente ejercicio en turno */}
+              <div
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1.25rem',
+                  maxWidth: '450px',
+                  width: '100%',
+                  marginBottom: '1rem',
+                }}
+              >
+                <span style={{ display: 'block', fontSize: '0.7rem', color: '#F5D77F', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+                  Prepárate para:
+                </span>
+                <h3 style={{ fontSize: 'clamp(1.05rem, 4vw, 1.25rem)', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.25rem' }}>
+                  {workoutSteps[currentStepIndex + 1]?.exerciseName}
+                </h3>
+                <span style={{ fontSize: '0.82rem', color: '#9FA6B8' }}>
+                  Meta: <strong style={{ color: '#F5D77F' }}>{workoutSteps[currentStepIndex + 1]?.targetQuantity} {workoutSteps[currentStepIndex + 1]?.targetUnit}</strong>
+                </span>
               </div>
             </div>
 
-            {/* Siguiente ejercicio en turno */}
+            {/* Botones de Descanso Pinned al fondo */}
             <div
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(212, 175, 55, 0.25)',
-                borderRadius: '12px',
-                padding: '1.25rem 2rem',
-                maxWidth: '450px',
+                padding: '0.75rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px)) 1rem',
+                backgroundColor: '#0A0B0F',
+                borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+                flexShrink: 0,
                 width: '100%',
-                marginBottom: '2rem',
               }}
             >
-              <span style={{ display: 'block', fontSize: '0.74rem', color: '#F5D77F', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.3rem' }}>
-                Prepárate para:
-              </span>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.3rem' }}>
-                {workoutSteps[currentStepIndex + 1]?.exerciseName}
-              </h3>
-              <span style={{ fontSize: '0.88rem', color: '#9FA6B8' }}>
-                Meta: {workoutSteps[currentStepIndex + 1]?.targetQuantity} {workoutSteps[currentStepIndex + 1]?.targetUnit}
-              </span>
-            </div>
+              <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%', display: 'flex', gap: '0.65rem' }}>
+                <button
+                  onClick={addExtraRest}
+                  style={{
+                    flex: 1,
+                    padding: '0.85rem 1rem',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                    touchAction: 'manipulation',
+                  }}
+                >
+                  +15s Descanso
+                </button>
 
-            {/* Controles de descanso */}
-            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <button
-                onClick={addExtraRest}
-                style={{
-                  padding: '0.75rem 1.4rem',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                }}
-              >
-                +15 segundos
-              </button>
-
-              <button
-                onClick={skipRestAndProceed}
-                className="btn-martial-primary"
-                style={{
-                  padding: '0.75rem 1.8rem',
-                  fontSize: '0.95rem',
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <SkipForward size={16} />
-                <span>Omitir Descanso y Continuar</span>
-              </button>
+                <button
+                  onClick={skipRestAndProceed}
+                  className="btn-martial-primary"
+                  style={{
+                    flex: 1.4,
+                    padding: '0.85rem 1.2rem',
+                    fontSize: '0.92rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.45rem',
+                    borderRadius: '10px',
+                    touchAction: 'manipulation',
+                  }}
+                >
+                  <SkipForward size={16} />
+                  <span>¡Continuar!</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1230,18 +1404,19 @@ export default function TrainingPage() {
           <div
             style={{
               flex: 1,
+              overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '2.5rem 1.5rem',
+              padding: '2rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px))',
               textAlign: 'center',
             }}
           >
             <div
               style={{
-                width: '90px',
-                height: '90px',
+                width: '75px',
+                height: '75px',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(212, 175, 55, 0.2)',
                 border: '3px solid #F5D77F',
@@ -1249,78 +1424,79 @@ export default function TrainingPage() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#F5D77F',
-                margin: '0 auto 1.5rem',
-                boxShadow: '0 0 45px rgba(212, 175, 55, 0.4)',
+                margin: '0 auto 1.25rem',
+                boxShadow: '0 0 35px rgba(212, 175, 55, 0.4)',
               }}
             >
-              <Award size={46} />
+              <Award size={38} />
             </div>
 
             <span
               style={{
-                fontSize: '0.85rem',
+                fontSize: '0.78rem',
                 fontWeight: 800,
                 color: '#D4AF37',
-                letterSpacing: '0.2em',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                marginBottom: '0.5rem',
+                marginBottom: '0.35rem',
               }}
             >
               Mokuso • Rei (礼)
             </span>
 
-            <h1 style={{ fontSize: '2.4rem', fontWeight: 900, color: '#FFFFFF', marginBottom: '0.5rem' }}>
+            <h1 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontWeight: 900, color: '#FFFFFF', marginBottom: '0.4rem' }}>
               ¡Entrenamiento Completado!
             </h1>
 
-            <p style={{ color: '#9FA6B8', fontSize: '1rem', maxWidth: '480px', marginBottom: '2rem' }}>
-              Has finalizado exitosamente la rutina <strong style={{ color: '#F5D77F' }}>{activeWorkoutRoutine.title}</strong>. La constancia diaria forja el espíritu del karateka.
+            <p style={{ color: '#9FA6B8', fontSize: '0.9rem', maxWidth: '420px', marginBottom: '1.5rem' }}>
+              Has finalizado la rutina <strong style={{ color: '#F5D77F' }}>{activeWorkoutRoutine.title}</strong>.
             </p>
 
-            {/* Tarjetas de métricas del entrenamiento realizado */}
+            {/* Métricas Responsivas */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '1rem',
-                maxWidth: '520px',
+                gap: '0.5rem',
+                maxWidth: '480px',
                 width: '100%',
-                marginBottom: '2.5rem',
+                marginBottom: '1.8rem',
               }}
             >
-              <div style={{ backgroundColor: '#0E0F14', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.3rem' }}>
+              <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
                   Tiempo Total
                 </span>
-                <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#F5D77F' }}>
+                <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#F5D77F' }}>
                   {formatTime(totalElapsedSeconds)}
                 </span>
               </div>
 
-              <div style={{ backgroundColor: '#0E0F14', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.3rem' }}>
-                  Pasos / Series
+              <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                  Pasos
                 </span>
-                <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#FFFFFF' }}>
+                <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF' }}>
                   {workoutSteps.length}
                 </span>
               </div>
 
-              <div style={{ backgroundColor: '#0E0F14', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.3rem' }}>
+              <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
                   Disciplina
                 </span>
-                <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#10B981' }}>
+                <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#10B981' }}>
                   100%
                 </span>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', maxWidth: '380px' }}>
               <button
                 onClick={() => startWorkout(activeWorkoutRoutine)}
                 style={{
-                  padding: '0.85rem 1.6rem',
+                  width: '100%',
+                  padding: '0.85rem',
                   borderRadius: '8px',
                   backgroundColor: 'rgba(255, 255, 255, 0.08)',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -1330,6 +1506,7 @@ export default function TrainingPage() {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '0.4rem',
                 }}
               >
@@ -1341,12 +1518,13 @@ export default function TrainingPage() {
                 onClick={exitWorkoutRunner}
                 className="btn-martial-primary"
                 style={{
-                  padding: '0.85rem 2rem',
+                  width: '100%',
+                  padding: '0.85rem',
                   fontSize: '0.95rem',
                   fontWeight: 800,
                 }}
               >
-                <span>Volver al Catálogo de Rutinas</span>
+                <span>Volver al Catálogo</span>
               </button>
             </div>
           </div>
