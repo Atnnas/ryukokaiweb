@@ -129,3 +129,23 @@ export interface Routine {
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
+
+export interface WorkoutLog {
+  id?: string;
+  _id?: string;
+  userEmail: string;
+  userName?: string;
+  routineId: string;
+  routineTitle: string;
+  durationSeconds: number;
+  stepsCompleted: number;
+  totalSteps: number;
+  completedAt: string | Date;
+}
+
+export interface WorkoutStats {
+  streak: number;
+  totalWorkouts: number;
+  totalMinutes: number;
+  monthWorkouts: number;
+}

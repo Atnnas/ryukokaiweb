@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { Routine, ExerciseItem } from '@/types';
+import { Routine, ExerciseItem, WorkoutLog, WorkoutStats } from '@/types';
 import { calculateRoutineDuration } from '@/lib/routineUtils';
 import {
   Dumbbell,
@@ -30,6 +30,10 @@ import {
   Maximize2,
   Minimize2,
   Lock,
+  Flame,
+  History,
+  Calendar,
+  Trophy,
 } from 'lucide-react';
 
 // Paso individual desempaquetado para el ejecutor interactivo de entrenamiento
@@ -232,6 +236,29 @@ function playAudioTone(type: 'beep' | 'gong' | 'victory' | 'rest') {
   }
 }
 
+// Síntesis de voz en español del Sensei para guiar el entrenamiento
+function speakSensei(text: string, enabled: boolean) {
+  if (!enabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'es-ES';
+    utterance.rate = 1.05;
+    utterance.pitch = 0.95;
+
+    const voices = window.speechSynthesis.getVoices();
+    const esVoice = voices.find(
+      (v) => v.lang.toLowerCase().includes('es') || v.lang.toLowerCase().includes('spa')
+    );
+    if (esVoice) {
+      utterance.voice = esVoice;
+    }
+    window.speechSynthesis.speak(utterance);
+  } catch {
+    // Si falla o el navegador restringe el audio, no bloquea el entrenamiento
+  }
+}
+
 export default function TrainingPage() {
   const { user, isLoading: authLoading, openAuthModal } = useAuth();
 
@@ -249,6 +276,40 @@ export default function TrainingPage() {
       [id]: !prev[id],
     }));
   };
+
+  // Estado de Voz del Sensei (persistido en localStorage)
+  const [voiceEnabled, setVoiceEnabled] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sensei_voice_enabled');
+      return saved !== null ? saved === 'true' : true;
+    }
+    return true;
+  });
+
+  const toggleVoice = () => {
+    setVoiceEnabled((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('sensei_voice_enabled', String(next));
+        if (!next && 'speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+      }
+      return next;
+    });
+  };
+
+  // Estados de Racha e Historial (Tanren Streak & Logs)
+  const [workoutStats, setWorkoutStats] = useState<WorkoutStats>({
+    streak: 0,
+    totalWorkouts: 0,
+    totalMinutes: 0,
+    monthWorkouts: 0,
+  });
+  const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [activeTab, setActiveTab] = useState<'catalog' | 'history'>('catalog');
+  const [hasLoggedCurrentWorkout, setHasLoggedCurrentWorkout] = useState(false);
 
   // Estados del Ejecutor Interactivo de Entrenamiento (Workout Runner)
   const [activeWorkoutRoutine, setActiveWorkoutRoutine] = useState<Routine | null>(null);
@@ -286,11 +347,29 @@ export default function TrainingPage() {
     }
   }, []);
 
+  // Cargar estadísticas de racha e historial del usuario
+  const fetchWorkoutStats = useCallback(async () => {
+    setLoadingStats(true);
+    try {
+      const res = await fetch('/api/training/logs');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.stats) setWorkoutStats(data.stats);
+        if (data.logs) setWorkoutLogs(data.logs);
+      }
+    } catch (err) {
+      console.error('Error al cargar historial y racha:', err);
+    } finally {
+      setLoadingStats(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (isApprovedUser) {
       fetchRoutines();
+      fetchWorkoutStats();
     }
-  }, [isApprovedUser, fetchRoutines]);
+  }, [isApprovedUser, fetchRoutines, fetchWorkoutStats]);
 
   // Iniciar ejecución de una rutina seleccionada
   const startWorkout = (routine: Routine) => {
@@ -302,6 +381,7 @@ export default function TrainingPage() {
     setCurrentStepIndex(0);
     setTotalElapsedSeconds(0);
     setPreviewRoutine(null);
+    setHasLoggedCurrentWorkout(false);
 
     // Comenzar con 5 segundos de cuenta regresiva de preparación (Hajime)
     setWorkoutPhase('prep');
@@ -311,6 +391,10 @@ export default function TrainingPage() {
     if (soundEnabled) {
       playAudioTone('beep');
     }
+    speakSensei(
+      `Iniciando rutina: ${routine.title}. Prepárate para: ${steps[0].exerciseName}.`,
+      voiceEnabled
+    );
   };
 
   // Pasar de la fase de preparación al primer ejercicio
@@ -327,7 +411,8 @@ export default function TrainingPage() {
     if (soundEnabled) {
       playAudioTone('gong');
     }
-  }, [soundEnabled]);
+    speakSensei('¡Hajime!', voiceEnabled);
+  }, [soundEnabled, voiceEnabled]);
 
   // Completar el ejercicio actual e iniciar el descanso correspondiente
   const completeCurrentExercise = useCallback(() => {
@@ -343,6 +428,7 @@ export default function TrainingPage() {
       if (soundEnabled) {
         playAudioTone('victory');
       }
+      speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
       return;
     }
 
@@ -355,19 +441,21 @@ export default function TrainingPage() {
       if (soundEnabled) {
         playAudioTone('rest');
       }
+      speakSensei(`¡Yame! Descanso de ${restSeconds} segundos.`, voiceEnabled);
     } else {
       // Transición continua directa al siguiente ejercicio
       const nextIdx = currentStepIndex + 1;
       setCurrentStepIndex(nextIdx);
       beginWorkPhase(workoutSteps[nextIdx]);
     }
-  }, [workoutSteps, currentStepIndex, soundEnabled, beginWorkPhase]);
+  }, [workoutSteps, currentStepIndex, soundEnabled, voiceEnabled, beginWorkPhase]);
 
   // Terminar el descanso antes de tiempo (Omitir descanso)
   const skipRestAndProceed = useCallback(() => {
     const nextIdx = currentStepIndex + 1;
     if (nextIdx < workoutSteps.length) {
       setCurrentStepIndex(nextIdx);
+      speakSensei(`Siguiente ejercicio: ${workoutSteps[nextIdx].exerciseName}`, voiceEnabled);
       beginWorkPhase(workoutSteps[nextIdx]);
     } else {
       setWorkoutPhase('finished');
@@ -375,12 +463,23 @@ export default function TrainingPage() {
       if (soundEnabled) {
         playAudioTone('victory');
       }
+      speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
     }
-  }, [currentStepIndex, workoutSteps, soundEnabled, beginWorkPhase]);
+  }, [currentStepIndex, workoutSteps, soundEnabled, voiceEnabled, beginWorkPhase]);
 
   // Añadir +15 segundos al descanso
   const addExtraRest = () => {
     setSecondsRemaining((prev) => prev + 15);
+    speakSensei('Más quince segundos de descanso', voiceEnabled);
+  };
+
+  // Alternar pausa / reanudación de cronómetro
+  const toggleTimerRunning = () => {
+    setIsTimerRunning((prev) => {
+      const next = !prev;
+      speakSensei(next ? 'Continuamos' : 'Pausa', voiceEnabled);
+      return next;
+    });
   };
 
   // Salir de la pantalla de ejecución y volver a la lista
@@ -390,11 +489,41 @@ export default function TrainingPage() {
         return;
       }
     }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     setActiveWorkoutRoutine(null);
     setWorkoutSteps([]);
     setWorkoutPhase('idle');
     setIsTimerRunning(false);
   };
+
+  // Registro automático en base de datos al finalizar entrenamiento
+  useEffect(() => {
+    if (workoutPhase === 'finished' && activeWorkoutRoutine && !hasLoggedCurrentWorkout) {
+      setHasLoggedCurrentWorkout(true);
+      fetch('/api/training/logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          routineId: activeWorkoutRoutine.id || activeWorkoutRoutine._id,
+          routineTitle: activeWorkoutRoutine.title,
+          durationSeconds: totalElapsedSeconds,
+          stepsCompleted: workoutSteps.length,
+          totalSteps: workoutSteps.length,
+        }),
+      })
+        .then(() => fetchWorkoutStats())
+        .catch((err) => console.error('Error al registrar entrenamiento:', err));
+    }
+  }, [
+    workoutPhase,
+    activeWorkoutRoutine,
+    hasLoggedCurrentWorkout,
+    totalElapsedSeconds,
+    workoutSteps.length,
+    fetchWorkoutStats,
+  ]);
 
   // Timer Tick (manejador de temporizador cada segundo)
   useEffect(() => {
@@ -409,6 +538,9 @@ export default function TrainingPage() {
             beginWorkPhase(workoutSteps[currentStepIndex]);
             return 0;
           }
+          if (prev === 4) speakSensei('Tres', voiceEnabled);
+          if (prev === 3) speakSensei('Dos', voiceEnabled);
+          if (prev === 2) speakSensei('Uno', voiceEnabled);
           if (soundEnabled && prev <= 4) {
             playAudioTone('beep');
           }
@@ -434,6 +566,9 @@ export default function TrainingPage() {
             skipRestAndProceed();
             return 0;
           }
+          if (prev === 6) {
+            speakSensei('Cinco segundos', voiceEnabled);
+          }
           if (soundEnabled && prev <= 4) {
             playAudioTone('beep');
           }
@@ -449,6 +584,7 @@ export default function TrainingPage() {
     currentStepIndex,
     workoutSteps,
     soundEnabled,
+    voiceEnabled,
     beginWorkPhase,
     completeCurrentExercise,
     skipRestAndProceed,
@@ -827,6 +963,31 @@ export default function TrainingPage() {
               {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
             </button>
 
+            {/* Voz del Sensei (ON / OFF) */}
+            <button
+              onClick={toggleVoice}
+              style={{
+                background: voiceEnabled ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                border: voiceEnabled ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid rgba(255, 255, 255, 0.12)',
+                color: voiceEnabled ? '#F5D77F' : '#64748B',
+                cursor: 'pointer',
+                padding: '0 0.5rem',
+                height: '34px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.25rem',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                flexShrink: 0,
+                touchAction: 'manipulation',
+              }}
+              title={voiceEnabled ? 'Voz del Sensei activa (clic para silenciar)' : 'Voz del Sensei desactivada (clic para activar)'}
+            >
+              <span>{voiceEnabled ? '🗣️ Voz ON' : '🔇 Voz OFF'}</span>
+            </button>
+
             {/* Pantalla completa nativa */}
             <button
               onClick={toggleFullscreen}
@@ -1100,7 +1261,7 @@ export default function TrainingPage() {
 
                       {/* Botón de Pausa / Reanudar en tiempo real */}
                       <button
-                        onClick={() => setIsTimerRunning(!isTimerRunning)}
+                        onClick={toggleTimerRunning}
                         style={{
                           background: 'rgba(255, 255, 255, 0.08)',
                           border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -1606,47 +1767,188 @@ export default function TrainingPage() {
             </p>
           </div>
 
-          {/* Tarjetas de Métricas de Repertorio */}
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          {/* Tarjetas de Métricas: Racha, Sesiones, Tiempo y Repertorio */}
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {/* Card 1: Racha de Disciplina */}
             <div
               style={{
-                padding: '0.85rem 1.25rem',
+                padding: '0.75rem 1.15rem',
                 backgroundColor: '#0E0F14',
                 borderRadius: '10px',
-                border: '1px solid rgba(212, 175, 55, 0.2)',
+                border: workoutStats.streak > 0 ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(212, 175, 55, 0.2)',
                 textAlign: 'center',
-                minWidth: '110px',
+                minWidth: '115px',
+                boxShadow: workoutStats.streak > 0 ? '0 0 20px rgba(245, 158, 11, 0.15)' : 'none',
               }}
             >
-              <span style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600 }}>
-                Rutinas
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', marginBottom: '0.15rem' }}>
+                <Flame size={15} color={workoutStats.streak > 0 ? '#F59E0B' : '#9FA6B8'} />
+                <span style={{ fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700 }}>
+                  Racha
+                </span>
+              </div>
+              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: workoutStats.streak > 0 ? '#F59E0B' : '#FFFFFF' }}>
+                {workoutStats.streak} {workoutStats.streak === 1 ? 'día' : 'días'}
               </span>
-              <span style={{ fontSize: '1.5rem', fontWeight: 900, color: '#FFFFFF' }}>
-                {totalRoutines}
+              <span style={{ display: 'block', fontSize: '0.68rem', color: workoutStats.streak > 0 ? '#FBBF24' : '#64748B', marginTop: '0.1rem' }}>
+                {workoutStats.streak > 0 ? '🔥 ¡Disciplina activa!' : 'Entrena hoy'}
               </span>
             </div>
 
+            {/* Card 2: Sesiones Completadas */}
             <div
               style={{
-                padding: '0.85rem 1.25rem',
+                padding: '0.75rem 1.15rem',
                 backgroundColor: '#0E0F14',
                 borderRadius: '10px',
                 border: '1px solid rgba(212, 175, 55, 0.2)',
                 textAlign: 'center',
-                minWidth: '110px',
+                minWidth: '115px',
               }}
             >
-              <span style={{ display: 'block', fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600 }}>
-                Duración Promedio
+              <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.15rem' }}>
+                Sesiones
               </span>
-              <span style={{ fontSize: '1.5rem', fontWeight: 900, color: '#F5D77F' }}>
-                ~{avgDuration}m
+              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#FFFFFF' }}>
+                {workoutStats.totalWorkouts}
+              </span>
+              <span style={{ display: 'block', fontSize: '0.68rem', color: '#10B981', marginTop: '0.1rem' }}>
+                {workoutStats.monthWorkouts} este mes
+              </span>
+            </div>
+
+            {/* Card 3: Tiempo Total */}
+            <div
+              style={{
+                padding: '0.75rem 1.15rem',
+                backgroundColor: '#0E0F14',
+                borderRadius: '10px',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                textAlign: 'center',
+                minWidth: '115px',
+              }}
+            >
+              <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.15rem' }}>
+                Tiempo Total
+              </span>
+              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#F5D77F' }}>
+                {workoutStats.totalMinutes}m
+              </span>
+              <span style={{ display: 'block', fontSize: '0.68rem', color: '#9FA6B8', marginTop: '0.1rem' }}>
+                Minutos en tatami
+              </span>
+            </div>
+
+            {/* Card 4: Rutinas Disponibles */}
+            <div
+              style={{
+                padding: '0.75rem 1.15rem',
+                backgroundColor: '#0E0F14',
+                borderRadius: '10px',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                textAlign: 'center',
+                minWidth: '115px',
+              }}
+            >
+              <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.15rem' }}>
+                Repertorio
+              </span>
+              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#FFFFFF' }}>
+                {totalRoutines}
+              </span>
+              <span style={{ display: 'block', fontSize: '0.68rem', color: '#F5D77F', marginTop: '0.1rem' }}>
+                ~{avgDuration}m promedio
               </span>
             </div>
           </div>
         </div>
 
-        {/* Barra de Búsqueda y Filtros Rápidos */}
+        {/* Barra Superior: Tabs de Navegación (Catálogo vs Historial) y Toggle de Voz */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            marginBottom: '1.75rem',
+            paddingBottom: '1rem',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          {/* Pestañas Catálogo vs Historial */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveTab('catalog')}
+              style={{
+                padding: '0.6rem 1.1rem',
+                borderRadius: '8px',
+                fontSize: '0.86rem',
+                fontWeight: activeTab === 'catalog' ? 800 : 600,
+                backgroundColor: activeTab === 'catalog' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                border: activeTab === 'catalog' ? '1px solid #D4AF37' : '1px solid rgba(255, 255, 255, 0.1)',
+                color: activeTab === 'catalog' ? '#F5D77F' : '#9FA6B8',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Dumbbell size={15} />
+              <span>Catálogo de Rutinas ({routines.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('history')}
+              style={{
+                padding: '0.6rem 1.1rem',
+                borderRadius: '8px',
+                fontSize: '0.86rem',
+                fontWeight: activeTab === 'history' ? 800 : 600,
+                backgroundColor: activeTab === 'history' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                border: activeTab === 'history' ? '1px solid #D4AF37' : '1px solid rgba(255, 255, 255, 0.1)',
+                color: activeTab === 'history' ? '#F5D77F' : '#9FA6B8',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <History size={15} />
+              <span>Mi Historial y Racha ({workoutLogs.length})</span>
+            </button>
+          </div>
+
+          {/* Control de Voz del Sensei (ON / OFF) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <button
+              onClick={toggleVoice}
+              style={{
+                padding: '0.55rem 0.95rem',
+                borderRadius: '8px',
+                backgroundColor: voiceEnabled ? 'rgba(212, 175, 55, 0.16)' : 'rgba(255, 255, 255, 0.05)',
+                border: voiceEnabled ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid rgba(255, 255, 255, 0.12)',
+                color: voiceEnabled ? '#F5D77F' : '#9FA6B8',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                transition: 'all 0.15s ease',
+              }}
+              title="Instrucciones habladas en tiempo real durante el entrenamiento"
+            >
+              <span>{voiceEnabled ? '🗣️ Voz del Sensei: ACTIVADA' : '🔇 Voz del Sensei: SILENCIADA'}</span>
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'catalog' && (
+          <>
+            {/* Barra de Búsqueda y Filtros Rápidos */}
         <div
           style={{
             display: 'flex',
@@ -2465,7 +2767,198 @@ export default function TrainingPage() {
             </div>
           </>
         )}
+      </>
+    )}
+
+    {/* ===================================================================== */}
+    {/* TAB: MI HISTORIAL Y RACHA DE DISCIPLINA                              */}
+    {/* ===================================================================== */}
+    {activeTab === 'history' && (
+      <div style={{ width: '100%' }}>
+        {loadingStats ? (
+          <div style={{ textAlign: 'center', padding: '4rem 0', color: '#9FA6B8' }}>
+            <Dumbbell size={36} className="spin-animation" style={{ color: '#F5D77F', margin: '0 auto 1rem' }} />
+            <p style={{ fontSize: '0.95rem' }}>Cargando historial de entrenamientos...</p>
+          </div>
+        ) : workoutLogs.length === 0 ? (
+          <div
+            className="card-sumi"
+            style={{
+              padding: '4rem 2rem',
+              textAlign: 'center',
+              backgroundColor: '#0E0F14',
+              border: '1px dashed rgba(212, 175, 55, 0.3)',
+              borderRadius: '14px',
+            }}
+          >
+            <Flame size={52} color="#F59E0B" style={{ margin: '0 auto 1.25rem' }} />
+            <h3 style={{ color: '#FFFFFF', fontSize: '1.35rem', fontWeight: 900, marginBottom: '0.4rem' }}>
+              ¡Aún no has registrado ningún entrenamiento!
+            </h3>
+            <p style={{ color: '#9FA6B8', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto 1.75rem', lineHeight: 1.5 }}>
+              Inicia hoy cualquier rutina del catálogo para encender tu fuego de disciplina marcial y comenzar tu racha de días consecutivos en el dojo.
+            </p>
+            <button
+              onClick={() => setActiveTab('catalog')}
+              className="btn-martial-primary"
+              style={{ padding: '0.75rem 1.6rem', fontSize: '0.92rem', fontWeight: 800, borderRadius: '8px' }}
+            >
+              <span>Explorar Catálogo de Rutinas</span>
+            </button>
+          </div>
+        ) : (
+          <div
+            className="card-sumi"
+            style={{
+              backgroundColor: '#0E0F14',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              borderRadius: '14px',
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7)',
+            }}
+          >
+            {/* Header del Historial */}
+            <div
+              style={{
+                padding: '1.25rem 1.5rem',
+                borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '0.85rem',
+                backgroundColor: 'rgba(212, 175, 55, 0.03)',
+              }}
+            >
+              <div>
+                <h3 style={{ margin: 0, color: '#FFFFFF', fontSize: '1.15rem', fontWeight: 900 }}>
+                  Registro de Sesiones de Práctica
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: '#9FA6B8' }}>
+                  Has completado un total de {workoutStats.totalWorkouts} entrenamientos • {workoutStats.totalMinutes} minutos acumulados
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <span
+                  style={{
+                    fontSize: '0.78rem',
+                    color: workoutStats.streak > 0 ? '#F59E0B' : '#9FA6B8',
+                    fontWeight: 800,
+                    backgroundColor: workoutStats.streak > 0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                    padding: '0.35rem 0.8rem',
+                    borderRadius: '999px',
+                    border: workoutStats.streak > 0 ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  <Flame size={14} color={workoutStats.streak > 0 ? '#F59E0B' : '#9FA6B8'} />
+                  <span>Racha actual: {workoutStats.streak} {workoutStats.streak === 1 ? 'día' : 'días'}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Tabla de Registros */}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.15)', backgroundColor: 'rgba(212, 175, 55, 0.02)' }}>
+                    <th style={{ padding: '0.9rem 1.25rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha y Hora</th>
+                    <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rutina Realizada</th>
+                    <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tiempo Activo</th>
+                    <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Disciplina</th>
+                    <th style={{ padding: '0.9rem 1.25rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {workoutLogs.map((log, idx) => {
+                    const dateObj = new Date(log.completedAt);
+                    const dateStr = dateObj.toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    });
+                    const timeStr = dateObj.toLocaleTimeString('es-ES', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    });
+
+                    const matchingRoutine = routines.find(
+                      (r) => (r.id && r.id === log.routineId) || (r._id && r._id === log.routineId) || r.title === log.routineTitle
+                    );
+
+                    return (
+                      <tr
+                        key={log.id || log._id || idx}
+                        style={{
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                          backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.012)',
+                        }}
+                      >
+                        <td style={{ padding: '1rem 1.25rem', color: '#CBD5E1', whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                            <div style={{ width: '30px', height: '30px', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F5D77F' }}>
+                              <Calendar size={14} />
+                            </div>
+                            <div>
+                              <strong style={{ display: 'block', color: '#FFFFFF', fontSize: '0.86rem' }}>{dateStr}</strong>
+                              <span style={{ fontSize: '0.72rem', color: '#9FA6B8' }}>{timeStr}</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td style={{ padding: '1rem 1rem', color: '#FFFFFF', fontWeight: 700 }}>
+                          <span style={{ fontSize: '0.92rem' }}>{log.routineTitle}</span>
+                        </td>
+
+                        <td style={{ padding: '1rem 1rem', color: '#F5D77F', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <Clock size={13} />
+                            <span>{formatTime(log.durationSeconds)}</span>
+                          </span>
+                        </td>
+
+                        <td style={{ padding: '1rem 1rem', whiteSpace: 'nowrap' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10B981', fontSize: '0.76rem', fontWeight: 700, backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '0.2rem 0.55rem', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                            <CheckCircle size={13} />
+                            <span>100% Completada</span>
+                          </span>
+                        </td>
+
+                        <td style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                          {matchingRoutine && (
+                            <button
+                              onClick={() => startWorkout(matchingRoutine)}
+                              className="btn-martial-primary"
+                              style={{
+                                padding: '0.45rem 0.95rem',
+                                fontSize: '0.8rem',
+                                fontWeight: 800,
+                                borderRadius: '6px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)',
+                              }}
+                            >
+                              <RotateCcw size={13} />
+                              <span>Repetir</span>
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
+    )}
+  </div>
 
       {/* ===================================================================== */}
       {/* MODAL: VER DESGLOSE COMPLETO ANTES DE INICIAR (BOTTOM SHEET EN MÓVIL) */}
