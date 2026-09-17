@@ -455,7 +455,7 @@ export default function TrainingPage() {
         if (soundEnabled) {
           playAudioTone('gong');
         }
-        speakSensei('Atención practicante. En el Karate-Do la honestidad contigo mismo es lo principal. Este entrenamiento fue demasiado apresurado y no contará para tu racha.', voiceEnabled);
+        speakSensei('¡Chui! Advertencia. No te engañes a ti mismo; esta sesión no cuenta para tu racha.', voiceEnabled);
       } else {
         if (soundEnabled) {
           playAudioTone('victory');
@@ -507,7 +507,7 @@ export default function TrainingPage() {
         if (soundEnabled) {
           playAudioTone('gong');
         }
-        speakSensei('Atención practicante. En el Karate-Do la honestidad contigo mismo es lo principal. Este entrenamiento fue demasiado apresurado y no contará para tu racha.', voiceEnabled);
+        speakSensei('¡Chui! Advertencia. No te engañes a ti mismo; esta sesión no cuenta para tu racha.', voiceEnabled);
       } else {
         if (soundEnabled) {
           playAudioTone('victory');
@@ -1634,113 +1634,125 @@ export default function TrainingPage() {
             }}
           >
             {workoutIntegrityResult?.isRushed ? (
-              /* ADVERTENCIA DE HONESTIDAD MARCIAL (MAKOTO - 誠) */
-              <>
+              /* ADVERTENCIA WKF: CHŪI! (注意 - FALTA POR HONESTIDAD MARCIAL) */
+              <div
+                style={{
+                  maxWidth: '420px',
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  animation: 'fadeIn 0.3s ease',
+                }}
+              >
+                {/* Imagen del Árbitro WKF Sacando el Dedo Índice */}
                 <div
                   style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    position: 'relative',
+                    width: 'min(190px, 48vw)',
+                    height: 'min(190px, 48vw)',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
                     border: '3px solid #EF4444',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#EF4444',
-                    margin: '0 auto 1.25rem',
-                    boxShadow: '0 0 35px rgba(239, 68, 68, 0.35)',
+                    boxShadow: '0 0 35px rgba(239, 68, 68, 0.45)',
+                    marginBottom: '0.85rem',
+                    backgroundColor: '#0E0F14',
                   }}
                 >
-                  <AlertTriangle size={42} />
+                  <Image
+                    src="/images/wkf_referee_chui.jpg"
+                    alt="Árbitro WKF marcando falta Chui con el dedo índice"
+                    fill
+                    sizes="(max-width: 768px) 190px, 190px"
+                    style={{ objectFit: 'cover' }}
+                    priority
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)',
+                      padding: '0.35rem 0.5rem',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.65rem', fontWeight: 900, color: '#FCA5A5', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                      Arbitraje Oficial WKF
+                    </span>
+                  </div>
                 </div>
 
-                <span
-                  style={{
-                    fontSize: '0.78rem',
-                    fontWeight: 800,
-                    color: '#EF4444',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    marginBottom: '0.35rem',
-                  }}
-                >
-                  Principio de Makoto (誠) • Honestidad Marcial
-                </span>
-
-                <h1 style={{ fontSize: 'clamp(1.45rem, 5vw, 2rem)', fontWeight: 900, color: '#FFFFFF', marginBottom: '0.5rem' }}>
-                  Ritmo Inusualmente Acelerado
-                </h1>
-
-                <p style={{ color: '#FCA5A5', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto 1.25rem', lineHeight: 1.55 }}>
-                  Completaste esta rutina en apenas <strong style={{ color: '#FFFFFF' }}>{formatTime(totalElapsedSeconds)}</strong> ({workoutSteps.length} ejercicios de una rutina estimada en {activeWorkoutRoutine.durationMinutes} min). Para ejecutar la respiración, kime y técnica a conciencia, se requería al menos <strong style={{ color: '#FDE68A' }}>{formatTime(workoutIntegrityResult.minHonestSeconds)}</strong>.
-                </p>
-
+                {/* Badge Grande de CHUI */}
                 <div
                   style={{
-                    maxWidth: '480px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    padding: '0.35rem 1.15rem',
+                    borderRadius: '999px',
+                    backgroundColor: 'rgba(239, 68, 68, 0.18)',
+                    border: '2px solid #EF4444',
+                    color: '#F87171',
+                    marginBottom: '0.5rem',
+                    boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)',
+                  }}
+                >
+                  <AlertTriangle size={20} color="#EF4444" />
+                  <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '0.1em' }}>
+                    ¡CHŪI! (注意)
+                  </span>
+                </div>
+
+                <h2 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.45rem)', fontWeight: 900, color: '#FFFFFF', margin: '0 0 0.35rem 0' }}>
+                  Falta al Espíritu del Karate
+                </h2>
+
+                {/* Mensaje Corto, Preciso e Ingenioso */}
+                <p style={{ color: '#CBD5E1', fontSize: '0.88rem', lineHeight: 1.45, margin: '0 0 1rem 0', maxWidth: '360px' }}>
+                  Pasaste <strong style={{ color: '#FFFFFF' }}>{workoutSteps.length} ejercicios</strong> en solo <strong style={{ color: '#EF4444' }}>{formatTime(totalElapsedSeconds)}</strong>.
+                  <br />
+                  <span style={{ color: '#FDE68A', fontWeight: 700 }}>
+                    Al cronómetro lo puedes engañar, pero a ti mismo jamás.
+                  </span>
+                </p>
+
+                {/* Tarjeta de Anulación Compacta */}
+                <div
+                  style={{
                     width: '100%',
                     backgroundColor: 'rgba(239, 68, 68, 0.08)',
                     border: '1px solid rgba(239, 68, 68, 0.3)',
                     borderRadius: '10px',
-                    padding: '1rem 1.25rem',
-                    textAlign: 'left',
-                    fontSize: '0.84rem',
-                    color: '#E2E8F0',
-                    lineHeight: 1.5,
-                    marginBottom: '1.5rem',
+                    padding: '0.7rem 1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    marginBottom: '1.25rem',
                   }}
                 >
-                  <p style={{ margin: '0 0 0.4rem 0', fontWeight: 800, color: '#FCA5A5' }}>
-                    🥋 Mensaje del Dojo:
-                  </p>
-                  <p style={{ margin: '0 0 0.6rem 0', color: '#CBD5E1' }}>
-                    En el camino marcial (Budo), el valor supremo es la <strong>honestidad contigo mismo</strong>. Saltar los ejercicios para inflar la racha no fortalece tus músculos ni templa tu espíritu; únicamente te engaña a ti mismo.
-                  </p>
-                  <div style={{ padding: '0.55rem 0.75rem', backgroundColor: 'rgba(0, 0, 0, 0.3)', borderRadius: '6px', borderLeft: '3px solid #EF4444', color: '#F87171', fontWeight: 700, fontSize: '0.8rem' }}>
-                    ⚠️ Esta sesión se guardó con advertencia y <strong>NO contará para tu racha marcial</strong> ni otorgará días de descanso.
-                  </div>
-                </div>
-
-                {/* Métricas Informativas */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '0.5rem',
-                    maxWidth: '480px',
-                    width: '100%',
-                    marginBottom: '1.8rem',
-                  }}
-                >
-                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-                      Tiempo Marcado
-                    </span>
-                    <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#EF4444' }}>
-                      {formatTime(totalElapsedSeconds)}
-                    </span>
-                  </div>
-
-                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-                      Ejercicios
-                    </span>
-                    <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF' }}>
-                      {workoutSteps.length}
-                    </span>
-                  </div>
-
-                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                  <div style={{ textAlign: 'left' }}>
+                    <span style={{ display: 'block', fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700 }}>
                       Racha Marcial
                     </span>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 900, color: '#EF4444' }}>
-                      No válida ✕
+                    <strong style={{ color: '#F87171', fontSize: '0.9rem' }}>
+                      ⛔ Sesión Anulada
+                    </strong>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ display: 'block', fontSize: '0.66rem', color: '#9FA6B8' }}>
+                      Mínimo requerido:
+                    </span>
+                    <span style={{ color: '#F5D77F', fontWeight: 800, fontSize: '0.84rem' }}>
+                      {formatTime(workoutIntegrityResult.minHonestSeconds)}
                     </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', maxWidth: '380px' }}>
+                {/* Botones de Acción */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', width: '100%' }}>
                   <button
                     onClick={() => startWorkout(activeWorkoutRoutine)}
                     className="btn-martial-primary"
@@ -1753,31 +1765,32 @@ export default function TrainingPage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.4rem',
+                      gap: '0.45rem',
+                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.25)',
                     }}
                   >
                     <RotateCcw size={16} />
-                    <span>Reiniciar Rutina a Ritmo Real</span>
+                    <span>Oss, Repetir con Honor</span>
                   </button>
 
                   <button
                     onClick={exitWorkoutRunner}
                     style={{
                       width: '100%',
-                      padding: '0.85rem',
+                      padding: '0.75rem',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: '#94A3B8',
                       fontWeight: 700,
-                      fontSize: '0.9rem',
+                      fontSize: '0.84rem',
                       cursor: 'pointer',
                     }}
                   >
-                    <span>Comprendido, volver al Catálogo (Oss)</span>
+                    <span>Volver al Catálogo</span>
                   </button>
                 </div>
-              </>
+              </div>
             ) : (
               /* PANTALLA NORMAL: ENTRENAMIENTO COMPLETADO CON ÉXITO */
               <>
