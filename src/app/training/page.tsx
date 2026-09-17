@@ -302,6 +302,13 @@ export default function TrainingPage() {
   // Estados de Racha e Historial (Tanren Streak & Logs)
   const [workoutStats, setWorkoutStats] = useState<WorkoutStats>({
     streak: 0,
+    consecutiveDays: 0,
+    isStreakActive: false,
+    daysNeededForStreak: 3,
+    restDaysAvailable: 0,
+    restDaysUsed: 0,
+    daysUntilNextRestDay: 5,
+    statusMessage: 'Inicia hoy tu entrenamiento para activar tu racha marcial tras 3 días continuos.',
     totalWorkouts: 0,
     totalMinutes: 0,
     monthWorkouts: 0,
@@ -1775,23 +1782,53 @@ export default function TrainingPage() {
                 padding: '0.75rem 1.15rem',
                 backgroundColor: '#0E0F14',
                 borderRadius: '10px',
-                border: workoutStats.streak > 0 ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid rgba(212, 175, 55, 0.2)',
+                border: workoutStats.isStreakActive
+                  ? '1px solid rgba(245, 158, 11, 0.5)'
+                  : workoutStats.consecutiveDays > 0
+                  ? '1px solid rgba(245, 158, 11, 0.25)'
+                  : '1px solid rgba(212, 175, 55, 0.2)',
                 textAlign: 'center',
-                minWidth: '115px',
-                boxShadow: workoutStats.streak > 0 ? '0 0 20px rgba(245, 158, 11, 0.15)' : 'none',
+                minWidth: '120px',
+                boxShadow: workoutStats.isStreakActive ? '0 0 20px rgba(245, 158, 11, 0.15)' : 'none',
               }}
+              title={workoutStats.statusMessage}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', marginBottom: '0.15rem' }}>
-                <Flame size={15} color={workoutStats.streak > 0 ? '#F59E0B' : '#9FA6B8'} />
+                <Flame size={15} color={workoutStats.isStreakActive ? '#F59E0B' : workoutStats.consecutiveDays > 0 ? '#FBBF24' : '#9FA6B8'} />
                 <span style={{ fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700 }}>
                   Racha
                 </span>
+                {workoutStats.restDaysAvailable > 0 && (
+                  <span
+                    style={{
+                      fontSize: '0.6rem',
+                      padding: '0.05rem 0.35rem',
+                      backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                      color: '#60A5FA',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      borderRadius: '999px',
+                      fontWeight: 800,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.15rem',
+                    }}
+                    title={`Tienes ${workoutStats.restDaysAvailable} descanso(s) libre(s) para proteger tu racha.`}
+                  >
+                    <Shield size={9} color="#60A5FA" /> {workoutStats.restDaysAvailable}
+                  </span>
+                )}
               </div>
-              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: workoutStats.streak > 0 ? '#F59E0B' : '#FFFFFF' }}>
-                {workoutStats.streak} {workoutStats.streak === 1 ? 'día' : 'días'}
+              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: workoutStats.isStreakActive ? '#F59E0B' : workoutStats.consecutiveDays > 0 ? '#FDE68A' : '#FFFFFF' }}>
+                {workoutStats.isStreakActive ? `${workoutStats.streak} ${workoutStats.streak === 1 ? 'día' : 'días'}` : `${workoutStats.consecutiveDays}/3 d`}
               </span>
-              <span style={{ display: 'block', fontSize: '0.68rem', color: workoutStats.streak > 0 ? '#FBBF24' : '#64748B', marginTop: '0.1rem' }}>
-                {workoutStats.streak > 0 ? '🔥 ¡Disciplina activa!' : 'Entrena hoy'}
+              <span style={{ display: 'block', fontSize: '0.66rem', color: workoutStats.isStreakActive ? '#FBBF24' : '#94A3B8', marginTop: '0.1rem' }}>
+                {workoutStats.isStreakActive
+                  ? (workoutStats.restDaysAvailable > 0
+                      ? `🛡️ ${workoutStats.restDaysAvailable} descanso${workoutStats.restDaysAvailable > 1 ? 's' : ''} libre${workoutStats.restDaysAvailable > 1 ? 's' : ''}`
+                      : `+1 descanso en ${workoutStats.daysUntilNextRestDay}d`)
+                  : (workoutStats.consecutiveDays > 0
+                      ? `Faltan ${workoutStats.daysNeededForStreak}d para racha`
+                      : '3 días para activar')}
               </span>
             </div>
 
@@ -2839,23 +2876,78 @@ export default function TrainingPage() {
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
                 <span
                   style={{
                     fontSize: '0.78rem',
-                    color: workoutStats.streak > 0 ? '#F59E0B' : '#9FA6B8',
+                    color: workoutStats.isStreakActive ? '#F59E0B' : '#9FA6B8',
                     fontWeight: 800,
-                    backgroundColor: workoutStats.streak > 0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: workoutStats.isStreakActive ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
                     padding: '0.35rem 0.8rem',
                     borderRadius: '999px',
-                    border: workoutStats.streak > 0 ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                    border: workoutStats.isStreakActive ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.35rem',
                   }}
                 >
-                  <Flame size={14} color={workoutStats.streak > 0 ? '#F59E0B' : '#9FA6B8'} />
-                  <span>Racha actual: {workoutStats.streak} {workoutStats.streak === 1 ? 'día' : 'días'}</span>
+                  <Flame size={14} color={workoutStats.isStreakActive ? '#F59E0B' : '#9FA6B8'} />
+                  <span>
+                    {workoutStats.isStreakActive
+                      ? `Racha marcial: ${workoutStats.streak} ${workoutStats.streak === 1 ? 'día' : 'días'}`
+                      : `Progreso: ${workoutStats.consecutiveDays}/3 días para racha`}
+                  </span>
+                </span>
+
+                <span
+                  style={{
+                    fontSize: '0.78rem',
+                    color: workoutStats.restDaysAvailable > 0 ? '#60A5FA' : '#9FA6B8',
+                    fontWeight: 800,
+                    backgroundColor: workoutStats.restDaysAvailable > 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                    padding: '0.35rem 0.8rem',
+                    borderRadius: '999px',
+                    border: workoutStats.restDaysAvailable > 0 ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                  title="Por cada 5 días de entrenamiento ganas 1 día de descanso libre que te protege si faltas un día."
+                >
+                  <Shield size={14} color={workoutStats.restDaysAvailable > 0 ? '#60A5FA' : '#9FA6B8'} />
+                  <span>
+                    {workoutStats.restDaysAvailable} {workoutStats.restDaysAvailable === 1 ? 'descanso libre' : 'descansos libres'}
+                    {workoutStats.daysUntilNextRestDay > 0 && ` (+1 en ${workoutStats.daysUntilNextRestDay}d)`}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            {/* Banner de Reglas del Tanren */}
+            <div
+              style={{
+                margin: '1.25rem 1.5rem 0.5rem 1.5rem',
+                padding: '0.9rem 1.25rem',
+                backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '0.85rem',
+                fontSize: '0.83rem',
+                color: '#D1D5DB',
+                lineHeight: 1.55,
+              }}
+            >
+              <Award size={20} color="#F59E0B" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <span style={{ fontWeight: 800, color: '#FDE68A', display: 'block', marginBottom: '0.25rem' }}>
+                  Reglas de la Racha Marcial (Tanren)
+                </span>
+                <span style={{ color: '#9CA3AF' }}>
+                  • <strong style={{ color: '#F3F4F6' }}>Activación:</strong> La racha se gana a partir del <strong>3er día consecutivo</strong> de entrenamiento.<br />
+                  • <strong style={{ color: '#F3F4F6' }}>Descanso merecido:</strong> Por cada <strong>5 días de entrenamiento</strong> ganas <strong>1 día de descanso libre (escudo)</strong>.<br />
+                  • <strong style={{ color: '#F3F4F6' }}>Protección:</strong> Si un día no entrenas, tu día libre ganado cubre la ausencia y tu racha se preserva. Si no tienes descansos disponibles, la racha se pierde y regresa a 0.
                 </span>
               </div>
             </div>

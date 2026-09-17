@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDatabase } from '@/lib/mongodb';
+import { calculateMartialStreak, formatDateString } from '@/lib/streakUtils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,59 +39,31 @@ export async function GET(request: NextRequest) {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthWorkouts = allUserLogs.filter((l) => new Date(l.completedAt) >= startOfMonth).length;
 
-    // 4. Racha de días consecutivos (Streak)
-    const uniqueDatesSet = new Set<string>();
+    // 4. Racha Marcial de Disciplina (Tanren Streak):
+    // Reglas:
+    // - Se gana a partir del 3er día consecutivo.
+    // - Por cada 5 días de entrenamiento se gana 1 día de descanso libre.
+    // - Si un día no se entrena, se gasta 1 día de descanso (si hay) o se rompe la racha.
+    const uniqueDatesArray: string[] = [];
     allUserLogs.forEach((l) => {
-      const d = new Date(l.completedAt);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      uniqueDatesSet.add(`${year}-${month}-${day}`);
+      if (l.completedAt) {
+        uniqueDatesArray.push(formatDateString(new Date(l.completedAt)));
+      }
     });
 
-    const sortedDates = Array.from(uniqueDatesSet).sort().reverse();
-
-    let streak = 0;
-    if (sortedDates.length > 0) {
-      const formatD = (d: Date) => {
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}`;
-      };
-
-      const today = new Date();
-      const todayStr = formatD(today);
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = formatD(yesterday);
-
-      let checkDate = new Date();
-      if (sortedDates[0] === todayStr) {
-        checkDate = today;
-      } else if (sortedDates[0] === yesterdayStr) {
-        checkDate = yesterday;
-      } else {
-        checkDate = new Date(0); // racha rota
-      }
-
-      if (checkDate.getTime() > 0) {
-        while (true) {
-          const dateStr = formatD(checkDate);
-          if (uniqueDatesSet.has(dateStr)) {
-            streak++;
-            checkDate.setDate(checkDate.getDate() - 1);
-          } else {
-            break;
-          }
-        }
-      }
-    }
+    const streakData = calculateMartialStreak(uniqueDatesArray, new Date());
 
     return NextResponse.json({
       success: true,
       stats: {
-        streak,
+        streak: streakData.streak,
+        consecutiveDays: streakData.consecutiveDays,
+        isStreakActive: streakData.isStreakActive,
+        daysNeededForStreak: streakData.daysNeededForStreak,
+        restDaysAvailable: streakData.restDaysAvailable,
+        restDaysUsed: streakData.restDaysUsed,
+        daysUntilNextRestDay: streakData.daysUntilNextRestDay,
+        statusMessage: streakData.statusMessage,
         totalWorkouts,
         totalMinutes,
         monthWorkouts,

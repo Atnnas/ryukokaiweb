@@ -145,6 +145,13 @@ export interface WorkoutLog {
 
 export interface WorkoutStats {
   streak: number;
+  consecutiveDays: number;
+  isStreakActive: boolean;
+  daysNeededForStreak: number;
+  restDaysAvailable: number;
+  restDaysUsed: number;
+  daysUntilNextRestDay: number;
+  statusMessage: string;
   totalWorkouts: number;
   totalMinutes: number;
   monthWorkouts: number;
