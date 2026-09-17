@@ -300,54 +300,6 @@ export default function Header() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.4rem', fontSize: '0.76rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#E2E8F0', fontWeight: 600 }}>
-                        <Award size={14} color="#D4AF37" />
-                        <span style={{ color: '#F5D77F', fontWeight: 700 }}>{user.kyuDan || user.belt || 'Sin grado'}</span>
-                      </div>
-                      <span style={{ fontSize: '0.7rem', color: '#9FA6B8' }}>{user.classesAttended || 0} clases</span>
-                    </div>
-
-                    {(user.kataCategory || user.kumiteCategory) && (
-                      <div
-                        style={{
-                          marginTop: '0.6rem',
-                          padding: '0.55rem',
-                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                          border: '1px solid rgba(212, 175, 55, 0.15)',
-                          borderRadius: '6px',
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                          <span style={{ fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.06em', color: '#D4AF37', textTransform: 'uppercase' }}>
-                            Categorías WKF
-                          </span>
-                          {user.age && (
-                            <span style={{ fontSize: '0.68rem', color: '#CBD5E1', fontWeight: 600 }}>
-                              {user.age} años {user.weight ? `• ${user.weight}kg` : ''}
-                            </span>
-                          )}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                          {user.kataCategory && (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                              <span style={{ color: '#F5D77F', fontWeight: 600 }}>🥋 Kata:</span>
-                              <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(212, 175, 55, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
-                                {user.kataCategory}
-                              </span>
-                            </div>
-                          )}
-                          {user.kumiteCategory && (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                              <span style={{ color: '#E2E8F0', fontWeight: 600 }}>🥊 Kumite:</span>
-                              <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(255, 255, 255, 0.1)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-                                {user.kumiteCategory}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
 
 
                     {user.status === 'pending' && (
@@ -600,50 +552,9 @@ export default function Header() {
                   </div>
                   <div>
                     <p style={{ fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>{user.name}</p>
-                    <p style={{ fontSize: '0.78rem', color: '#F5D77F', fontWeight: 700 }}>{user.kyuDan || user.belt}</p>
                   </div>
                 </div>
 
-                {(user.kataCategory || user.kumiteCategory) && (
-                  <div
-                    style={{
-                      marginTop: '0.65rem',
-                      padding: '0.55rem',
-                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                      border: '1px solid rgba(212, 175, 55, 0.15)',
-                      borderRadius: '6px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                      <span style={{ fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.06em', color: '#D4AF37', textTransform: 'uppercase' }}>
-                        Categorías WKF
-                      </span>
-                      {user.age && (
-                        <span style={{ fontSize: '0.68rem', color: '#CBD5E1', fontWeight: 600 }}>
-                          {user.age} años {user.weight ? `• ${user.weight}kg` : ''}
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                      {user.kataCategory && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                          <span style={{ color: '#F5D77F', fontWeight: 600 }}>🥋 Kata:</span>
-                          <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(212, 175, 55, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
-                            {user.kataCategory}
-                          </span>
-                        </div>
-                      )}
-                      {user.kumiteCategory && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                          <span style={{ color: '#E2E8F0', fontWeight: 600 }}>🥊 Kumite:</span>
-                          <span style={{ color: '#FFFFFF', fontWeight: 700, backgroundColor: 'rgba(255, 255, 255, 0.1)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-                            {user.kumiteCategory}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
 
 
                 {user.status === 'pending' && (
