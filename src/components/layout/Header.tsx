@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, X, LogIn, LogOut, Award, Shield, Clock, User as UserIcon } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, Award, Shield, Clock, User as UserIcon, ChevronRight } from 'lucide-react';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -330,21 +330,48 @@ export default function Header() {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.6rem',
-                        padding: '0.65rem 0.6rem',
-                        marginTop: '0.5rem',
-                        backgroundColor: 'rgba(212, 175, 55, 0.14)',
-                        border: '1px solid rgba(212, 175, 55, 0.35)',
-                        borderRadius: '6px',
-                        color: '#F5D77F',
+                        justifyContent: 'space-between',
+                        padding: '0.5rem 0.65rem',
+                        marginTop: '0.55rem',
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(212, 175, 55, 0.18)',
+                        borderRadius: '8px',
+                        color: '#E2E8F0',
                         textDecoration: 'none',
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        transition: 'background-color 0.2s ease',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(212, 175, 55, 0.08)';
+                        e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.38)';
+                        e.currentTarget.style.color = '#F5D77F';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+                        e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.18)';
+                        e.currentTarget.style.color = '#E2E8F0';
                       }}
                     >
-                      <Shield size={16} color="#D4AF37" />
-                      <span>Panel de Administración (/admin)</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                        <div
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '6px',
+                            backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                            border: '1px solid rgba(212, 175, 55, 0.22)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Shield size={13} color="#D4AF37" />
+                        </div>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.01em' }}>
+                          Panel Administrativo
+                        </span>
+                      </div>
+                      <ChevronRight size={13} style={{ opacity: 0.45 }} />
                     </Link>
                   )}
 
@@ -570,19 +597,35 @@ export default function Header() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.5rem',
-                      padding: '0.5rem 0.75rem',
+                      justifyContent: 'space-between',
+                      padding: '0.55rem 0.75rem',
                       marginTop: '0.65rem',
-                      backgroundColor: 'rgba(212, 175, 55, 0.14)',
-                      border: '1px solid rgba(212, 175, 55, 0.35)',
-                      borderRadius: '4px',
-                      color: '#F5D77F',
-                      fontWeight: 700,
-                      fontSize: '0.85rem',
+                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(212, 175, 55, 0.18)',
+                      borderRadius: '8px',
+                      color: '#E2E8F0',
                       textDecoration: 'none',
                     }}
                   >
-                    <Shield size={14} color="#D4AF37" /> Panel Administrativo (/admin)
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                      <div
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '6px',
+                          backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                          border: '1px solid rgba(212, 175, 55, 0.22)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Shield size={13} color="#D4AF37" />
+                      </div>
+                      <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>Panel Administrativo</span>
+                    </div>
+                    <ChevronRight size={13} style={{ opacity: 0.45 }} />
                   </Link>
                 )}
 
