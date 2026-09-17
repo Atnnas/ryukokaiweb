@@ -25,6 +25,8 @@ import {
   Repeat,
   Sparkles,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Maximize2,
   Minimize2,
   Lock,
@@ -239,6 +241,14 @@ export default function TrainingPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'loops' | 'short' | 'long'>('all');
   const [previewRoutine, setPreviewRoutine] = useState<Routine | null>(null);
+  const [expandedRoutineIds, setExpandedRoutineIds] = useState<Record<string, boolean>>({});
+
+  const toggleExpanded = (id: string) => {
+    setExpandedRoutineIds((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   // Estados del Ejecutor Interactivo de Entrenamiento (Workout Runner)
   const [activeWorkoutRoutine, setActiveWorkoutRoutine] = useState<Routine | null>(null);
@@ -1560,210 +1570,494 @@ export default function TrainingPage() {
           </div>
         ) : (
           <div
+            className="card-sumi"
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-              gap: '1.5rem',
+              padding: 0,
+              overflow: 'hidden',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              borderRadius: '12px',
+              backgroundColor: '#0E0F14',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7)',
             }}
           >
-            {filteredRoutines.map((routine) => {
-              const exCount = routine.exercises?.length || 0;
-              const loopSet = new Set((routine.exercises || []).map((e) => e.loopId).filter(Boolean));
-              const loopCount = loopSet.size;
+            <div style={{ overflowX: 'auto' }}>
+              <table
+                style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  textAlign: 'left',
+                  fontSize: '0.88rem',
+                }}
+              >
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+                      backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                    }}
+                  >
+                    <th style={{ padding: '1rem 1.25rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Rutina / Enfoque
+                    </th>
+                    <th style={{ padding: '1rem 1rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
+                      Duración Estimada
+                    </th>
+                    <th style={{ padding: '1rem 1rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Ejercicios
+                    </th>
+                    <th style={{ padding: '1rem 1.25rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>
+                      Acción / Ejecución
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRoutines.map((routine) => {
+                    const routineId = routine.id || routine._id || '';
+                    const isExpanded = !!expandedRoutineIds[routineId];
+                    const exerciseCount = routine.exercises?.length || 0;
+                    const loopSet = new Set((routine.exercises || []).map((e) => e.loopId).filter(Boolean));
+                    const loopCount = loopSet.size;
 
-              return (
-                <div
-                  key={routine.id || routine._id}
-                  className="card-sumi"
-                  style={{
-                    backgroundColor: '#0E0F14',
-                    border: '1px solid rgba(212, 175, 55, 0.22)',
-                    borderRadius: '14px',
-                    padding: '1.5rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: '1.25rem',
-                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.6)',
-                    transition: 'transform 0.2s ease, border-color 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.5)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.22)';
-                    e.currentTarget.style.transform = 'none';
-                  }}
-                >
-                  <div>
-                    {/* Header de la tarjeta */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '0.5rem',
-                        marginBottom: '0.85rem',
-                      }}
-                    >
-                      {/* Duración */}
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                          padding: '0.25rem 0.65rem',
-                          borderRadius: '999px',
-                          backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                          border: '1px solid rgba(212, 175, 55, 0.3)',
-                          color: '#F5D77F',
-                          fontSize: '0.78rem',
-                          fontWeight: 700,
-                        }}
-                      >
-                        <Clock size={13} />
-                        <span>~{routine.durationMinutes} minutos</span>
-                      </span>
+                    return (
+                      <React.Fragment key={routineId}>
+                        <tr
+                          style={{
+                            borderBottom: isExpanded ? 'none' : '1px solid rgba(255, 255, 255, 0.07)',
+                            backgroundColor: isExpanded ? 'rgba(212, 175, 55, 0.03)' : 'transparent',
+                            transition: 'background-color 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isExpanded) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isExpanded) e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          {/* Nombre y Descripción */}
+                          <td style={{ padding: '1.1rem 1.25rem', verticalAlign: 'middle' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
+                              <div
+                                style={{
+                                  width: '38px',
+                                  height: '38px',
+                                  borderRadius: '8px',
+                                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                                  border: '1px solid rgba(212, 175, 55, 0.28)',
+                                  color: '#F5D77F',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  flexShrink: 0,
+                                  marginTop: '0.1rem',
+                                }}
+                              >
+                                <Dumbbell size={19} />
+                              </div>
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                                  <span style={{ color: '#FFFFFF', fontWeight: 800, fontSize: '1rem' }}>
+                                    {routine.title}
+                                  </span>
+                                  {loopCount > 0 && (
+                                    <span
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.25rem',
+                                        padding: '0.15rem 0.5rem',
+                                        borderRadius: '4px',
+                                        backgroundColor: 'rgba(239, 68, 68, 0.14)',
+                                        border: '1px solid rgba(239, 68, 68, 0.35)',
+                                        color: '#F87171',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 700,
+                                      }}
+                                    >
+                                      <Zap size={11} /> {loopCount} Súper Serie{loopCount > 1 ? 's' : ''}
+                                    </span>
+                                  )}
+                                </div>
+                                {routine.description ? (
+                                  <p style={{ color: '#9FA6B8', fontSize: '0.82rem', margin: 0, lineHeight: 1.45, maxWidth: '420px' }}>
+                                    {routine.description}
+                                  </p>
+                                ) : (
+                                  <span style={{ color: '#64748B', fontSize: '0.76rem', fontStyle: 'italic' }}>
+                                    Rutina técnica guiada de karate
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </td>
 
-                      {/* Loops o Ejercicios */}
-                      <div style={{ display: 'flex', gap: '0.4rem' }}>
-                        {loopCount > 0 && (
-                          <span
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.25rem',
-                              padding: '0.2rem 0.5rem',
-                              borderRadius: '4px',
-                              backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                              border: '1px solid rgba(239, 68, 68, 0.3)',
-                              color: '#F87171',
-                              fontSize: '0.7rem',
-                              fontWeight: 700,
-                            }}
-                          >
-                            <Zap size={11} /> {loopCount} Súper Serie{loopCount > 1 ? 's' : ''}
-                          </span>
+                          {/* Duración Estimada */}
+                          <td style={{ padding: '1.1rem 1rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                            <div
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.4rem',
+                                padding: '0.35rem 0.75rem',
+                                borderRadius: '999px',
+                                backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                                border: '1px solid rgba(212, 175, 55, 0.3)',
+                                color: '#F5D77F',
+                                fontWeight: 700,
+                                fontSize: '0.82rem',
+                              }}
+                            >
+                              <Clock size={14} />
+                              <span>~{routine.durationMinutes} minutos</span>
+                            </div>
+                          </td>
+
+                          {/* Ejercicios y Botón Desplegar */}
+                          <td style={{ padding: '1.1rem 1rem', verticalAlign: 'middle' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                              <button
+                                onClick={() => toggleExpanded(routineId)}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.4rem',
+                                  padding: '0.4rem 0.8rem',
+                                  borderRadius: '6px',
+                                  backgroundColor: isExpanded ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                                  border: isExpanded ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid rgba(255, 255, 255, 0.12)',
+                                  color: isExpanded ? '#F5D77F' : '#E2E8F0',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease',
+                                }}
+                                title="Ver u ocultar secuencia de ejercicios"
+                              >
+                                <Layers size={13} />
+                                <span>
+                                  {exerciseCount} {exerciseCount === 1 ? 'ejercicio' : 'ejercicios'}
+                                </span>
+                                {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                              </button>
+
+                              {!isExpanded && routine.exercises && routine.exercises.length > 0 && (
+                                <span style={{ fontSize: '0.78rem', color: '#9FA6B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '220px' }}>
+                                  {routine.exercises.slice(0, 2).map((e) => e.name).join(', ')}
+                                  {routine.exercises.length > 2 ? '...' : ''}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Acciones */}
+                          <td style={{ padding: '1.1rem 1.25rem', verticalAlign: 'middle', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', justifyContent: 'flex-end' }}>
+                              <button
+                                onClick={() => setPreviewRoutine(routine)}
+                                style={{
+                                  padding: '0.5rem 0.85rem',
+                                  borderRadius: '6px',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                                  color: '#E2E8F0',
+                                  fontSize: '0.82rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  transition: 'all 0.15s ease',
+                                }}
+                                title="Ver detalles y notas"
+                              >
+                                <Layers size={13} />
+                                <span>Ver Desglose</span>
+                              </button>
+
+                              <button
+                                onClick={() => startWorkout(routine)}
+                                className="btn-martial-primary"
+                                style={{
+                                  padding: '0.5rem 1.1rem',
+                                  fontSize: '0.84rem',
+                                  fontWeight: 800,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.45rem',
+                                  borderRadius: '6px',
+                                  boxShadow: '0 2px 10px rgba(212, 175, 55, 0.25)',
+                                }}
+                                title="Iniciar ejecución interactiva de la rutina"
+                              >
+                                <Play size={14} />
+                                <span>Iniciar Rutina</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Fila expandible con el desglose detallado */}
+                        {isExpanded && (
+                          <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', backgroundColor: 'rgba(0, 0, 0, 0.35)' }}>
+                            <td colSpan={4} style={{ padding: '1.25rem 1.5rem 1.75rem' }}>
+                              <div
+                                style={{
+                                  padding: '1.25rem',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                                  borderRadius: '10px',
+                                }}
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#F5D77F', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                      Secuencia Planificada ({exerciseCount} ejercicios)
+                                    </span>
+                                  </div>
+
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <span style={{ fontSize: '0.78rem', color: '#9FA6B8' }}>
+                                      Duración estimada: <strong style={{ color: '#F5D77F' }}>~{routine.durationMinutes} min</strong>
+                                    </span>
+                                    <button
+                                      onClick={() => startWorkout(routine)}
+                                      className="btn-martial-primary"
+                                      style={{
+                                        padding: '0.4rem 0.9rem',
+                                        fontSize: '0.78rem',
+                                        fontWeight: 800,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.35rem',
+                                        borderRadius: '6px',
+                                      }}
+                                    >
+                                      <Play size={13} />
+                                      <span>Iniciar Esta Rutina</span>
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Desglose agrupando individuales y bloques súper series */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                                  {(() => {
+                                    interface RoutineRowBlock {
+                                      type: 'single' | 'loop';
+                                      loopId?: string;
+                                      loopName?: string;
+                                      loopRounds?: number;
+                                      loopRestBetweenRounds?: number;
+                                      items: ExerciseItem[];
+                                    }
+
+                                    const rBlocks: RoutineRowBlock[] = [];
+                                    let currentBlock: RoutineRowBlock | null = null;
+
+                                    (routine.exercises || []).forEach((ex) => {
+                                      if (ex.loopId) {
+                                        if (currentBlock && currentBlock.loopId === ex.loopId) {
+                                          currentBlock.items.push(ex);
+                                        } else {
+                                          currentBlock = {
+                                            type: 'loop',
+                                            loopId: ex.loopId,
+                                            loopName: ex.loopName || 'Súper Serie',
+                                            loopRounds: ex.loopRounds || 4,
+                                            loopRestBetweenRounds: ex.loopRestBetweenRounds !== undefined ? ex.loopRestBetweenRounds : 60,
+                                            items: [ex],
+                                          };
+                                          rBlocks.push(currentBlock);
+                                        }
+                                      } else {
+                                        currentBlock = null;
+                                        rBlocks.push({
+                                          type: 'single',
+                                          items: [ex],
+                                        });
+                                      }
+                                    });
+
+                                    return rBlocks.map((blk, blkIdx) => {
+                                      if (blk.type === 'single') {
+                                        const ex = blk.items[0];
+                                        const quantity = ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : 12;
+                                        const unit = ex.repsOrDurationUnit || 'repeticiones';
+
+                                        return (
+                                          <div
+                                            key={ex.id || blkIdx}
+                                            style={{
+                                              padding: '0.75rem 0.9rem',
+                                              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                              border: '1px solid rgba(255, 255, 255, 0.07)',
+                                              borderRadius: '6px',
+                                              display: 'flex',
+                                              flexDirection: 'column',
+                                              gap: '0.35rem',
+                                            }}
+                                          >
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                                <span
+                                                  style={{
+                                                    width: '22px',
+                                                    height: '22px',
+                                                    borderRadius: '50%',
+                                                    backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                                                    color: '#F5D77F',
+                                                    fontSize: '0.72rem',
+                                                    fontWeight: 700,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    flexShrink: 0,
+                                                  }}
+                                                >
+                                                  {blkIdx + 1}
+                                                </span>
+                                                <span style={{ color: '#FFFFFF', fontSize: '0.88rem', fontWeight: 600 }}>
+                                                  {ex.name}
+                                                </span>
+                                              </div>
+
+                                              <span style={{ color: '#F5D77F', fontSize: '0.82rem', fontWeight: 700 }}>
+                                                {ex.sets ? `${ex.sets} × ` : ''}{quantity} {unit}
+                                              </span>
+                                            </div>
+
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', paddingLeft: '1.7rem', fontSize: '0.75rem', color: '#9FA6B8' }}>
+                                              {ex.restSeconds !== undefined && (
+                                                <span>⏱ Descanso entre series: <strong style={{ color: '#E2E8F0' }}>{ex.restSeconds}s</strong></span>
+                                              )}
+                                              {ex.notes && (
+                                                <span style={{ fontStyle: 'italic', color: '#CBD5E1' }}>💡 {ex.notes}</span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        );
+                                      } else {
+                                        return (
+                                          <div
+                                            key={blk.loopId || blkIdx}
+                                            style={{
+                                              padding: '0.85rem 1rem',
+                                              backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                                              border: '1px solid rgba(212, 175, 55, 0.35)',
+                                              borderRadius: '8px',
+                                            }}
+                                          >
+                                            <div
+                                              style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                marginBottom: '0.6rem',
+                                                paddingBottom: '0.4rem',
+                                                borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+                                                flexWrap: 'wrap',
+                                                gap: '0.5rem',
+                                              }}
+                                            >
+                                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                                <Zap size={14} color="#F5D77F" />
+                                                <span style={{ color: '#F5D77F', fontWeight: 800, fontSize: '0.85rem' }}>
+                                                  {blk.loopName || 'SÚPER SERIE'}
+                                                </span>
+                                              </div>
+
+                                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.75rem' }}>
+                                                <span
+                                                  style={{
+                                                    color: '#10B981',
+                                                    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                                                    padding: '0.15rem 0.45rem',
+                                                    borderRadius: '4px',
+                                                    fontWeight: 700,
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.25rem',
+                                                  }}
+                                                >
+                                                  <Repeat size={12} /> {blk.loopRounds} rondas / vueltas
+                                                </span>
+                                                <span style={{ color: '#9FA6B8' }}>
+                                                  ⏱ Pausa fin de ronda: <strong style={{ color: '#E2E8F0' }}>{blk.loopRestBetweenRounds}s</strong>
+                                                </span>
+                                              </div>
+                                            </div>
+
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                                              {blk.items.map((ex, stepIdx) => {
+                                                const quantity = ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : 12;
+                                                const unit = ex.repsOrDurationUnit || 'repeticiones';
+
+                                                return (
+                                                  <div
+                                                    key={ex.id || stepIdx}
+                                                    style={{
+                                                      padding: '0.5rem 0.75rem',
+                                                      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                                                      borderRadius: '6px',
+                                                      display: 'flex',
+                                                      flexDirection: 'column',
+                                                      gap: '0.2rem',
+                                                    }}
+                                                  >
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                                        <span
+                                                          style={{
+                                                            width: '18px',
+                                                            height: '18px',
+                                                            borderRadius: '50%',
+                                                            backgroundColor: 'rgba(212, 175, 55, 0.3)',
+                                                            color: '#F5D77F',
+                                                            fontSize: '0.68rem',
+                                                            fontWeight: 800,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                          }}
+                                                        >
+                                                          {stepIdx + 1}
+                                                        </span>
+                                                        <span style={{ color: '#FFFFFF', fontSize: '0.84rem', fontWeight: 600 }}>
+                                                          {ex.name}
+                                                        </span>
+                                                      </div>
+
+                                                      <span style={{ color: '#F5D77F', fontSize: '0.78rem', fontWeight: 700 }}>
+                                                        {quantity} {unit}
+                                                      </span>
+                                                    </div>
+
+                                                    <div style={{ fontSize: '0.72rem', color: '#9FA6B8', paddingLeft: '1.4rem' }}>
+                                                      {stepIdx < blk.items.length - 1 && ex.restSeconds !== undefined && ex.restSeconds > 0 ? (
+                                                        <span>⏱ Pausa al siguiente: <strong style={{ color: '#E2E8F0' }}>{ex.restSeconds}s</strong></span>
+                                                      ) : (
+                                                        <span>⚡ Pasa continuo al siguiente</span>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          </div>
+                                        );
+                                      }
+                                    });
+                                  })()}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
                         )}
-
-                        <span
-                          style={{
-                            padding: '0.2rem 0.5rem',
-                            borderRadius: '4px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            color: '#9FA6B8',
-                            fontSize: '0.72rem',
-                            fontWeight: 600,
-                          }}
-                        >
-                          {exCount} ejercicios
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Título de la rutina */}
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '0.5rem' }}>
-                      {routine.title}
-                    </h3>
-
-                    {/* Descripción */}
-                    {routine.description && (
-                      <p style={{ color: '#9FA6B8', fontSize: '0.85rem', lineHeight: 1.45, marginBottom: '1.1rem' }}>
-                        {routine.description}
-                      </p>
-                    )}
-
-                    {/* Lista previa de ejercicios */}
-                    <div
-                      style={{
-                        padding: '0.75rem',
-                        backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)',
-                        borderRadius: '8px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '0.4rem',
-                      }}
-                    >
-                      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#F5D77F', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Secuencia Planificada
-                      </span>
-
-                      {(routine.exercises || []).slice(0, 3).map((ex, idx) => (
-                        <div
-                          key={ex.id || idx}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            fontSize: '0.78rem',
-                            color: '#CBD5E1',
-                          }}
-                        >
-                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '210px' }}>
-                            {idx + 1}. {ex.name}
-                          </span>
-                          <span style={{ color: '#F5D77F', fontWeight: 600, flexShrink: 0 }}>
-                            {ex.loopId
-                              ? `${ex.loopRounds || 4}x ${ex.repsOrDurationValue || 12} ${ex.repsOrDurationUnit === 'segundos' ? 's' : 'r'}`
-                              : `${ex.sets || 3}×${ex.repsOrDurationValue || 12} ${ex.repsOrDurationUnit === 'segundos' ? 's' : 'r'}`}
-                          </span>
-                        </div>
-                      ))}
-
-                      {exCount > 3 && (
-                        <span style={{ fontSize: '0.72rem', color: '#9FA6B8', fontStyle: 'italic', marginTop: '0.1rem' }}>
-                          + {exCount - 3} ejercicio{exCount - 3 > 1 ? 's' : ''} adicional{exCount - 3 > 1 ? 'es' : ''}...
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Acciones de la Tarjeta */}
-                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
-                    <button
-                      onClick={() => setPreviewRoutine(routine)}
-                      style={{
-                        padding: '0.65rem 0.9rem',
-                        borderRadius: '8px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        color: '#E2E8F0',
-                        fontSize: '0.82rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.3rem',
-                      }}
-                    >
-                      <Layers size={14} />
-                      <span>Ver Desglose</span>
-                    </button>
-
-                    <button
-                      onClick={() => startWorkout(routine)}
-                      className="btn-martial-primary"
-                      style={{
-                        flex: 1,
-                        padding: '0.65rem 1rem',
-                        fontSize: '0.88rem',
-                        fontWeight: 800,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.45rem',
-                        borderRadius: '8px',
-                      }}
-                    >
-                      <Play size={15} />
-                      <span>Iniciar Rutina</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
