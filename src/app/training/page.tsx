@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { Routine, ExerciseItem, WorkoutLog, WorkoutStats } from '@/types';
 import { calculateRoutineDuration } from '@/lib/routineUtils';
+import { evaluateWorkoutHonesty } from '@/lib/streakUtils';
 import {
   Dumbbell,
   Play,
@@ -34,6 +35,7 @@ import {
   History,
   Calendar,
   Trophy,
+  AlertTriangle,
 } from 'lucide-react';
 
 // Paso individual desempaquetado para el ejecutor interactivo de entrenamiento
@@ -330,6 +332,12 @@ export default function TrainingPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const runnerRef = useRef<HTMLDivElement | null>(null);
+  const elapsedSecondsRef = useRef(0);
+  const [workoutIntegrityResult, setWorkoutIntegrityResult] = useState<{
+    isRushed: boolean;
+    minHonestSeconds: number;
+    reason?: string;
+  } | null>(null);
 
   const isSuperAdmin =
     user?.email?.toLowerCase().includes('david.artavia.rodriguez@gmail.com') ||
@@ -387,6 +395,8 @@ export default function TrainingPage() {
     setWorkoutSteps(steps);
     setCurrentStepIndex(0);
     setTotalElapsedSeconds(0);
+    elapsedSecondsRef.current = 0;
+    setWorkoutIntegrityResult(null);
     setPreviewRoutine(null);
     setHasLoggedCurrentWorkout(false);
 
@@ -429,13 +439,29 @@ export default function TrainingPage() {
     const isLastStep = currentStepIndex === workoutSteps.length - 1;
 
     if (isLastStep) {
-      // ¡Entrenamiento completado con éxito!
+      // Fin del último ejercicio: evaluar honestidad marcial
+      const elapsed = elapsedSecondsRef.current;
+      const integrity = evaluateWorkoutHonesty({
+        durationSeconds: elapsed,
+        stepsCount: workoutSteps.length,
+        estimatedMinutes: activeWorkoutRoutine?.durationMinutes,
+        steps: workoutSteps.map((s) => ({ targetQuantity: s.targetQuantity, targetUnit: s.targetUnit })),
+      });
+      setWorkoutIntegrityResult(integrity);
       setWorkoutPhase('finished');
       setIsTimerRunning(false);
-      if (soundEnabled) {
-        playAudioTone('victory');
+
+      if (integrity.isRushed) {
+        if (soundEnabled) {
+          playAudioTone('gong');
+        }
+        speakSensei('Atención practicante. En el Karate-Do la honestidad contigo mismo es lo principal. Este entrenamiento fue demasiado apresurado y no contará para tu racha.', voiceEnabled);
+      } else {
+        if (soundEnabled) {
+          playAudioTone('victory');
+        }
+        speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
       }
-      speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
       return;
     }
 
@@ -455,7 +481,7 @@ export default function TrainingPage() {
       setCurrentStepIndex(nextIdx);
       beginWorkPhase(workoutSteps[nextIdx]);
     }
-  }, [workoutSteps, currentStepIndex, soundEnabled, voiceEnabled, beginWorkPhase]);
+  }, [workoutSteps, currentStepIndex, activeWorkoutRoutine, soundEnabled, voiceEnabled, beginWorkPhase]);
 
   // Terminar el descanso antes de tiempo (Omitir descanso)
   const skipRestAndProceed = useCallback(() => {
@@ -465,14 +491,31 @@ export default function TrainingPage() {
       speakSensei(`Siguiente ejercicio: ${workoutSteps[nextIdx].exerciseName}`, voiceEnabled);
       beginWorkPhase(workoutSteps[nextIdx]);
     } else {
+      // Fin de la rutina saltando descanso final: evaluar honestidad marcial
+      const elapsed = elapsedSecondsRef.current;
+      const integrity = evaluateWorkoutHonesty({
+        durationSeconds: elapsed,
+        stepsCount: workoutSteps.length,
+        estimatedMinutes: activeWorkoutRoutine?.durationMinutes,
+        steps: workoutSteps.map((s) => ({ targetQuantity: s.targetQuantity, targetUnit: s.targetUnit })),
+      });
+      setWorkoutIntegrityResult(integrity);
       setWorkoutPhase('finished');
       setIsTimerRunning(false);
-      if (soundEnabled) {
-        playAudioTone('victory');
+
+      if (integrity.isRushed) {
+        if (soundEnabled) {
+          playAudioTone('gong');
+        }
+        speakSensei('Atención practicante. En el Karate-Do la honestidad contigo mismo es lo principal. Este entrenamiento fue demasiado apresurado y no contará para tu racha.', voiceEnabled);
+      } else {
+        if (soundEnabled) {
+          playAudioTone('victory');
+        }
+        speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
       }
-      speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
     }
-  }, [currentStepIndex, workoutSteps, soundEnabled, voiceEnabled, beginWorkPhase]);
+  }, [currentStepIndex, workoutSteps, activeWorkoutRoutine, soundEnabled, voiceEnabled, beginWorkPhase]);
 
   // Añadir +15 segundos al descanso
   const addExtraRest = () => {
@@ -509,6 +552,8 @@ export default function TrainingPage() {
   useEffect(() => {
     if (workoutPhase === 'finished' && activeWorkoutRoutine && !hasLoggedCurrentWorkout) {
       setHasLoggedCurrentWorkout(true);
+      const isRushed = workoutIntegrityResult?.isRushed ?? false;
+
       fetch('/api/training/logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -518,6 +563,8 @@ export default function TrainingPage() {
           durationSeconds: totalElapsedSeconds,
           stepsCompleted: workoutSteps.length,
           totalSteps: workoutSteps.length,
+          estimatedMinutes: activeWorkoutRoutine.durationMinutes,
+          isRushed,
         }),
       })
         .then(() => fetchWorkoutStats())
@@ -529,6 +576,7 @@ export default function TrainingPage() {
     hasLoggedCurrentWorkout,
     totalElapsedSeconds,
     workoutSteps.length,
+    workoutIntegrityResult,
     fetchWorkoutStats,
   ]);
 
@@ -537,7 +585,11 @@ export default function TrainingPage() {
     if (!isTimerRunning) return;
 
     const interval = setInterval(() => {
-      setTotalElapsedSeconds((prev) => prev + 1);
+      setTotalElapsedSeconds((prev) => {
+        const next = prev + 1;
+        elapsedSecondsRef.current = next;
+        return next;
+      });
 
       if (workoutPhase === 'prep') {
         setSecondsRemaining((prev) => {
@@ -1566,7 +1618,7 @@ export default function TrainingPage() {
         )}
 
         {/* ================================================================= */}
-        {/* PANTALLA: ENTRENAMIENTO COMPLETADO (VICTORY / REI)                */}
+        {/* PANTALLA: ENTRENAMIENTO COMPLETADO (VICTORY O ADVERTENCIA MAKOTO)  */}
         {/* ================================================================= */}
         {workoutPhase === 'finished' && (
           <div
@@ -1581,120 +1633,270 @@ export default function TrainingPage() {
               textAlign: 'center',
             }}
           >
-            <div
-              style={{
-                width: '75px',
-                height: '75px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(212, 175, 55, 0.2)',
-                border: '3px solid #F5D77F',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#F5D77F',
-                margin: '0 auto 1.25rem',
-                boxShadow: '0 0 35px rgba(212, 175, 55, 0.4)',
-              }}
-            >
-              <Award size={38} />
-            </div>
+            {workoutIntegrityResult?.isRushed ? (
+              /* ADVERTENCIA DE HONESTIDAD MARCIAL (MAKOTO - 誠) */
+              <>
+                <div
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    border: '3px solid #EF4444',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#EF4444',
+                    margin: '0 auto 1.25rem',
+                    boxShadow: '0 0 35px rgba(239, 68, 68, 0.35)',
+                  }}
+                >
+                  <AlertTriangle size={42} />
+                </div>
 
-            <span
-              style={{
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                color: '#D4AF37',
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                marginBottom: '0.35rem',
-              }}
-            >
-              Mokuso • Rei (礼)
-            </span>
-
-            <h1 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontWeight: 900, color: '#FFFFFF', marginBottom: '0.4rem' }}>
-              ¡Entrenamiento Completado!
-            </h1>
-
-            <p style={{ color: '#9FA6B8', fontSize: '0.9rem', maxWidth: '420px', marginBottom: '1.5rem' }}>
-              Has finalizado la rutina <strong style={{ color: '#F5D77F' }}>{activeWorkoutRoutine.title}</strong>.
-            </p>
-
-            {/* Métricas Responsivas */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '0.5rem',
-                maxWidth: '480px',
-                width: '100%',
-                marginBottom: '1.8rem',
-              }}
-            >
-              <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-                  Tiempo Total
+                <span
+                  style={{
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    color: '#EF4444',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    marginBottom: '0.35rem',
+                  }}
+                >
+                  Principio de Makoto (誠) • Honestidad Marcial
                 </span>
-                <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#F5D77F' }}>
-                  {formatTime(totalElapsedSeconds)}
-                </span>
-              </div>
 
-              <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-                  Pasos
-                </span>
-                <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF' }}>
-                  {workoutSteps.length}
-                </span>
-              </div>
+                <h1 style={{ fontSize: 'clamp(1.45rem, 5vw, 2rem)', fontWeight: 900, color: '#FFFFFF', marginBottom: '0.5rem' }}>
+                  Ritmo Inusualmente Acelerado
+                </h1>
 
-              <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-                  Disciplina
-                </span>
-                <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#10B981' }}>
-                  100%
-                </span>
-              </div>
-            </div>
+                <p style={{ color: '#FCA5A5', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto 1.25rem', lineHeight: 1.55 }}>
+                  Completaste esta rutina en apenas <strong style={{ color: '#FFFFFF' }}>{formatTime(totalElapsedSeconds)}</strong> ({workoutSteps.length} ejercicios de una rutina estimada en {activeWorkoutRoutine.durationMinutes} min). Para ejecutar la respiración, kime y técnica a conciencia, se requería al menos <strong style={{ color: '#FDE68A' }}>{formatTime(workoutIntegrityResult.minHonestSeconds)}</strong>.
+                </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', maxWidth: '380px' }}>
-              <button
-                onClick={() => startWorkout(activeWorkoutRoutine)}
-                style={{
-                  width: '100%',
-                  padding: '0.85rem',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '0.92rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.4rem',
-                }}
-              >
-                <RotateCcw size={16} />
-                <span>Repetir Rutina</span>
-              </button>
+                <div
+                  style={{
+                    maxWidth: '480px',
+                    width: '100%',
+                    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    borderRadius: '10px',
+                    padding: '1rem 1.25rem',
+                    textAlign: 'left',
+                    fontSize: '0.84rem',
+                    color: '#E2E8F0',
+                    lineHeight: 1.5,
+                    marginBottom: '1.5rem',
+                  }}
+                >
+                  <p style={{ margin: '0 0 0.4rem 0', fontWeight: 800, color: '#FCA5A5' }}>
+                    🥋 Mensaje del Dojo:
+                  </p>
+                  <p style={{ margin: '0 0 0.6rem 0', color: '#CBD5E1' }}>
+                    En el camino marcial (Budo), el valor supremo es la <strong>honestidad contigo mismo</strong>. Saltar los ejercicios para inflar la racha no fortalece tus músculos ni templa tu espíritu; únicamente te engaña a ti mismo.
+                  </p>
+                  <div style={{ padding: '0.55rem 0.75rem', backgroundColor: 'rgba(0, 0, 0, 0.3)', borderRadius: '6px', borderLeft: '3px solid #EF4444', color: '#F87171', fontWeight: 700, fontSize: '0.8rem' }}>
+                    ⚠️ Esta sesión se guardó con advertencia y <strong>NO contará para tu racha marcial</strong> ni otorgará días de descanso.
+                  </div>
+                </div>
 
-              <button
-                onClick={exitWorkoutRunner}
-                className="btn-martial-primary"
-                style={{
-                  width: '100%',
-                  padding: '0.85rem',
-                  fontSize: '0.95rem',
-                  fontWeight: 800,
-                }}
-              >
-                <span>Volver al Catálogo</span>
-              </button>
-            </div>
+                {/* Métricas Informativas */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '0.5rem',
+                    maxWidth: '480px',
+                    width: '100%',
+                    marginBottom: '1.8rem',
+                  }}
+                >
+                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                      Tiempo Marcado
+                    </span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#EF4444' }}>
+                      {formatTime(totalElapsedSeconds)}
+                    </span>
+                  </div>
+
+                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                      Ejercicios
+                    </span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF' }}>
+                      {workoutSteps.length}
+                    </span>
+                  </div>
+
+                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                      Racha Marcial
+                    </span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 900, color: '#EF4444' }}>
+                      No válida ✕
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', maxWidth: '380px' }}>
+                  <button
+                    onClick={() => startWorkout(activeWorkoutRoutine)}
+                    className="btn-martial-primary"
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem',
+                      borderRadius: '8px',
+                      fontSize: '0.92rem',
+                      fontWeight: 800,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <RotateCcw size={16} />
+                    <span>Reiniciar Rutina a Ritmo Real</span>
+                  </button>
+
+                  <button
+                    onClick={exitWorkoutRunner}
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: '#FFFFFF',
+                      fontWeight: 700,
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <span>Comprendido, volver al Catálogo (Oss)</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              /* PANTALLA NORMAL: ENTRENAMIENTO COMPLETADO CON ÉXITO */
+              <>
+                <div
+                  style={{
+                    width: '75px',
+                    height: '75px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                    border: '3px solid #F5D77F',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#F5D77F',
+                    margin: '0 auto 1.25rem',
+                    boxShadow: '0 0 35px rgba(212, 175, 55, 0.4)',
+                  }}
+                >
+                  <Award size={38} />
+                </div>
+
+                <span
+                  style={{
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    color: '#D4AF37',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    marginBottom: '0.35rem',
+                  }}
+                >
+                  Mokuso • Rei (礼)
+                </span>
+
+                <h1 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontWeight: 900, color: '#FFFFFF', marginBottom: '0.4rem' }}>
+                  ¡Entrenamiento Completado!
+                </h1>
+
+                <p style={{ color: '#9FA6B8', fontSize: '0.9rem', maxWidth: '420px', marginBottom: '1.5rem' }}>
+                  Has finalizado la rutina <strong style={{ color: '#F5D77F' }}>{activeWorkoutRoutine.title}</strong>.
+                </p>
+
+                {/* Métricas Responsivas */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '0.5rem',
+                    maxWidth: '480px',
+                    width: '100%',
+                    marginBottom: '1.8rem',
+                  }}
+                >
+                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                      Tiempo Total
+                    </span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#F5D77F' }}>
+                      {formatTime(totalElapsedSeconds)}
+                    </span>
+                  </div>
+
+                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                      Pasos
+                    </span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF' }}>
+                      {workoutSteps.length}
+                    </span>
+                  </div>
+
+                  <div style={{ backgroundColor: '#0E0F14', padding: '0.75rem 0.4rem', borderRadius: '8px', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#9FA6B8', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
+                      Disciplina
+                    </span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#10B981' }}>
+                      100%
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%', maxWidth: '380px' }}>
+                  <button
+                    onClick={() => startWorkout(activeWorkoutRoutine)}
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: '#FFFFFF',
+                      fontWeight: 700,
+                      fontSize: '0.92rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <RotateCcw size={16} />
+                    <span>Repetir Rutina</span>
+                  </button>
+
+                  <button
+                    onClick={exitWorkoutRunner}
+                    className="btn-martial-primary"
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem',
+                      fontSize: '0.95rem',
+                      fontWeight: 800,
+                    }}
+                  >
+                    <span>Volver al Catálogo</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -3013,10 +3215,31 @@ export default function TrainingPage() {
                         </td>
 
                         <td style={{ padding: '1rem 1rem', whiteSpace: 'nowrap' }}>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10B981', fontSize: '0.76rem', fontWeight: 700, backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '0.2rem 0.55rem', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
-                            <CheckCircle size={13} />
-                            <span>100% Completada</span>
-                          </span>
+                          {log.isRushed ? (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                                color: '#F87171',
+                                fontSize: '0.74rem',
+                                fontWeight: 700,
+                                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                padding: '0.2rem 0.55rem',
+                                borderRadius: '4px',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                              }}
+                              title="Completada a ritmo inusualmente acelerado. No contó para la racha por el principio de honestidad marcial."
+                            >
+                              <AlertTriangle size={13} color="#F87171" />
+                              <span>No contó (Acelerado)</span>
+                            </span>
+                          ) : (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10B981', fontSize: '0.76rem', fontWeight: 700, backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '0.2rem 0.55rem', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                              <CheckCircle size={13} />
+                              <span>100% Completada</span>
+                            </span>
+                          )}
                         </td>
 
                         <td style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>

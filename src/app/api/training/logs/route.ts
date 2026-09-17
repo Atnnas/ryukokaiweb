@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getDatabase } from '@/lib/mongodb';
-import { calculateMartialStreak, formatDateString } from '@/lib/streakUtils';
+import { calculateMartialStreak, formatDateString, evaluateWorkoutHonesty } from '@/lib/streakUtils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     // 2. Minutos totales
     const allUserLogs = await db
       .collection('TrainingLogs')
-      .find({ userEmail }, { projection: { durationSeconds: 1, completedAt: 1 } })
+      .find({ userEmail }, { projection: { durationSeconds: 1, completedAt: 1, isRushed: 1, isValidForStreak: 1 } })
       .toArray();
 
     const totalSeconds = allUserLogs.reduce((acc, curr) => acc + (curr.durationSeconds || 0), 0);
@@ -40,13 +40,10 @@ export async function GET(request: NextRequest) {
     const monthWorkouts = allUserLogs.filter((l) => new Date(l.completedAt) >= startOfMonth).length;
 
     // 4. Racha Marcial de Disciplina (Tanren Streak):
-    // Reglas:
-    // - Se gana a partir del 3er día consecutivo.
-    // - Por cada 5 días de entrenamiento se gana 1 día de descanso libre.
-    // - Si un día no se entrena, se gasta 1 día de descanso (si hay) o se rompe la racha.
+    // Solo cuentan las sesiones honestas y válidas (isRushed !== true && isValidForStreak !== false)
     const uniqueDatesArray: string[] = [];
     allUserLogs.forEach((l) => {
-      if (l.completedAt) {
+      if (l.completedAt && l.isValidForStreak !== false && !l.isRushed) {
         uniqueDatesArray.push(formatDateString(new Date(l.completedAt)));
       }
     });
@@ -92,11 +89,29 @@ export async function POST(request: NextRequest) {
       durationSeconds,
       stepsCompleted,
       totalSteps,
+      estimatedMinutes,
+      isRushed: clientIsRushed,
     } = body;
 
     if (!routineTitle) {
       return NextResponse.json({ error: 'Datos de entrenamiento incompletos' }, { status: 400 });
     }
+
+    const validDuration = Math.max(1, Number(durationSeconds) || 0);
+    const validTotalSteps = Math.max(1, Number(totalSteps) || Number(stepsCompleted) || 1);
+
+    // Validación de honestidad marcial (Makoto) en servidor
+    const honestyCheck = evaluateWorkoutHonesty({
+      durationSeconds: validDuration,
+      stepsCount: validTotalSteps,
+      estimatedMinutes: Number(estimatedMinutes) || undefined,
+    });
+
+    const isRushed = clientIsRushed === true || honestyCheck.isRushed;
+    const isValidForStreak = !isRushed;
+    const integrityNote = isRushed
+      ? 'Sesión completada a ritmo inusualmente apresurado. No cuenta para la racha marcial por principio de Makoto (Honestidad).'
+      : 'Sesión completada con disciplina marcial.';
 
     const db = await getDatabase();
     const newLog = {
@@ -104,9 +119,12 @@ export async function POST(request: NextRequest) {
       userName: session.user.name || '',
       routineId: String(routineId || ''),
       routineTitle: String(routineTitle),
-      durationSeconds: Math.max(1, Number(durationSeconds) || 0),
+      durationSeconds: validDuration,
       stepsCompleted: Number(stepsCompleted) || 0,
-      totalSteps: Number(totalSteps) || 0,
+      totalSteps: validTotalSteps,
+      isRushed,
+      isValidForStreak,
+      integrityNote,
       completedAt: new Date(),
     };
 
@@ -115,7 +133,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       logId: result.insertedId,
-      message: '¡Entrenamiento registrado con éxito!',
+      isRushed,
+      isValidForStreak,
+      message: isRushed
+        ? 'Entrenamiento registrado con advertencia (no suma a la racha marcial).'
+        : '¡Entrenamiento registrado con éxito!',
     });
   } catch (error) {
     console.error('Error saving training log:', error);

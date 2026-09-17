@@ -18,6 +18,59 @@ export interface StreakCalculation {
   statusMessage: string;
 }
 
+export interface WorkoutIntegrityCheck {
+  isRushed: boolean;
+  isValidForStreak: boolean;
+  minHonestSeconds: number;
+  reason?: string;
+}
+
+/**
+ * Evalúa si una rutina fue completada a un ritmo apresurado o simulado (Makoto / Honestidad Marcial)
+ */
+export function evaluateWorkoutHonesty(params: {
+  durationSeconds: number;
+  stepsCount: number;
+  estimatedMinutes?: number;
+  steps?: { targetQuantity: number; targetUnit: string }[];
+}): WorkoutIntegrityCheck {
+  const { durationSeconds, stepsCount, estimatedMinutes, steps } = params;
+
+  let minHonestSeconds = 0;
+
+  if (steps && steps.length > 0) {
+    let stepsSum = 0;
+    for (const step of steps) {
+      if (step.targetUnit === 'segundos') {
+        // Al menos el 25% del tiempo establecido o mínimo 5s por ejercicio
+        stepsSum += Math.max(5, Math.floor(step.targetQuantity * 0.25));
+      } else {
+        // Al menos 0.6s por repetición marcial o mínimo 5s por serie
+        stepsSum += Math.max(5, Math.floor(step.targetQuantity * 0.6));
+      }
+    }
+    // Mínimo de transición entre ejercicios (2 segundos por paso)
+    stepsSum += Math.max(0, (steps.length - 1) * 2);
+
+    const estimatedMinSecs = estimatedMinutes ? Math.floor(estimatedMinutes * 60 * 0.15) : 0;
+    minHonestSeconds = Math.max(stepsSum, estimatedMinSecs, stepsCount * 4, 25);
+  } else {
+    const estimatedMinSecs = estimatedMinutes ? Math.floor(estimatedMinutes * 60 * 0.18) : 0;
+    minHonestSeconds = Math.max(stepsCount * 4, estimatedMinSecs, 25);
+  }
+
+  const isRushed = durationSeconds < minHonestSeconds;
+
+  return {
+    isRushed,
+    isValidForStreak: !isRushed,
+    minHonestSeconds,
+    reason: isRushed
+      ? `Tiempo invertido (${durationSeconds}s) muy inferior al mínimo requerido (${minHonestSeconds}s) para ${stepsCount} ejercicios.`
+      : undefined,
+  };
+}
+
 export function formatDateString(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');

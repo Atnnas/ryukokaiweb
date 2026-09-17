@@ -141,6 +141,9 @@ export interface WorkoutLog {
   stepsCompleted: number;
   totalSteps: number;
   completedAt: string | Date;
+  isRushed?: boolean;
+  isValidForStreak?: boolean;
+  integrityNote?: string;
 }
 
 export interface WorkoutStats {
