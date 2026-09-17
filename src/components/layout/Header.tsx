@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, X, LogIn, LogOut, Award, Shield, Clock, User as UserIcon, FileText } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, Award, Shield, Clock, User as UserIcon } from 'lucide-react';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -349,33 +349,6 @@ export default function Header() {
                       </div>
                     )}
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsFichaModalOpen(true);
-                        setIsUserDropdownOpen(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        marginTop: '0.6rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.45rem',
-                        padding: '0.45rem',
-                        backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                        border: '1px solid rgba(212, 175, 55, 0.35)',
-                        color: '#F5D77F',
-                        borderRadius: '6px',
-                        fontSize: '0.76rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      <FileText size={13} color="#D4AF37" />
-                      <span>Ver Ficha Marcial WKF</span>
-                    </button>
 
                     {user.status === 'pending' && (
                       <div
@@ -672,32 +645,6 @@ export default function Header() {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsFichaModalOpen(true);
-                    closeMobile();
-                  }}
-                  style={{
-                    width: '100%',
-                    marginTop: '0.6rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.45rem',
-                    padding: '0.5rem',
-                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                    border: '1px solid rgba(212, 175, 55, 0.35)',
-                    color: '#F5D77F',
-                    borderRadius: '6px',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <FileText size={14} color="#D4AF37" />
-                  <span>Ver Ficha Marcial WKF</span>
-                </button>
 
                 {user.status === 'pending' && (
                   <p style={{ fontSize: '0.72rem', color: '#F5D77F', marginTop: '0.3rem' }}>
