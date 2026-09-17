@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, X, LogIn, LogOut, Award, Shield, Clock, User as UserIcon, FileText } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, Award, Shield, Clock, User as UserIcon, FileText, Dumbbell } from 'lucide-react';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -23,11 +23,14 @@ export default function Header() {
     isSuperAdmin
   );
 
+  const isApprovedUser = !!user && (user.status === 'active' || isAdmin);
+
   const navLinks = [
     { name: 'Inicio', href: '/' },
     { name: 'Nosotros', href: '/nosotros' },
     { name: 'Noticias & Redes', href: '/noticias' },
     { name: 'Contacto', href: '/contacto' },
+    ...(isApprovedUser ? [{ name: 'Entrenamiento', href: '/training' }] : []),
   ];
 
   const closeMobile = () => setIsMobileMenuOpen(false);
@@ -393,6 +396,31 @@ export default function Header() {
                       </div>
                     )}
                   </div>
+
+                  {isApprovedUser && (
+                    <Link
+                      href="/training"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.6rem',
+                        padding: '0.65rem 0.6rem',
+                        marginTop: '0.5rem',
+                        backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                        border: '1px solid rgba(212, 175, 55, 0.25)',
+                        borderRadius: '6px',
+                        color: '#FFFFFF',
+                        textDecoration: 'none',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        transition: 'background-color 0.2s ease',
+                      }}
+                    >
+                      <Dumbbell size={16} color="#F5D77F" />
+                      <span>Zona de Entrenamiento (/training)</span>
+                    </Link>
+                  )}
 
                   {isAdmin && (
                     <Link
