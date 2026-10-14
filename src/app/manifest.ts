@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Dojo oficial de Karate Do tradicional y alta competencia Ryoku Kai. Rutinas, kata y kumite.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#070709',
-    theme_color: '#070709',
+    background_color: '#0A0F1D',
+    theme_color: '#0A0F1D',
     icons: [
       {
         src: '/icon.png',

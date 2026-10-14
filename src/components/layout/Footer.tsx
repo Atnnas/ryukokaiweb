@@ -19,8 +19,9 @@ export default function Footer() {
   return (
     <footer
       style={{
-        backgroundColor: '#070709',
-        borderTop: '1px solid rgba(212, 175, 55, 0.18)',
+        backgroundColor: 'rgba(10, 15, 29, 0.96)',
+        borderTop: '1px solid rgba(212, 175, 55, 0.25)',
+        boxShadow: '0 -20px 40px rgba(0, 0, 0, 0.45)',
         position: 'relative',
         zIndex: 10,
         paddingTop: '4.5rem',
@@ -88,7 +89,7 @@ export default function Footer() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '6px',
-                  backgroundColor: '#101116',
+                  backgroundColor: 'rgba(17, 24, 39, 0.85)',
                   border: '1px solid rgba(212, 175, 55, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
@@ -113,7 +114,7 @@ export default function Footer() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '6px',
-                  backgroundColor: '#101116',
+                  backgroundColor: 'rgba(17, 24, 39, 0.85)',
                   border: '1px solid rgba(212, 175, 55, 0.25)',
                   display: 'flex',
                   alignItems: 'center',
@@ -136,7 +137,7 @@ export default function Footer() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '6px',
-                  backgroundColor: '#101116',
+                  backgroundColor: 'rgba(17, 24, 39, 0.85)',
                   border: '1px solid rgba(212, 175, 55, 0.25)',
                   display: 'flex',
                   alignItems: 'center',

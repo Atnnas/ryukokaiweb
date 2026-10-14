@@ -191,9 +191,9 @@ export default function NoticiasPage() {
       {/* ================= HEADER SECCIÓN NOTICIAS ================= */}
       <section
         style={{
-          padding: 'clamp(3rem, 6vw, 5rem) 0 3rem',
-          backgroundColor: '#0A0B0E',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+          padding: 'clamp(3.5rem, 6vw, 5.5rem) 0 3.5rem',
+          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
         }}
       >
         <div className="container-dojo">
@@ -246,7 +246,7 @@ export default function NoticiasPage() {
       </section>
 
       {/* ================= PANEL DE SINCRONIZACIÓN Y PREVISTA ================= */}
-      <section style={{ padding: '2rem 0', backgroundColor: '#070709', borderBottom: '1px solid rgba(212, 175, 55, 0.12)' }}>
+      <section style={{ padding: '2rem 0', backgroundColor: 'rgba(10, 15, 29, 0.65)', borderBottom: '1px solid rgba(212, 175, 55, 0.15)' }}>
         <div className="container-dojo">
           <div
             style={{
@@ -255,10 +255,11 @@ export default function NoticiasPage() {
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '1.25rem',
-              backgroundColor: '#0E0F14',
+              backgroundColor: 'rgba(17, 24, 39, 0.85)',
               border: '1px solid rgba(212, 175, 55, 0.25)',
-              borderRadius: '8px',
+              borderRadius: '12px',
               padding: '1rem 1.5rem',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
@@ -358,7 +359,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'all' ? '1px solid var(--color-gold)' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'all' ? 'rgba(212, 175, 55, 0.2)' : '#0E0F14',
+                backgroundColor: selectedFilter === 'all' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(17, 24, 39, 0.8)',
                 color: selectedFilter === 'all' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -374,7 +375,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'instagram' ? '1px solid #E1306C' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'instagram' ? 'rgba(225, 48, 108, 0.25)' : '#0E0F14',
+                backgroundColor: selectedFilter === 'instagram' ? 'rgba(225, 48, 108, 0.25)' : 'rgba(17, 24, 39, 0.8)',
                 color: selectedFilter === 'instagram' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -390,7 +391,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'facebook' ? '1px solid #1877F2' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'facebook' ? 'rgba(24, 119, 242, 0.25)' : '#0E0F14',
+                backgroundColor: selectedFilter === 'facebook' ? 'rgba(24, 119, 242, 0.25)' : 'rgba(17, 24, 39, 0.8)',
                 color: selectedFilter === 'facebook' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -406,7 +407,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'youtube' ? '1px solid #FF0000' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'youtube' ? 'rgba(255, 0, 0, 0.25)' : '#0E0F14',
+                backgroundColor: selectedFilter === 'youtube' ? 'rgba(255, 0, 0, 0.25)' : 'rgba(17, 24, 39, 0.8)',
                 color: selectedFilter === 'youtube' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,
@@ -422,7 +423,7 @@ export default function NoticiasPage() {
                 padding: '0.5rem 1rem',
                 borderRadius: '6px',
                 border: selectedFilter === 'official' ? '1px solid var(--color-gold)' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'official' ? 'rgba(212, 175, 55, 0.25)' : '#0E0F14',
+                backgroundColor: selectedFilter === 'official' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(17, 24, 39, 0.8)',
                 color: selectedFilter === 'official' ? '#FFFFFF' : '#9DA3B4',
                 fontSize: '0.85rem',
                 fontWeight: 600,

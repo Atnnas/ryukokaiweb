@@ -1,40 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  /* Paleta Oficial Marcial: Dorado, Blanco y Negro */
+  /* Paleta Oficial Marcial: Dorado, Blanco y Negro con Acentos Dragón y Tigre */
   --color-gold: #D4AF37;
   --color-gold-light: #F5D77F;
   --color-gold-dark: #AA7C11;
-  --color-gold-glow: rgba(212, 175, 55, 0.28);
-  --color-gold-subtle: rgba(212, 175, 55, 0.12);
+  --color-gold-glow: rgba(212, 175, 55, 0.35);
+  --color-gold-subtle: rgba(212, 175, 55, 0.15);
+
+  /* Acentos de Linaje Marcial Ryūko (Dragón y Tigre del Logo) */
+  --color-dragon: #EF4444;
+  --color-dragon-light: #F87171;
+  --color-dragon-glow: rgba(239, 68, 68, 0.3);
+  --color-dragon-subtle: rgba(239, 68, 68, 0.12);
+
+  --color-tiger: #3B82F6;
+  --color-tiger-light: #60A5FA;
+  --color-tiger-glow: rgba(59, 130, 246, 0.3);
+  --color-tiger-subtle: rgba(59, 130, 246, 0.12);
 
   /* Aliases para compatibilidad hacia atrás */
-  --color-ying: #D4AF37;
-  --color-ying-light: #F5D77F;
-  --color-ying-glow: rgba(212, 175, 55, 0.25);
+  --color-ying: var(--color-gold);
+  --color-ying-light: var(--color-gold-light);
+  --color-ying-glow: var(--color-gold-glow);
 
-  --color-yang: #AA7C11;
-  --color-yang-light: #F5D77F;
-  --color-yang-glow: rgba(255, 255, 255, 0.08);
+  --color-yang: var(--color-tiger);
+  --color-yang-light: var(--color-tiger-light);
+  --color-yang-glow: var(--color-tiger-glow);
 
-  /* Fondos: Negro Obsidiana y Carbón */
-  --bg-main: #070709;
-  --bg-surface: #0E0F14;
-  --bg-surface-elevated: #16171E;
-  --bg-surface-glass: rgba(14, 15, 20, 0.88);
+  /* Fondos Vivos: Midnight Bushido (Slate Índigo Noche Profunda - NUNCA más negro plano) */
+  --bg-main: #0A0F1D;
+  --bg-main-alt: #0F172A;
+  --bg-surface: #111827;
+  --bg-surface-elevated: #1E293B;
+  --bg-surface-glass: rgba(15, 23, 42, 0.82);
+  --bg-surface-card: rgba(17, 24, 39, 0.88);
 
-  /* Bordes de Lujo Marcial */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(212, 175, 55, 0.25);
+  /* Bordes y Reflejos de Lujo Marcial */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-medium: rgba(212, 175, 55, 0.28);
   --border-gold: rgba(212, 175, 55, 0.45);
-  --border-gold-glow: rgba(212, 175, 55, 0.7);
+  --border-gold-glow: rgba(212, 175, 55, 0.75);
+  --border-dragon: rgba(239, 68, 68, 0.4);
+  --border-tiger: rgba(59, 130, 246, 0.4);
   --border-ying: rgba(212, 175, 55, 0.4);
-  --border-yang: rgba(255, 255, 255, 0.25);
+  --border-yang: rgba(59, 130, 246, 0.35);
 
   /* Tipografía Oficial */
   --text-main: #FFFFFF;
-  --text-secondary: #D1D5DB;
-  --text-muted: #8E929D;
+  --text-secondary: #E2E8F0;
+  --text-muted: #94A3B8;
   --text-gold: #F5D77F;
 
   --font-family-base: var(--font-zen-kaku), system-ui, -apple-system, sans-serif;
@@ -61,39 +76,47 @@ html {
 
 body {
   background-color: var(--bg-main);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.16) 0px, transparent 55%),
+    radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.18) 0px, transparent 55%),
+    radial-gradient(at 50% 50%, rgba(212, 175, 55, 0.06) 0px, transparent 65%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px;
+  background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
 }
 
-/* Ambient Background Lights - Halo Dorado y Niebla Blanca */
+/* Ambient Background Lights - Halos Dinámicos Dragón y Tigre */
 body::before {
   content: "";
   position: fixed;
-  top: -15vw;
-  left: -15vw;
+  top: -10vw;
+  left: -10vw;
   width: 50vw;
   height: 50vw;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--color-gold-glow) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.18) 0%, rgba(212, 175, 55, 0.1) 40%, transparent 70%);
   pointer-events: none;
   z-index: 0;
-  filter: blur(80px);
+  filter: blur(100px);
 }
 
 body::after {
   content: "";
   position: fixed;
-  bottom: -15vw;
-  right: -15vw;
+  bottom: -10vw;
+  right: -10vw;
   width: 55vw;
   height: 55vw;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(30, 58, 138, 0.12) 45%, transparent 70%);
   pointer-events: none;
   z-index: 0;
-  filter: blur(90px);
+  filter: blur(110px);
 }
 
 /* Tipografía Responsiva */
@@ -182,18 +205,55 @@ p {
 /* Tarjetas con Efecto Cristal / Glassmorphism */
 .glass-panel {
   background: var(--bg-surface-glass);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-panel:hover {
   border-color: var(--border-medium);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.12);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.65), 0 0 25px rgba(212, 175, 55, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Tarjeta Marcial Sumi-e con Profundidad de Cristal */
+.card-sumi {
+  background: var(--bg-surface-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  border-radius: 14px;
+  box-shadow: 0 14px 35px -10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-sumi:hover {
+  border-color: var(--border-gold);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(212, 175, 55, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+}
+
+.card-dragon {
+  border-color: var(--border-dragon) !important;
+  box-shadow: 0 14px 35px -10px rgba(239, 68, 68, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+.card-dragon:hover {
+  border-color: #EF4444 !important;
+  box-shadow: 0 22px 48px -10px rgba(239, 68, 68, 0.45), 0 0 35px rgba(239, 68, 68, 0.25) !important;
+}
+
+.card-tiger {
+  border-color: var(--border-tiger) !important;
+  box-shadow: 0 14px 35px -10px rgba(59, 130, 246, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+.card-tiger:hover {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 22px 48px -10px rgba(59, 130, 246, 0.45), 0 0 35px rgba(59, 130, 246, 0.25) !important;
 }
 
 /* Insignias de Cinturón */

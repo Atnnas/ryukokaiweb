@@ -18,9 +18,9 @@ export default function ContactoPage() {
       {/* ================= HEADER SECCIÓN CONTACTO ================= */}
       <section
         style={{
-          padding: 'clamp(3rem, 6vw, 5rem) 0 3rem',
-          backgroundColor: '#0A0B0E',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+          padding: 'clamp(3.5rem, 6vw, 5.5rem) 0 3.5rem',
+          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
         }}
       >
         <div className="container-dojo">
@@ -258,9 +258,9 @@ export default function ContactoPage() {
                 style={{
                   marginTop: '2rem',
                   padding: '1.35rem',
-                  backgroundColor: '#0E0F14',
-                  border: '1px solid rgba(212, 175, 55, 0.2)',
-                  borderRadius: '10px',
+                  backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',

@@ -15,9 +15,9 @@ export default function NosotrosPage() {
       {/* ================= HERO NOSOTROS ================= */}
       <section
         style={{
-          padding: 'clamp(3rem, 6vw, 5rem) 0 3rem',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
-          backgroundColor: '#0A0B0E',
+          padding: 'clamp(3.5rem, 6vw, 5.5rem) 0 3.5rem',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)',
           position: 'relative',
         }}
       >
@@ -72,12 +72,12 @@ export default function NosotrosPage() {
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1.25rem' }}>
-                <div style={{ padding: '1.25rem', backgroundColor: '#0E0F14', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '8px' }}>
+                <div style={{ padding: '1.25rem', backgroundColor: 'rgba(17, 24, 39, 0.88)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.4)' }}>
                   <Award size={24} color="#D4AF37" style={{ marginBottom: '0.5rem' }} />
                   <h4 style={{ fontSize: '1.1rem', margin: 0, color: '#FFFFFF' }}>Afiliación Oficial</h4>
                   <p style={{ fontSize: '0.82rem', color: '#9DA3B4', margin: '0.35rem 0 0' }}>Reconocidos por federaciones nacionales e internacionales de Karate Do.</p>
                 </div>
-                <div style={{ padding: '1.25rem', backgroundColor: '#0E0F14', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '8px' }}>
+                <div style={{ padding: '1.25rem', backgroundColor: 'rgba(17, 24, 39, 0.88)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.4)' }}>
                   <Shield size={24} color="#F5D77F" style={{ marginBottom: '0.5rem' }} />
                   <h4 style={{ fontSize: '1.1rem', margin: 0, color: '#FFFFFF' }}>Espacio Seguro</h4>
                   <p style={{ fontSize: '0.82rem', color: '#9DA3B4', margin: '0.35rem 0 0' }}>Ambiente familiar con protocolos estrictos de cuidado y cero tolerancia al abuso.</p>
@@ -96,12 +96,13 @@ export default function NosotrosPage() {
                 style={{
                   width: '100%',
                   maxWidth: '440px',
-                  backgroundColor: '#0E0F14',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  borderRadius: '16px',
+                  backgroundColor: 'rgba(17, 24, 39, 0.92)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  borderRadius: '20px',
                   padding: '2.5rem',
                   textAlign: 'center',
-                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.1)',
+                  boxShadow: '0 25px 50px rgba(0, 0, 0, 0.75), 0 0 35px rgba(212, 175, 55, 0.15)',
+                  backdropFilter: 'blur(16px)',
                 }}
               >
                 <div

@@ -71,10 +71,11 @@ export default function Header() {
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        backgroundColor: 'rgba(7, 7, 9, 0.92)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(212, 175, 55, 0.18)',
+        backgroundColor: 'rgba(10, 15, 29, 0.88)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(212, 175, 55, 0.22)',
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.4)',
         transition: 'all 0.3s ease',
       }}
     >
