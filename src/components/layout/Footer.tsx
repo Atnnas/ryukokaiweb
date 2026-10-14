@@ -11,8 +11,8 @@ export default function Footer() {
   const pathname = usePathname();
   const { openAuthModal } = useAuth();
 
-  // El footer se muestra en TODAS las rutas excepto en el área administrativa (/admin)
-  if (pathname?.startsWith('/admin')) {
+  // El footer se oculta en administración (/admin) y en la zona de entrenamiento (/training)
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/training')) {
     return null;
   }
 

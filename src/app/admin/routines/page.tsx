@@ -25,6 +25,10 @@ import {
   Repeat,
   Zap,
   Unlink,
+  Minus,
+  Flame,
+  Settings2,
+  ArrowDown,
 } from 'lucide-react';
 
 export default function AdminRoutinesPage() {
@@ -1291,10 +1295,11 @@ export default function AdminRoutinesPage() {
                                         <div
                                           key={blk.loopId || blkIdx}
                                           style={{
-                                            padding: '0.85rem 1rem',
-                                            backgroundColor: 'rgba(212, 175, 55, 0.04)',
-                                            border: '1px solid rgba(212, 175, 55, 0.35)',
-                                            borderRadius: '8px',
+                                            padding: '0.9rem 1.1rem',
+                                            backgroundColor: 'rgba(245, 158, 11, 0.04)',
+                                            border: '1.5px solid rgba(245, 158, 11, 0.45)',
+                                            borderRadius: '10px',
+                                            boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
                                           }}
                                         >
                                           {/* Cabecera del bloque súper serie */}
@@ -1303,17 +1308,31 @@ export default function AdminRoutinesPage() {
                                               display: 'flex',
                                               alignItems: 'center',
                                               justifyContent: 'space-between',
-                                              marginBottom: '0.6rem',
-                                              paddingBottom: '0.4rem',
-                                              borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+                                              marginBottom: '0.65rem',
+                                              paddingBottom: '0.45rem',
+                                              borderBottom: '1px solid rgba(245, 158, 11, 0.25)',
                                               flexWrap: 'wrap',
                                               gap: '0.5rem',
                                             }}
                                           >
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                                              <Zap size={14} color="#F5D77F" />
-                                              <span style={{ color: '#F5D77F', fontWeight: 800, fontSize: '0.84rem' }}>
-                                                {blk.loopName || 'SÚPER SERIE'}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                              <span
+                                                style={{
+                                                  display: 'inline-flex',
+                                                  alignItems: 'center',
+                                                  gap: '0.25rem',
+                                                  backgroundColor: '#F59E0B',
+                                                  color: '#000',
+                                                  fontSize: '0.7rem',
+                                                  fontWeight: 900,
+                                                  padding: '0.15rem 0.45rem',
+                                                  borderRadius: '4px',
+                                                }}
+                                              >
+                                                <Zap size={11} style={{ fill: '#000' }} /> SÚPER SERIE
+                                              </span>
+                                              <span style={{ color: '#FFFBEB', fontWeight: 800, fontSize: '0.88rem' }}>
+                                                {blk.loopName || 'Súper Serie'}
                                               </span>
                                             </div>
 
@@ -1686,25 +1705,32 @@ export default function AdminRoutinesPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '1rem',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
+                    marginBottom: '0.75rem',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Layers size={18} color="#F5D77F" />
-                    <span style={{ fontWeight: 700, color: '#FFFFFF', fontSize: '0.92rem' }}>
-                      Ejercicios de la Rutina ({exercises.length})
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Layers size={18} color="#F5D77F" />
+                      <span style={{ fontWeight: 800, color: '#FFFFFF', fontSize: '0.94rem' }}>
+                        Ejercicios de la Rutina ({exercises.length})
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', color: '#9FA6B8', marginTop: '0.15rem', display: 'block' }}>
+                      Arma la rutina combinando ejercicios individuales o bloques de súper series por rondas.
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={addExerciseRow}
                       style={{
-                        padding: '0.4rem 0.8rem',
-                        borderRadius: '6px',
+                        padding: '0.45rem 0.85rem',
+                        borderRadius: '7px',
                         backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.18)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                         color: '#FFFFFF',
                         fontSize: '0.8rem',
                         fontWeight: 700,
@@ -1712,35 +1738,72 @@ export default function AdminRoutinesPage() {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.35rem',
+                        transition: 'all 0.15s ease',
                       }}
                     >
                       <Plus size={14} />
-                      <span>+ Ejercicio Individual</span>
+                      <span>Ejercicio Individual</span>
                     </button>
 
+                    {/* Botón Destacado: Súper Serie */}
                     <button
                       type="button"
                       onClick={addLoopBlock}
                       style={{
-                        padding: '0.4rem 0.85rem',
-                        borderRadius: '6px',
-                        backgroundColor: 'rgba(212, 175, 55, 0.18)',
-                        border: '1px solid rgba(212, 175, 55, 0.45)',
-                        color: '#F5D77F',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
+                        padding: '0.45rem 0.95rem',
+                        borderRadius: '7px',
+                        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.28) 0%, rgba(220, 38, 38, 0.25) 100%)',
+                        border: '1.5px solid #F59E0B',
+                        color: '#FFFBEB',
+                        fontSize: '0.82rem',
+                        fontWeight: 800,
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.35rem',
-                        boxShadow: '0 0 12px rgba(212, 175, 55, 0.12)',
+                        gap: '0.45rem',
+                        boxShadow: '0 0 16px rgba(245, 158, 11, 0.28), inset 0 0 8px rgba(245, 158, 11, 0.15)',
+                        transition: 'all 0.15s ease',
                       }}
-                      title="Crear un bloque de Súper Serie / Circuito que se repite por rondas"
+                      title="Crear un bloque de Súper Serie / Circuito que se repite por rondas o vueltas continuas"
                     >
-                      <Zap size={14} />
-                      <span>⚡ Súper Serie (Loop)</span>
+                      <Zap size={15} style={{ fill: '#F59E0B', color: '#F59E0B' }} />
+                      <span>+ NUEVA SÚPER SERIE</span>
+                      <span
+                        style={{
+                          fontSize: '0.65rem',
+                          padding: '0.12rem 0.4rem',
+                          borderRadius: '4px',
+                          backgroundColor: '#F59E0B',
+                          color: '#000000',
+                          fontWeight: 900,
+                          letterSpacing: '0.04em',
+                        }}
+                      >
+                        CIRCUITO
+                      </span>
                     </button>
                   </div>
+                </div>
+
+                {/* Banner explicativo de Súper Serie */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    padding: '0.55rem 0.85rem',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px dashed rgba(245, 158, 11, 0.35)',
+                    color: '#FDE68A',
+                    fontSize: '0.74rem',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <Zap size={14} style={{ fill: '#F59E0B', color: '#F59E0B', flexShrink: 0 }} />
+                  <span>
+                    <strong>Súper Serie / Circuito:</strong> Agrupa 2 o más ejercicios continuos con número de vueltas (rondas) y tiempo de pausa configurado al terminar cada vuelta completa.
+                  </span>
                 </div>
 
                 {/* Agrupación en Bloques (Individuales vs Súper Series / Loops) */}
@@ -1830,27 +1893,29 @@ export default function AdminRoutinesPage() {
                               </div>
 
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                {/* Botón Convertir en Súper Serie */}
+                                {/* Botón Destacado Convertir en Súper Serie */}
                                 <button
                                   type="button"
                                   onClick={() => convertExerciseToLoop(idx)}
                                   style={{
-                                    padding: '0.28rem 0.55rem',
-                                    borderRadius: '5px',
-                                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                                    color: '#F5D77F',
-                                    fontSize: '0.74rem',
-                                    fontWeight: 600,
+                                    padding: '0.35rem 0.75rem',
+                                    borderRadius: '6px',
+                                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(220, 38, 38, 0.16) 100%)',
+                                    border: '1.5px solid rgba(245, 158, 11, 0.65)',
+                                    color: '#FDE68A',
+                                    fontSize: '0.76rem',
+                                    fontWeight: 700,
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '0.3rem',
+                                    gap: '0.38rem',
+                                    boxShadow: '0 0 10px rgba(245, 158, 11, 0.15)',
+                                    transition: 'all 0.15s ease',
                                   }}
-                                  title="Agrupar en una Súper Serie (Loop) que se repite por rondas"
+                                  title="Agrupar este ejercicio en una Súper Serie (Circuito) con rondas y descanso"
                                 >
-                                  <Zap size={12} />
-                                  <span>Crear Súper Serie</span>
+                                  <Zap size={13} style={{ fill: '#F59E0B', color: '#F59E0B' }} />
+                                  <span>Convertir en Súper Serie</span>
                                 </button>
 
                                 {/* Botón Guardar directo en Base de Datos */}
@@ -2198,17 +2263,18 @@ export default function AdminRoutinesPage() {
                           <div
                             key={block.loopId || blockIdx}
                             style={{
-                              padding: '1.15rem',
-                              backgroundColor: 'rgba(212, 175, 55, 0.03)',
-                              border: '1px solid rgba(212, 175, 55, 0.45)',
-                              borderRadius: '12px',
+                              padding: '1.25rem',
+                              backgroundColor: 'rgba(245, 158, 11, 0.03)',
+                              border: '2px solid rgba(245, 158, 11, 0.65)',
+                              borderRadius: '14px',
                               display: 'flex',
                               flexDirection: 'column',
-                              gap: '1rem',
-                              boxShadow: '0 4px 25px rgba(0, 0, 0, 0.45), inset 0 0 15px rgba(212, 175, 55, 0.06)',
+                              gap: '1.15rem',
+                              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 24px rgba(245, 158, 11, 0.12)',
+                              position: 'relative',
                             }}
                           >
-                            {/* Cabecera de la Súper Serie */}
+                            {/* Cabecera Principal y Barra de Título de la Súper Serie */}
                             <div
                               style={{
                                 display: 'flex',
@@ -2216,117 +2282,92 @@ export default function AdminRoutinesPage() {
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
                                 gap: '0.75rem',
-                                paddingBottom: '0.75rem',
-                                borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
+                                padding: '0.85rem 1rem',
+                                borderRadius: '10px',
+                                background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.22) 0%, rgba(220, 38, 38, 0.14) 100%)',
+                                border: '1px solid rgba(245, 158, 11, 0.45)',
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
                                 <span
                                   style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    borderRadius: '6px',
-                                    backgroundColor: 'rgba(212, 175, 55, 0.22)',
-                                    display: 'flex',
+                                    display: 'inline-flex',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: '#F5D77F',
+                                    gap: '0.35rem',
+                                    backgroundColor: '#F59E0B',
+                                    color: '#0F1117',
+                                    fontWeight: 900,
+                                    fontSize: '0.74rem',
+                                    padding: '0.22rem 0.55rem',
+                                    borderRadius: '5px',
+                                    letterSpacing: '0.04em',
                                   }}
                                 >
-                                  <Zap size={16} />
+                                  <Zap size={13} style={{ fill: '#0F1117' }} />
+                                  SÚPER SERIE
                                 </span>
-                                <input
-                                  type="text"
-                                  value={block.loopName || 'Súper Serie'}
-                                  onChange={(e) => updateLoopMeta(block.loopId!, 'loopName', e.target.value)}
-                                  placeholder="Nombre de la Súper Serie..."
-                                  style={{
-                                    backgroundColor: 'transparent',
-                                    border: 'none',
-                                    borderBottom: '1px dashed rgba(212, 175, 55, 0.5)',
-                                    color: '#F5D77F',
-                                    fontWeight: 800,
-                                    fontSize: '0.98rem',
-                                    outline: 'none',
-                                    padding: '0.15rem 0.35rem',
-                                    minWidth: '150px',
-                                  }}
-                                />
-                                <span
-                                  style={{
-                                    fontSize: '0.72rem',
-                                    color: '#9FA6B8',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                    padding: '0.15rem 0.5rem',
-                                    borderRadius: '4px',
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  Loop: {block.items.length} ejercicios
-                                </span>
-                              </div>
 
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-                                {/* Selector de Rondas / Vueltas */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                  <label style={{ fontSize: '0.76rem', fontWeight: 700, color: '#F5D77F', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                    <Repeat size={13} /> Rondas / Vueltas:
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                  <label style={{ fontSize: '0.75rem', color: '#FCD34D', fontWeight: 700 }}>
+                                    Nombre:
                                   </label>
                                   <input
-                                    type="number"
-                                    min={1}
-                                    max={30}
-                                    value={block.loopRounds || 4}
-                                    onChange={(e) => updateLoopMeta(block.loopId!, 'loopRounds', Math.max(1, Number(e.target.value)))}
+                                    type="text"
+                                    value={block.loopName || 'Súper Serie'}
+                                    onChange={(e) => updateLoopMeta(block.loopId!, 'loopName', e.target.value)}
+                                    placeholder="Ej: Tándem Explosivo, Circuito Piernas..."
                                     style={{
-                                      width: '54px',
-                                      padding: '0.25rem 0.35rem',
+                                      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+                                      border: '1px solid rgba(245, 158, 11, 0.45)',
                                       borderRadius: '6px',
-                                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                                      border: '1px solid rgba(212, 175, 55, 0.35)',
-                                      color: '#FFFFFF',
-                                      fontWeight: 700,
-                                      fontSize: '0.85rem',
-                                      textAlign: 'center',
+                                      color: '#FFFBEB',
+                                      fontWeight: 800,
+                                      fontSize: '0.92rem',
                                       outline: 'none',
+                                      padding: '0.3rem 0.6rem',
+                                      minWidth: '200px',
                                     }}
-                                    title="Número de vueltas completas de la súper serie"
                                   />
                                 </div>
 
-                                {/* Pausa entre rondas */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                  <label style={{ fontSize: '0.76rem', fontWeight: 700, color: '#9FA6B8', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                    <Clock size={13} /> Pausa entre vueltas:
-                                  </label>
-                                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                                    <input
-                                      type="number"
-                                      min={0}
-                                      max={600}
-                                      value={block.loopRestBetweenRounds !== undefined ? block.loopRestBetweenRounds : 60}
-                                      onChange={(e) => updateLoopMeta(block.loopId!, 'loopRestBetweenRounds', Math.max(0, Number(e.target.value)))}
-                                      style={{
-                                        width: '64px',
-                                        padding: '0.25rem 1.3rem 0.25rem 0.35rem',
-                                        borderRadius: '6px',
-                                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                                        color: '#FFFFFF',
-                                        fontWeight: 700,
-                                        fontSize: '0.85rem',
-                                        textAlign: 'center',
-                                        outline: 'none',
-                                      }}
-                                      title="Segundos de recuperación al terminar toda la vuelta del bucle"
-                                    />
-                                    <span style={{ position: 'absolute', right: '5px', fontSize: '0.7rem', color: '#9FA6B8', pointerEvents: 'none' }}>
-                                      s
-                                    </span>
-                                  </div>
-                                </div>
+                                <span
+                                  style={{
+                                    fontSize: '0.74rem',
+                                    color: '#FDE68A',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                                    padding: '0.2rem 0.6rem',
+                                    borderRadius: '5px',
+                                    fontWeight: 700,
+                                  }}
+                                >
+                                  {block.items.length} {block.items.length === 1 ? 'ejercicio' : 'ejercicios'} enlazados
+                                </span>
+                              </div>
 
-                                {/* Desagrupar Súper Serie */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => addExerciseToLoop(block.loopId!)}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.3rem',
+                                    padding: '0.32rem 0.65rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.25)',
+                                    border: '1px solid #F59E0B',
+                                    color: '#FFFFFF',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                  title="Añadir un ejercicio nuevo dentro de este circuito"
+                                >
+                                  <Plus size={13} />
+                                  <span>Añadir Ejercicio</span>
+                                </button>
+
                                 <button
                                   type="button"
                                   onClick={() => ungroupLoop(block.loopId!)}
@@ -2334,20 +2375,186 @@ export default function AdminRoutinesPage() {
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     gap: '0.3rem',
-                                    padding: '0.3rem 0.6rem',
-                                    borderRadius: '5px',
+                                    padding: '0.32rem 0.65rem',
+                                    borderRadius: '6px',
                                     backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                                    border: '1px solid rgba(255, 255, 255, 0.18)',
                                     color: '#CBD5E1',
                                     fontSize: '0.74rem',
                                     fontWeight: 600,
                                     cursor: 'pointer',
                                   }}
-                                  title="Separar los ejercicios de este loop en ejercicios individuales"
+                                  title="Separar los ejercicios de este circuito para que vuelvan a ser individuales"
                                 >
                                   <Unlink size={12} />
                                   <span>Desagrupar</span>
                                 </button>
+                              </div>
+                            </div>
+
+                            {/* Panel Destacado de Configuración de Vueltas y Descanso del Circuito */}
+                            <div
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                                gap: '0.85rem',
+                                padding: '0.9rem 1.1rem',
+                                borderRadius: '10px',
+                                backgroundColor: 'rgba(15, 17, 23, 0.85)',
+                                border: '1.5px solid rgba(245, 158, 11, 0.35)',
+                                boxShadow: 'inset 0 0 16px rgba(0, 0, 0, 0.5)',
+                              }}
+                            >
+                              {/* Configuración 1: Rondas / Vueltas */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <label style={{ fontSize: '0.8rem', fontWeight: 800, color: '#FCD34D', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <Repeat size={14} color="#F59E0B" />
+                                    <span>VUELTAS / RONDAS DEL CIRCUITO</span>
+                                  </label>
+                                  <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>Total repeticiones</span>
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                  {/* Stepper Numérico */}
+                                  <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.6)', border: '1px solid rgba(245, 158, 11, 0.45)', borderRadius: '6px', overflow: 'hidden' }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => updateLoopMeta(block.loopId!, 'loopRounds', Math.max(1, (block.loopRounds || 4) - 1))}
+                                      style={{ padding: '0.35rem 0.55rem', background: 'transparent', border: 'none', color: '#FCD34D', cursor: 'pointer' }}
+                                      title="Restar una ronda"
+                                    >
+                                      <Minus size={13} />
+                                    </button>
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      max={30}
+                                      value={block.loopRounds || 4}
+                                      onChange={(e) => updateLoopMeta(block.loopId!, 'loopRounds', Math.max(1, Number(e.target.value)))}
+                                      style={{
+                                        width: '46px',
+                                        padding: '0.3rem 0.2rem',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#FFFFFF',
+                                        fontWeight: 800,
+                                        fontSize: '0.95rem',
+                                        textAlign: 'center',
+                                        outline: 'none',
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => updateLoopMeta(block.loopId!, 'loopRounds', Math.min(30, (block.loopRounds || 4) + 1))}
+                                      style={{ padding: '0.35rem 0.55rem', background: 'transparent', border: 'none', color: '#FCD34D', cursor: 'pointer' }}
+                                      title="Sumar una ronda"
+                                    >
+                                      <Plus size={13} />
+                                    </button>
+                                  </div>
+
+                                  {/* Píldoras de selección rápida */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                    {[2, 3, 4, 5, 6].map((rCount) => {
+                                      const isSelected = (block.loopRounds || 4) === rCount;
+                                      return (
+                                        <button
+                                          key={rCount}
+                                          type="button"
+                                          onClick={() => updateLoopMeta(block.loopId!, 'loopRounds', rCount)}
+                                          style={{
+                                            padding: '0.28rem 0.55rem',
+                                            borderRadius: '5px',
+                                            fontSize: '0.74rem',
+                                            fontWeight: isSelected ? 800 : 600,
+                                            backgroundColor: isSelected ? '#F59E0B' : 'rgba(255, 255, 255, 0.06)',
+                                            color: isSelected ? '#000000' : '#CBD5E1',
+                                            border: isSelected ? '1px solid #F59E0B' : '1px solid rgba(255, 255, 255, 0.12)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.15s ease',
+                                          }}
+                                        >
+                                          {rCount}x
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', fontStyle: 'italic' }}>
+                                  Cada ejercicio se ejecuta 1 serie por vuelta hasta completar las {block.loopRounds || 4} rondas.
+                                </span>
+                              </div>
+
+                              {/* Configuración 2: Descanso entre vueltas */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                  <label style={{ fontSize: '0.8rem', fontWeight: 800, color: '#FCD34D', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <Clock size={14} color="#F59E0B" />
+                                    <span>PAUSA AL TERMINAR LA VUELTA</span>
+                                  </label>
+                                  <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>Descanso circuito</span>
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={600}
+                                      step={5}
+                                      value={block.loopRestBetweenRounds !== undefined ? block.loopRestBetweenRounds : 60}
+                                      onChange={(e) => updateLoopMeta(block.loopId!, 'loopRestBetweenRounds', Math.max(0, Number(e.target.value)))}
+                                      style={{
+                                        width: '68px',
+                                        padding: '0.35rem 1.4rem 0.35rem 0.5rem',
+                                        borderRadius: '6px',
+                                        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                        border: '1px solid rgba(245, 158, 11, 0.45)',
+                                        color: '#FFFFFF',
+                                        fontWeight: 800,
+                                        fontSize: '0.9rem',
+                                        textAlign: 'center',
+                                        outline: 'none',
+                                      }}
+                                      title="Segundos de recuperación al terminar toda la vuelta del bucle"
+                                    />
+                                    <span style={{ position: 'absolute', right: '6px', fontSize: '0.72rem', color: '#F59E0B', fontWeight: 700, pointerEvents: 'none' }}>
+                                      s
+                                    </span>
+                                  </div>
+
+                                  {/* Píldoras de descanso rápido */}
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexWrap: 'wrap' }}>
+                                    {[30, 45, 60, 90, 120].map((sec) => {
+                                      const currentRest = block.loopRestBetweenRounds !== undefined ? block.loopRestBetweenRounds : 60;
+                                      const isSelected = currentRest === sec;
+                                      return (
+                                        <button
+                                          key={sec}
+                                          type="button"
+                                          onClick={() => updateLoopMeta(block.loopId!, 'loopRestBetweenRounds', sec)}
+                                          style={{
+                                            padding: '0.28rem 0.5rem',
+                                            borderRadius: '5px',
+                                            fontSize: '0.74rem',
+                                            fontWeight: isSelected ? 800 : 600,
+                                            backgroundColor: isSelected ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.06)',
+                                            color: isSelected ? '#FCD34D' : '#CBD5E1',
+                                            border: isSelected ? '1px solid #F59E0B' : '1px solid rgba(255, 255, 255, 0.12)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.15s ease',
+                                          }}
+                                        >
+                                          {sec}s
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', fontStyle: 'italic' }}>
+                                  Recuperación al finalizar todos los pasos del circuito antes de iniciar la siguiente vuelta.
+                                </span>
                               </div>
                             </div>
 
@@ -2692,6 +2899,68 @@ export default function AdminRoutinesPage() {
                                         }}
                                       />
                                     </div>
+                                    {/* Indicador de conexión entre ejercicios del circuito */}
+                                    {!isLastInLoop ? (
+                                      <div
+                                        style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          gap: '0.6rem',
+                                          padding: '0.35rem 0',
+                                        }}
+                                      >
+                                        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent)' }} />
+                                        <span
+                                          style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '0.35rem',
+                                            padding: '0.2rem 0.65rem',
+                                            borderRadius: '20px',
+                                            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                                            border: '1px solid rgba(245, 158, 11, 0.35)',
+                                            color: '#FCD34D',
+                                            fontSize: '0.72rem',
+                                            fontWeight: 700,
+                                          }}
+                                        >
+                                          <ArrowDown size={11} />
+                                          <span>Paso siguiente en circuito (Pausa: {ex.restSeconds || 0}s)</span>
+                                        </span>
+                                        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent)' }} />
+                                      </div>
+                                    ) : (
+                                      <div
+                                        style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          gap: '0.6rem',
+                                          padding: '0.35rem 0',
+                                        }}
+                                      >
+                                        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.4), transparent)' }} />
+                                        <span
+                                          style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '0.35rem',
+                                            padding: '0.2rem 0.65rem',
+                                            borderRadius: '20px',
+                                            backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                                            border: '1px solid rgba(34, 197, 94, 0.35)',
+                                            color: '#86EFAC',
+                                            fontSize: '0.72rem',
+                                            fontWeight: 700,
+                                          }}
+                                        >
+                                          <Repeat size={11} />
+                                          <span>Fin de vuelta ➔ Pausa de {block.loopRestBetweenRounds !== undefined ? block.loopRestBetweenRounds : 60}s ➔ Siguiente ronda hasta completar {block.loopRounds || 4} vueltas</span>
+                                        </span>
+                                        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.4), transparent)' }} />
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               })}
@@ -2705,20 +2974,21 @@ export default function AdminRoutinesPage() {
                                 style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
-                                  gap: '0.35rem',
-                                  padding: '0.4rem 0.8rem',
-                                  borderRadius: '6px',
-                                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                                  border: '1px dashed rgba(212, 175, 55, 0.45)',
-                                  color: '#F5D77F',
-                                  fontSize: '0.8rem',
-                                  fontWeight: 700,
+                                  gap: '0.45rem',
+                                  padding: '0.45rem 0.95rem',
+                                  borderRadius: '7px',
+                                  backgroundColor: 'rgba(245, 158, 11, 0.14)',
+                                  border: '1.5px dashed rgba(245, 158, 11, 0.6)',
+                                  color: '#FDE68A',
+                                  fontSize: '0.82rem',
+                                  fontWeight: 800,
                                   cursor: 'pointer',
                                   transition: 'all 0.15s ease',
+                                  boxShadow: '0 0 12px rgba(245, 158, 11, 0.12)',
                                 }}
                               >
-                                <Plus size={13} />
-                                <span>+ Añadir ejercicio a esta {block.loopName || 'Súper Serie'}</span>
+                                <Plus size={14} color="#F59E0B" />
+                                <span>+ Añadir ejercicio a esta Súper Serie ({block.loopName || 'Circuito'})</span>
                               </button>
                             </div>
                           </div>

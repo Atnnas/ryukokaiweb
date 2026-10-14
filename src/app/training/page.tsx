@@ -36,6 +36,8 @@ import {
   Calendar,
   Trophy,
   AlertTriangle,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 
 // Paso individual desempaquetado para el ejecutor interactivo de entrenamiento
@@ -294,6 +296,27 @@ export default function TrainingPage() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'loops' | 'short' | 'long'>('all');
   const [previewRoutine, setPreviewRoutine] = useState<Routine | null>(null);
   const [expandedRoutineIds, setExpandedRoutineIds] = useState<Record<string, boolean>>({});
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('training_view_mode');
+      if (saved === 'list' || saved === 'grid') {
+        setViewMode(saved);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleSetViewMode = (mode: 'grid' | 'list') => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem('training_view_mode', mode);
+    } catch {
+      // ignore
+    }
+  };
 
   const toggleExpanded = (id: string) => {
     setExpandedRoutineIds((prev) => ({
@@ -2118,40 +2141,37 @@ export default function TrainingPage() {
       style={{
         minHeight: '90vh',
         backgroundColor: '#070709',
-        padding: '2.5rem 0 5rem',
+        padding: '2rem 0 5rem',
       }}
     >
-      <div className="container-dojo" style={{ width: '100%' }}>
-        {/* Cabecera Principal con Kanji y Atmósfera Marcial */}
+      <div className="container-dojo" style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding: '0 1rem' }}>
+        {/* Cabecera Principal Minimalista y Punchy */}
         <div
           style={{
             display: 'flex',
             flexWrap: 'wrap',
-            alignItems: 'flex-start',
+            alignItems: 'flex-end',
             justifyContent: 'space-between',
             gap: '1.5rem',
-            marginBottom: '2.5rem',
+            marginBottom: '2rem',
             paddingBottom: '1.5rem',
             borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
           }}
         >
-          <div style={{ flex: 1, minWidth: '280px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-              <span
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
+              <h1
                 style={{
-                  fontSize: '0.74rem',
-                  fontWeight: 800,
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  color: '#D4AF37',
-                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: '4px',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  fontSize: 'clamp(2rem, 5vw, 2.75rem)',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.02em',
+                  margin: 0,
+                  lineHeight: 1.1,
                 }}
               >
-                鍛錬 • TANREN (ENTRENAMIENTO MARCIAL)
-              </span>
+                Entrenamiento
+              </h1>
 
               {!isOnline && (
                 <span
@@ -2160,17 +2180,17 @@ export default function TrainingPage() {
                     fontWeight: 700,
                     color: '#F59E0B',
                     backgroundColor: 'rgba(245, 158, 11, 0.12)',
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '4px',
+                    padding: '0.2rem 0.65rem',
+                    borderRadius: '999px',
                     border: '1px solid rgba(245, 158, 11, 0.3)',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.3rem',
                   }}
-                  title="Entrenando sin conexión. Las rutinas y tu racha se sincronizarán al reconectar."
+                  title="Modo Dojo Offline activo"
                 >
                   <Zap size={11} />
-                  <span>Modo Dojo Offline</span>
+                  <span>Offline</span>
                 </span>
               )}
 
@@ -2178,159 +2198,146 @@ export default function TrainingPage() {
                 <Link
                   href="/admin/routines"
                   style={{
-                    fontSize: '0.72rem',
-                    color: '#9FA6B8',
-                    textDecoration: 'underline',
+                    fontSize: '0.74rem',
+                    color: '#D4AF37',
+                    fontWeight: 700,
+                    padding: '0.2rem 0.65rem',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                    border: '1px solid rgba(212, 175, 55, 0.25)',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
                   }}
                 >
-                  Gestionar Rutinas (/admin/routines)
+                  ⚙️ Admin Rutinas
                 </Link>
               )}
             </div>
 
-            <h1
-              style={{
-                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-                fontWeight: 900,
-                color: '#FFFFFF',
-                margin: '0.3rem 0',
-              }}
-            >
-              Rutinas de Entrenamiento
-            </h1>
-
-            <p style={{ color: '#9FA6B8', fontSize: '0.95rem', maxWidth: '850px', margin: 0, lineHeight: 1.5 }}>
-              Selecciona una rutina creada por el Sensei para iniciar tu sesión guiada. El sistema controlará tus tiempos activos y las pausas entre series y súper series en tiempo real.
+            <p style={{ color: '#9FA6B8', fontSize: '0.92rem', margin: 0, fontWeight: 500 }}>
+              Rutinas oficiales guiadas paso a paso en tiempo real
             </p>
           </div>
 
-          {/* Tarjetas de Métricas: Racha, Sesiones, Tiempo y Repertorio */}
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            {/* Card 1: Racha de Disciplina */}
+          {/* Tarjetas KPI Modernas con Tipografía Grande */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+              gap: '0.75rem',
+              width: '100%',
+              maxWidth: '620px',
+            }}
+          >
+            {/* KPI 1: Racha */}
             <div
+              className="card-sumi"
               style={{
-                padding: '0.75rem 1.15rem',
+                padding: '0.85rem 1rem',
                 backgroundColor: '#0E0F14',
-                borderRadius: '10px',
+                borderRadius: '12px',
                 border: workoutStats.isStreakActive
-                  ? '1px solid rgba(245, 158, 11, 0.5)'
-                  : workoutStats.consecutiveDays > 0
-                  ? '1px solid rgba(245, 158, 11, 0.25)'
-                  : '1px solid rgba(212, 175, 55, 0.2)',
-                textAlign: 'center',
-                minWidth: '120px',
+                  ? '1px solid rgba(245, 158, 11, 0.45)'
+                  : '1px solid rgba(255, 255, 255, 0.08)',
                 boxShadow: workoutStats.isStreakActive ? '0 0 20px rgba(245, 158, 11, 0.15)' : 'none',
               }}
               title={workoutStats.statusMessage}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', marginBottom: '0.15rem' }}>
-                <Flame size={15} color={workoutStats.isStreakActive ? '#F59E0B' : workoutStats.consecutiveDays > 0 ? '#FBBF24' : '#9FA6B8'} />
-                <span style={{ fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
                   Racha
                 </span>
-                {workoutStats.restDaysAvailable > 0 && (
-                  <span
-                    style={{
-                      fontSize: '0.6rem',
-                      padding: '0.05rem 0.35rem',
-                      backgroundColor: 'rgba(59, 130, 246, 0.15)',
-                      color: '#60A5FA',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
-                      borderRadius: '999px',
-                      fontWeight: 800,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.15rem',
-                    }}
-                    title={`Tienes ${workoutStats.restDaysAvailable} descanso(s) libre(s) para proteger tu racha.`}
-                  >
-                    <Shield size={9} color="#60A5FA" /> {workoutStats.restDaysAvailable}
-                  </span>
-                )}
+                <Flame size={16} color={workoutStats.isStreakActive ? '#F59E0B' : '#64748B'} />
               </div>
-              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: workoutStats.isStreakActive ? '#F59E0B' : workoutStats.consecutiveDays > 0 ? '#FDE68A' : '#FFFFFF' }}>
-                {workoutStats.isStreakActive ? `${workoutStats.streak} ${workoutStats.streak === 1 ? 'día' : 'días'}` : `${workoutStats.consecutiveDays}/3 d`}
-              </span>
-              <span style={{ display: 'block', fontSize: '0.66rem', color: workoutStats.isStreakActive ? '#FBBF24' : '#94A3B8', marginTop: '0.1rem' }}>
+              <div style={{ fontSize: '1.65rem', fontWeight: 900, color: workoutStats.isStreakActive ? '#F59E0B' : '#FFFFFF', lineHeight: 1.1 }}>
+                {workoutStats.isStreakActive ? `${workoutStats.streak}d` : `${workoutStats.consecutiveDays}/3d`}
+              </div>
+              <div style={{ fontSize: '0.68rem', color: workoutStats.isStreakActive ? '#FBBF24' : '#64748B', marginTop: '0.25rem' }}>
                 {workoutStats.isStreakActive
                   ? (workoutStats.restDaysAvailable > 0
-                      ? `🛡️ ${workoutStats.restDaysAvailable} descanso${workoutStats.restDaysAvailable > 1 ? 's' : ''} libre${workoutStats.restDaysAvailable > 1 ? 's' : ''}`
-                      : `+1 descanso en ${workoutStats.daysUntilNextRestDay}d`)
-                  : (workoutStats.consecutiveDays > 0
-                      ? `Faltan ${workoutStats.daysNeededForStreak}d para racha`
-                      : '3 días para activar')}
-              </span>
+                      ? `🛡️ ${workoutStats.restDaysAvailable} libre${workoutStats.restDaysAvailable > 1 ? 's' : ''}`
+                      : `+1 libre en ${workoutStats.daysUntilNextRestDay}d`)
+                  : (workoutStats.consecutiveDays > 0 ? `Faltan ${workoutStats.daysNeededForStreak}d` : '3d para activar')}
+              </div>
             </div>
 
-            {/* Card 2: Sesiones Completadas */}
+            {/* KPI 2: Sesiones */}
             <div
+              className="card-sumi"
               style={{
-                padding: '0.75rem 1.15rem',
+                padding: '0.85rem 1rem',
                 backgroundColor: '#0E0F14',
-                borderRadius: '10px',
-                border: '1px solid rgba(212, 175, 55, 0.2)',
-                textAlign: 'center',
-                minWidth: '115px',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.15rem' }}>
-                Sesiones
-              </span>
-              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#FFFFFF' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                  Sesiones
+                </span>
+                <Trophy size={16} color="#10B981" />
+              </div>
+              <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1.1 }}>
                 {workoutStats.totalWorkouts}
-              </span>
-              <span style={{ display: 'block', fontSize: '0.68rem', color: '#10B981', marginTop: '0.1rem' }}>
-                {workoutStats.monthWorkouts} este mes
-              </span>
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#10B981', marginTop: '0.25rem', fontWeight: 600 }}>
+                +{workoutStats.monthWorkouts} este mes
+              </div>
             </div>
 
-            {/* Card 3: Tiempo Total */}
+            {/* KPI 3: Tiempo */}
             <div
+              className="card-sumi"
               style={{
-                padding: '0.75rem 1.15rem',
+                padding: '0.85rem 1rem',
                 backgroundColor: '#0E0F14',
-                borderRadius: '10px',
-                border: '1px solid rgba(212, 175, 55, 0.2)',
-                textAlign: 'center',
-                minWidth: '115px',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.15rem' }}>
-                Tiempo Total
-              </span>
-              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#F5D77F' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                  Tiempo
+                </span>
+                <Clock size={16} color="#F5D77F" />
+              </div>
+              <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#F5D77F', lineHeight: 1.1 }}>
                 {workoutStats.totalMinutes}m
-              </span>
-              <span style={{ display: 'block', fontSize: '0.68rem', color: '#9FA6B8', marginTop: '0.1rem' }}>
-                Minutos en tatami
-              </span>
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#9FA6B8', marginTop: '0.25rem' }}>
+                Minutos activos
+              </div>
             </div>
 
-            {/* Card 4: Rutinas Disponibles */}
+            {/* KPI 4: Repertorio */}
             <div
+              className="card-sumi"
               style={{
-                padding: '0.75rem 1.15rem',
+                padding: '0.85rem 1rem',
                 backgroundColor: '#0E0F14',
-                borderRadius: '10px',
-                border: '1px solid rgba(212, 175, 55, 0.2)',
-                textAlign: 'center',
-                minWidth: '115px',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <span style={{ display: 'block', fontSize: '0.7rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.15rem' }}>
-                Repertorio
-              </span>
-              <span style={{ fontSize: '1.45rem', fontWeight: 900, color: '#FFFFFF' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                  Rutinas
+                </span>
+                <Dumbbell size={16} color="#CBD5E1" />
+              </div>
+              <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1.1 }}>
                 {totalRoutines}
-              </span>
-              <span style={{ display: 'block', fontSize: '0.68rem', color: '#F5D77F', marginTop: '0.1rem' }}>
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#9FA6B8', marginTop: '0.25rem' }}>
                 ~{avgDuration}m promedio
-              </span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Barra Superior: Tabs de Navegación (Catálogo vs Historial) y Toggle de Voz */}
+        {/* Barra de Control Segmentado y Switch de Voz */}
         <div
           style={{
             display: 'flex',
@@ -2339,21 +2346,28 @@ export default function TrainingPage() {
             justifyContent: 'space-between',
             gap: '1rem',
             marginBottom: '1.75rem',
-            paddingBottom: '1rem',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           }}
         >
-          {/* Pestañas Catálogo vs Historial */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {/* Segmented Control M3 */}
+          <div
+            style={{
+              display: 'inline-flex',
+              padding: '4px',
+              backgroundColor: '#0A0B0F',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '14px',
+              gap: '4px',
+            }}
+          >
             <button
               onClick={() => setActiveTab('catalog')}
               style={{
-                padding: '0.6rem 1.1rem',
-                borderRadius: '8px',
+                padding: '0.55rem 1.1rem',
+                borderRadius: '10px',
                 fontSize: '0.86rem',
                 fontWeight: activeTab === 'catalog' ? 800 : 600,
-                backgroundColor: activeTab === 'catalog' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                border: activeTab === 'catalog' ? '1px solid #D4AF37' : '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: activeTab === 'catalog' ? 'rgba(212, 175, 55, 0.18)' : 'transparent',
+                border: activeTab === 'catalog' ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid transparent',
                 color: activeTab === 'catalog' ? '#F5D77F' : '#9FA6B8',
                 cursor: 'pointer',
                 display: 'inline-flex',
@@ -2363,18 +2377,30 @@ export default function TrainingPage() {
               }}
             >
               <Dumbbell size={15} />
-              <span>Catálogo de Rutinas ({routines.length})</span>
+              <span>Rutinas</span>
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  padding: '0.1rem 0.45rem',
+                  borderRadius: '999px',
+                  backgroundColor: activeTab === 'catalog' ? 'rgba(212, 175, 55, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                  color: activeTab === 'catalog' ? '#FFFFFF' : '#CBD5E1',
+                  fontWeight: 800,
+                }}
+              >
+                {routines.length}
+              </span>
             </button>
 
             <button
               onClick={() => setActiveTab('history')}
               style={{
-                padding: '0.6rem 1.1rem',
-                borderRadius: '8px',
+                padding: '0.55rem 1.1rem',
+                borderRadius: '10px',
                 fontSize: '0.86rem',
                 fontWeight: activeTab === 'history' ? 800 : 600,
-                backgroundColor: activeTab === 'history' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                border: activeTab === 'history' ? '1px solid #D4AF37' : '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: activeTab === 'history' ? 'rgba(212, 175, 55, 0.18)' : 'transparent',
+                border: activeTab === 'history' ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid transparent',
                 color: activeTab === 'history' ? '#F5D77F' : '#9FA6B8',
                 cursor: 'pointer',
                 display: 'inline-flex',
@@ -2384,1124 +2410,1032 @@ export default function TrainingPage() {
               }}
             >
               <History size={15} />
-              <span>Mi Historial y Racha ({workoutLogs.length})</span>
+              <span>Historial</span>
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  padding: '0.1rem 0.45rem',
+                  borderRadius: '999px',
+                  backgroundColor: activeTab === 'history' ? 'rgba(212, 175, 55, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                  color: activeTab === 'history' ? '#FFFFFF' : '#CBD5E1',
+                  fontWeight: 800,
+                }}
+              >
+                {workoutLogs.length}
+              </span>
             </button>
           </div>
 
-          {/* Control de Voz del Sensei (ON / OFF) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <button
-              onClick={toggleVoice}
+          {/* Toggle de Voz del Sensei */}
+          <button
+            onClick={toggleVoice}
+            style={{
+              padding: '0.55rem 0.95rem',
+              borderRadius: '12px',
+              backgroundColor: voiceEnabled ? 'rgba(212, 175, 55, 0.14)' : '#0E0F14',
+              border: voiceEnabled ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+              color: voiceEnabled ? '#F5D77F' : '#9FA6B8',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              transition: 'all 0.15s ease',
+            }}
+            title={voiceEnabled ? 'Desactivar voz del Sensei' : 'Activar voz del Sensei'}
+          >
+            {voiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            <span>Voz del Sensei</span>
+            <span
               style={{
-                padding: '0.55rem 0.95rem',
-                borderRadius: '8px',
-                backgroundColor: voiceEnabled ? 'rgba(212, 175, 55, 0.16)' : 'rgba(255, 255, 255, 0.05)',
-                border: voiceEnabled ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid rgba(255, 255, 255, 0.12)',
-                color: voiceEnabled ? '#F5D77F' : '#9FA6B8',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                transition: 'all 0.15s ease',
+                width: '7px',
+                height: '7px',
+                borderRadius: '50%',
+                backgroundColor: voiceEnabled ? '#10B981' : '#64748B',
+                boxShadow: voiceEnabled ? '0 0 8px #10B981' : 'none',
               }}
-              title="Instrucciones habladas en tiempo real durante el entrenamiento"
-            >
-              <span>{voiceEnabled ? '🗣️ Voz del Sensei: ACTIVADA' : '🔇 Voz del Sensei: SILENCIADA'}</span>
-            </button>
-          </div>
+            />
+          </button>
         </div>
 
         {activeTab === 'catalog' && (
           <>
-            {/* Barra de Búsqueda y Filtros Rápidos */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '1rem',
-            marginBottom: '2rem',
-          }}
-        >
-          {/* Input de Búsqueda */}
-          <div style={{ position: 'relative', flex: 1, maxWidth: '480px', minWidth: '240px' }}>
-            <Search
-              size={17}
-              style={{
-                position: 'absolute',
-                left: '0.85rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#9FA6B8',
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Buscar por nombre de rutina o ejercicio..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.65rem 1rem 0.65rem 2.4rem',
-                borderRadius: '8px',
-                backgroundColor: '#0E0F14',
-                border: '1px solid rgba(212, 175, 55, 0.25)',
-                color: '#FFFFFF',
-                fontSize: '0.88rem',
-                outline: 'none',
-              }}
-            />
-          </div>
-
-          {/* Filtros */}
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {[
-              { id: 'all', label: 'Todas' },
-              { id: 'loops', label: '⚡ Con Súper Series' },
-              { id: 'short', label: 'Rápidas (≤ 30 min)' },
-              { id: 'long', label: 'Avanzadas (> 45 min)' },
-            ].map((f) => {
-              const active = activeFilter === f.id;
-              return (
-                <button
-                  key={f.id}
-                  onClick={() => setActiveFilter(f.id as typeof activeFilter)}
-                  style={{
-                    padding: '0.45rem 0.85rem',
-                    borderRadius: '6px',
-                    fontSize: '0.8rem',
-                    fontWeight: active ? 800 : 500,
-                    backgroundColor: active ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                    border: active ? '1px solid #D4AF37' : '1px solid rgba(255, 255, 255, 0.1)',
-                    color: active ? '#F5D77F' : '#9FA6B8',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  {f.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Grid de Rutinas */}
-        {loadingRoutines ? (
-          <div style={{ textAlign: 'center', padding: '4rem 0', color: '#9FA6B8' }}>
-            <Dumbbell size={36} className="spin-animation" style={{ color: '#F5D77F', margin: '0 auto 1rem' }} />
-            <p style={{ fontSize: '0.95rem' }}>Cargando repertorio de rutinas del dojo...</p>
-          </div>
-        ) : filteredRoutines.length === 0 ? (
-          <div
-            className="card-sumi"
-            style={{
-              padding: '4rem 2rem',
-              textAlign: 'center',
-              backgroundColor: '#0E0F14',
-              border: '1px dashed rgba(212, 175, 55, 0.3)',
-              borderRadius: '12px',
-            }}
-          >
-            <Dumbbell size={42} color="#64748B" style={{ margin: '0 auto 1rem' }} />
-            <h3 style={{ color: '#FFFFFF', fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-              No se encontraron rutinas
-            </h3>
-            <p style={{ color: '#9FA6B8', fontSize: '0.88rem', margin: 0 }}>
-              {searchTerm
-                ? 'Intenta con otros términos de búsqueda.'
-                : 'Aún no hay rutinas creadas en la base de datos.'}
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* VISTA ESCRITORIO / TABLET: TABLA MARCIAL */}
+            {/* Buscador y Chips de Filtrado */}
             <div
-              className="desktop-routine-table card-sumi"
               style={{
-                padding: 0,
-                overflow: 'hidden',
-                border: '1px solid rgba(212, 175, 55, 0.25)',
-                borderRadius: '12px',
-                backgroundColor: '#0E0F14',
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7)',
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '1rem',
+                marginBottom: '2rem',
               }}
             >
-              <div style={{ overflowX: 'auto' }}>
-                <table
+              {/* Buscador */}
+              <div style={{ position: 'relative', flex: 1, maxWidth: '460px', minWidth: '240px' }}>
+                <Search
+                  size={16}
+                  style={{
+                    position: 'absolute',
+                    left: '0.9rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#9FA6B8',
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Buscar por rutina o ejercicio..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
                     width: '100%',
-                    borderCollapse: 'collapse',
-                    textAlign: 'left',
+                    padding: '0.65rem 1rem 0.65rem 2.5rem',
+                    borderRadius: '12px',
+                    backgroundColor: '#0E0F14',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#FFFFFF',
                     fontSize: '0.88rem',
+                    outline: 'none',
+                    transition: 'border-color 0.15s ease',
                   }}
-                >
-                  <thead>
-                    <tr
+                  onFocus={(e) => (e.target.style.borderColor = 'rgba(212, 175, 55, 0.6)')}
+                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)')}
+                />
+              </div>
+
+              {/* Filtros y Selector de Vista (Tarjetas / Lista) */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                {/* Filter Chips */}
+                <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                {[
+                  { id: 'all', label: 'Todas' },
+                  { id: 'loops', label: '⚡ Súper Series' },
+                  { id: 'short', label: '⏱ Rápidas (≤ 30m)' },
+                  { id: 'long', label: '🥋 Avanzadas (> 45m)' },
+                ].map((f) => {
+                  const active = activeFilter === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => setActiveFilter(f.id as typeof activeFilter)}
                       style={{
-                        borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
-                        backgroundColor: 'rgba(212, 175, 55, 0.04)',
+                        padding: '0.45rem 0.85rem',
+                        borderRadius: '999px',
+                        fontSize: '0.8rem',
+                        fontWeight: active ? 800 : 600,
+                        backgroundColor: active ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                        border: active ? '1px solid #D4AF37' : '1px solid rgba(255, 255, 255, 0.1)',
+                        color: active ? '#F5D77F' : '#9FA6B8',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
                       }}
                     >
-                      <th style={{ padding: '1rem 1.25rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Rutina / Enfoque
-                      </th>
-                      <th style={{ padding: '1rem 1rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>
-                        Duración Estimada
-                      </th>
-                      <th style={{ padding: '1rem 1rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Ejercicios
-                      </th>
-                      <th style={{ padding: '1rem 1.25rem', color: '#F5D77F', fontWeight: 700, fontSize: '0.76rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>
-                        Acción / Ejecución
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredRoutines.map((routine) => {
-                      const routineId = routine.id || routine._id || '';
-                      const isExpanded = !!expandedRoutineIds[routineId];
-                      const exerciseCount = routine.exercises?.length || 0;
-                      const loopSet = new Set((routine.exercises || []).map((e) => e.loopId).filter(Boolean));
-                      const loopCount = loopSet.size;
+                      {f.label}
+                    </button>
+                  );
+                })}
+                </div>
 
-                      return (
-                        <React.Fragment key={routineId}>
-                          <tr
-                            style={{
-                              borderBottom: isExpanded ? 'none' : '1px solid rgba(255, 255, 255, 0.07)',
-                              backgroundColor: isExpanded ? 'rgba(212, 175, 55, 0.03)' : 'transparent',
-                              transition: 'background-color 0.15s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!isExpanded) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!isExpanded) e.currentTarget.style.backgroundColor = 'transparent';
-                            }}
-                          >
-                            {/* Nombre y Descripción */}
-                            <td style={{ padding: '1.1rem 1.25rem', verticalAlign: 'middle' }}>
-                              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
-                                <div
-                                  style={{
-                                    width: '38px',
-                                    height: '38px',
-                                    borderRadius: '8px',
-                                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                                    border: '1px solid rgba(212, 175, 55, 0.28)',
-                                    color: '#F5D77F',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0,
-                                    marginTop: '0.1rem',
-                                  }}
-                                >
-                                  <Dumbbell size={19} />
-                                </div>
-                                <div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
-                                    <span style={{ color: '#FFFFFF', fontWeight: 800, fontSize: '1rem' }}>
-                                      {routine.title}
-                                    </span>
-                                    {loopCount > 0 && (
-                                      <span
-                                        style={{
-                                          display: 'inline-flex',
-                                          alignItems: 'center',
-                                          gap: '0.25rem',
-                                          padding: '0.15rem 0.5rem',
-                                          borderRadius: '4px',
-                                          backgroundColor: 'rgba(239, 68, 68, 0.14)',
-                                          border: '1px solid rgba(239, 68, 68, 0.35)',
-                                          color: '#F87171',
-                                          fontSize: '0.7rem',
-                                          fontWeight: 700,
-                                        }}
-                                      >
-                                        <Zap size={11} /> {loopCount} Súper Serie{loopCount > 1 ? 's' : ''}
-                                      </span>
-                                    )}
-                                  </div>
-                                  {routine.description ? (
-                                    <p style={{ color: '#9FA6B8', fontSize: '0.82rem', margin: 0, lineHeight: 1.45, maxWidth: '650px' }}>
-                                      {routine.description}
-                                    </p>
-                                  ) : (
-                                    <span style={{ color: '#64748B', fontSize: '0.76rem', fontStyle: 'italic' }}>
-                                      Rutina técnica guiada de karate
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
+                {/* Selector de Vista: Tarjetas vs Lista */}
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    padding: '3px',
+                    backgroundColor: '#0A0B0F',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '10px',
+                    gap: '3px',
+                  }}
+                >
+                  <button
+                    onClick={() => handleSetViewMode('grid')}
+                    style={{
+                      padding: '0.35rem 0.65rem',
+                      borderRadius: '7px',
+                      fontSize: '0.78rem',
+                      fontWeight: viewMode === 'grid' ? 800 : 600,
+                      backgroundColor: viewMode === 'grid' ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                      border: viewMode === 'grid' ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid transparent',
+                      color: viewMode === 'grid' ? '#F5D77F' : '#9FA6B8',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      transition: 'all 0.15s ease',
+                    }}
+                    title="Vista de cuadrícula / tarjetas"
+                  >
+                    <LayoutGrid size={13} />
+                    <span>Tarjetas</span>
+                  </button>
 
-                            {/* Duración Estimada */}
-                            <td style={{ padding: '1.1rem 1rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
-                              <div
-                                style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '0.4rem',
-                                  padding: '0.35rem 0.75rem',
-                                  borderRadius: '999px',
-                                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                                  border: '1px solid rgba(212, 175, 55, 0.3)',
-                                  color: '#F5D77F',
-                                  fontWeight: 700,
-                                  fontSize: '0.82rem',
-                                }}
-                              >
-                                <Clock size={14} />
-                                <span>~{routine.durationMinutes} minutos</span>
-                              </div>
-                            </td>
-
-                            {/* Ejercicios y Botón Desplegar */}
-                            <td style={{ padding: '1.1rem 1rem', verticalAlign: 'middle' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                                <button
-                                  onClick={() => toggleExpanded(routineId)}
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.4rem',
-                                    padding: '0.4rem 0.8rem',
-                                    borderRadius: '6px',
-                                    backgroundColor: isExpanded ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                                    border: isExpanded ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid rgba(255, 255, 255, 0.12)',
-                                    color: isExpanded ? '#F5D77F' : '#E2E8F0',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.15s ease',
-                                  }}
-                                  title="Ver u ocultar secuencia de ejercicios"
-                                >
-                                  <Layers size={13} />
-                                  <span>
-                                    {exerciseCount} {exerciseCount === 1 ? 'ejercicio' : 'ejercicios'}
-                                  </span>
-                                  {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                </button>
-
-                                {!isExpanded && routine.exercises && routine.exercises.length > 0 && (
-                                  <span style={{ fontSize: '0.78rem', color: '#9FA6B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '450px' }}>
-                                    {routine.exercises.slice(0, 4).map((e) => e.name).join(', ')}
-                                    {routine.exercises.length > 4 ? '...' : ''}
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-
-                            {/* Acciones */}
-                            <td style={{ padding: '1.1rem 1.25rem', verticalAlign: 'middle', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', justifyContent: 'flex-end' }}>
-                                <button
-                                  onClick={() => setPreviewRoutine(routine)}
-                                  style={{
-                                    padding: '0.5rem 0.85rem',
-                                    borderRadius: '6px',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                                    color: '#E2E8F0',
-                                    fontSize: '0.82rem',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.35rem',
-                                    transition: 'all 0.15s ease',
-                                  }}
-                                  title="Ver detalles y notas"
-                                >
-                                  <Layers size={13} />
-                                  <span>Ver Desglose</span>
-                                </button>
-
-                                <button
-                                  onClick={() => startWorkout(routine)}
-                                  className="btn-martial-primary"
-                                  style={{
-                                    padding: '0.5rem 1.1rem',
-                                    fontSize: '0.84rem',
-                                    fontWeight: 800,
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.45rem',
-                                    borderRadius: '6px',
-                                    boxShadow: '0 2px 10px rgba(212, 175, 55, 0.25)',
-                                  }}
-                                  title="Iniciar ejecución interactiva de la rutina"
-                                >
-                                  <Play size={14} />
-                                  <span>Iniciar Rutina</span>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-
-                          {/* Fila expandible con el desglose detallado */}
-                          {isExpanded && (
-                            <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', backgroundColor: 'rgba(0, 0, 0, 0.35)' }}>
-                              <td colSpan={4} style={{ padding: '1.25rem 1.5rem 1.75rem' }}>
-                                <div
-                                  style={{
-                                    padding: '1.25rem',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                    border: '1px solid rgba(212, 175, 55, 0.25)',
-                                    borderRadius: '10px',
-                                  }}
-                                >
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                      <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#F5D77F', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                        Secuencia Planificada ({exerciseCount} ejercicios)
-                                      </span>
-                                    </div>
-
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                      <span style={{ fontSize: '0.78rem', color: '#9FA6B8' }}>
-                                        Duración estimada: <strong style={{ color: '#F5D77F' }}>~{routine.durationMinutes} min</strong>
-                                      </span>
-                                      <button
-                                        onClick={() => startWorkout(routine)}
-                                        className="btn-martial-primary"
-                                        style={{
-                                          padding: '0.4rem 0.9rem',
-                                          fontSize: '0.78rem',
-                                          fontWeight: 800,
-                                          display: 'inline-flex',
-                                          alignItems: 'center',
-                                          gap: '0.35rem',
-                                          borderRadius: '6px',
-                                        }}
-                                      >
-                                        <Play size={13} />
-                                        <span>Iniciar Esta Rutina</span>
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {/* Desglose agrupando individuales y bloques súper series */}
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                                    {(() => {
-                                      interface RoutineRowBlock {
-                                        type: 'single' | 'loop';
-                                        loopId?: string;
-                                        loopName?: string;
-                                        loopRounds?: number;
-                                        loopRestBetweenRounds?: number;
-                                        items: ExerciseItem[];
-                                      }
-
-                                      const rBlocks: RoutineRowBlock[] = [];
-                                      let currentBlock: RoutineRowBlock | null = null;
-
-                                      (routine.exercises || []).forEach((ex) => {
-                                        if (ex.loopId) {
-                                          if (currentBlock && currentBlock.loopId === ex.loopId) {
-                                            currentBlock.items.push(ex);
-                                          } else {
-                                            currentBlock = {
-                                              type: 'loop',
-                                              loopId: ex.loopId,
-                                              loopName: ex.loopName || 'Súper Serie',
-                                              loopRounds: ex.loopRounds || 4,
-                                              loopRestBetweenRounds: ex.loopRestBetweenRounds !== undefined ? ex.loopRestBetweenRounds : 60,
-                                              items: [ex],
-                                            };
-                                            rBlocks.push(currentBlock);
-                                          }
-                                        } else {
-                                          currentBlock = null;
-                                          rBlocks.push({
-                                            type: 'single',
-                                            items: [ex],
-                                          });
-                                        }
-                                      });
-
-                                      return rBlocks.map((blk, blkIdx) => {
-                                        if (blk.type === 'single') {
-                                          const ex = blk.items[0];
-                                          const quantity = ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : 12;
-                                          const unit = ex.repsOrDurationUnit || 'repeticiones';
-
-                                          return (
-                                            <div
-                                              key={ex.id || blkIdx}
-                                              style={{
-                                                padding: '0.75rem 0.9rem',
-                                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                                border: '1px solid rgba(255, 255, 255, 0.07)',
-                                                borderRadius: '6px',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: '0.35rem',
-                                              }}
-                                            >
-                                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                                                  <span
-                                                    style={{
-                                                      width: '22px',
-                                                      height: '22px',
-                                                      borderRadius: '50%',
-                                                      backgroundColor: 'rgba(212, 175, 55, 0.2)',
-                                                      color: '#F5D77F',
-                                                      fontSize: '0.72rem',
-                                                      fontWeight: 700,
-                                                      display: 'flex',
-                                                      alignItems: 'center',
-                                                      justifyContent: 'center',
-                                                      flexShrink: 0,
-                                                    }}
-                                                  >
-                                                    {blkIdx + 1}
-                                                  </span>
-                                                  <span style={{ color: '#FFFFFF', fontSize: '0.88rem', fontWeight: 600 }}>
-                                                    {ex.name}
-                                                  </span>
-                                                </div>
-
-                                                <span style={{ color: '#F5D77F', fontSize: '0.82rem', fontWeight: 700 }}>
-                                                  {ex.sets ? `${ex.sets} × ` : ''}{quantity} {unit}
-                                                </span>
-                                              </div>
-
-                                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', paddingLeft: '1.7rem', fontSize: '0.75rem', color: '#9FA6B8' }}>
-                                                {ex.restSeconds !== undefined && (
-                                                  <span>⏱ Descanso entre series: <strong style={{ color: '#E2E8F0' }}>{ex.restSeconds}s</strong></span>
-                                                )}
-                                                {ex.notes && (
-                                                  <span style={{ fontStyle: 'italic', color: '#CBD5E1' }}>💡 {ex.notes}</span>
-                                                )}
-                                              </div>
-                                            </div>
-                                          );
-                                        } else {
-                                          return (
-                                            <div
-                                              key={blk.loopId || blkIdx}
-                                              style={{
-                                                padding: '0.85rem 1rem',
-                                                backgroundColor: 'rgba(239, 68, 68, 0.05)',
-                                                border: '1px solid rgba(239, 68, 68, 0.25)',
-                                                borderRadius: '8px',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: '0.6rem',
-                                              }}
-                                            >
-                                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                  <Zap size={14} color="#F87171" />
-                                                  <span style={{ color: '#FCA5A5', fontWeight: 800, fontSize: '0.84rem' }}>
-                                                    {blk.loopName}
-                                                  </span>
-                                                  <span style={{ fontSize: '0.72rem', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#FCA5A5', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
-                                                    {blk.loopRounds} vueltas continuas
-                                                  </span>
-                                                </div>
-
-                                                <span style={{ fontSize: '0.74rem', color: '#9FA6B8' }}>
-                                                  Pausa fin de vuelta: <strong style={{ color: '#F5D77F' }}>{blk.loopRestBetweenRounds}s</strong>
-                                                </span>
-                                              </div>
-
-                                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', paddingLeft: '0.5rem' }}>
-                                                {blk.items.map((ex, stepIdx) => {
-                                                  const quantity = ex.repsOrDurationValue !== undefined ? ex.repsOrDurationValue : 12;
-                                                  const unit = ex.repsOrDurationUnit || 'repeticiones';
-
-                                                  return (
-                                                    <div
-                                                      key={ex.id || stepIdx}
-                                                      style={{
-                                                        padding: '0.5rem 0.75rem',
-                                                        backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                                                        border: '1px solid rgba(255, 255, 255, 0.05)',
-                                                        borderRadius: '4px',
-                                                        display: 'flex',
-                                                        flexDirection: 'column',
-                                                        gap: '0.2rem',
-                                                      }}
-                                                    >
-                                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                                                          <span
-                                                            style={{
-                                                              width: '18px',
-                                                              height: '18px',
-                                                              borderRadius: '50%',
-                                                              backgroundColor: 'rgba(212, 175, 55, 0.3)',
-                                                              color: '#F5D77F',
-                                                              fontSize: '0.68rem',
-                                                              fontWeight: 800,
-                                                              display: 'flex',
-                                                              alignItems: 'center',
-                                                              justifyContent: 'center',
-                                                            }}
-                                                          >
-                                                            {stepIdx + 1}
-                                                          </span>
-                                                          <span style={{ color: '#FFFFFF', fontSize: '0.84rem', fontWeight: 600 }}>
-                                                            {ex.name}
-                                                          </span>
-                                                        </div>
-
-                                                        <span style={{ color: '#F5D77F', fontSize: '0.78rem', fontWeight: 700 }}>
-                                                          {quantity} {unit}
-                                                        </span>
-                                                      </div>
-
-                                                      <div style={{ fontSize: '0.72rem', color: '#9FA6B8', paddingLeft: '1.4rem' }}>
-                                                        {stepIdx < blk.items.length - 1 && ex.restSeconds !== undefined && ex.restSeconds > 0 ? (
-                                                          <span>⏱ Pausa al siguiente: <strong style={{ color: '#E2E8F0' }}>{ex.restSeconds}s</strong></span>
-                                                        ) : (
-                                                          <span>⚡ Pasa continuo al siguiente</span>
-                                                        )}
-                                                      </div>
-                                                    </div>
-                                                  );
-                                                })}
-                                              </div>
-                                            </div>
-                                          );
-                                        }
-                                      });
-                                    })()}
-                                  </div>
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                  <button
+                    onClick={() => handleSetViewMode('list')}
+                    style={{
+                      padding: '0.35rem 0.65rem',
+                      borderRadius: '7px',
+                      fontSize: '0.78rem',
+                      fontWeight: viewMode === 'list' ? 800 : 600,
+                      backgroundColor: viewMode === 'list' ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                      border: viewMode === 'list' ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid transparent',
+                      color: viewMode === 'list' ? '#F5D77F' : '#9FA6B8',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      transition: 'all 0.15s ease',
+                    }}
+                    title="Vista de lista compacta"
+                  >
+                    <List size={13} />
+                    <span>Lista</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* VISTA MÓVIL: CARDS NATIVAS TIPO APP (ESTILO SAMSUNG GALAXY S26 ULTRA / SMARTPHONE) */}
-            <div className="mobile-routine-cards">
-              {filteredRoutines.map((routine) => {
-                const routineId = routine.id || routine._id || '';
-                const isExpanded = !!expandedRoutineIds[routineId];
-                const exerciseCount = routine.exercises?.length || 0;
-                const loopSet = new Set((routine.exercises || []).map((e) => e.loopId).filter(Boolean));
-                const loopCount = loopSet.size;
+            {/* Grid de Tarjetas de Entrenamiento Elevadas */}
+            {loadingRoutines ? (
+              <div style={{ textAlign: 'center', padding: '4rem 0', color: '#9FA6B8' }}>
+                <Dumbbell size={36} className="spin-animation" style={{ color: '#F5D77F', margin: '0 auto 1rem' }} />
+                <p style={{ fontSize: '0.95rem' }}>Cargando catálogo marcial...</p>
+              </div>
+            ) : filteredRoutines.length === 0 ? (
+              <div
+                className="card-sumi"
+                style={{
+                  padding: '4rem 2rem',
+                  textAlign: 'center',
+                  backgroundColor: '#0E0F14',
+                  border: '1px dashed rgba(212, 175, 55, 0.3)',
+                  borderRadius: '16px',
+                }}
+              >
+                <Dumbbell size={42} color="#64748B" style={{ margin: '0 auto 1rem' }} />
+                <h3 style={{ color: '#FFFFFF', fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.4rem' }}>
+                  No se encontraron rutinas
+                </h3>
+                <p style={{ color: '#9FA6B8', fontSize: '0.88rem', margin: 0 }}>
+                  {searchTerm ? 'Intenta con otros términos de búsqueda.' : 'Aún no hay rutinas creadas en la base de datos.'}
+                </p>
+              </div>
+            ) : viewMode === 'grid' ? (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                  gap: '1.25rem',
+                }}
+              >
+                {filteredRoutines.map((routine) => {
+                  const routineId = routine.id || routine._id || '';
+                  const isExpanded = !!expandedRoutineIds[routineId];
+                  const exerciseCount = routine.exercises?.length || 0;
+                  const loopSet = new Set((routine.exercises || []).map((e) => e.loopId).filter(Boolean));
+                  const loopCount = loopSet.size;
 
-                return (
-                  <div
-                    key={`mob-card-${routineId}`}
-                    className="card-sumi render-defer"
-                    style={{
-                      backgroundColor: '#0E0F14',
-                      border: '1px solid rgba(212, 175, 55, 0.28)',
-                      borderRadius: '14px',
-                      padding: '1.15rem',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.65)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.85rem',
-                    }}
-                  >
-                    {/* Header de la tarjeta */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem' }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
-                          <h3 style={{ color: '#FFFFFF', fontWeight: 800, fontSize: '1.12rem', margin: 0, lineHeight: 1.25 }}>
-                            {routine.title}
-                          </h3>
-                          {loopCount > 0 && (
+                  return (
+                    <div
+                      key={routineId}
+                      className="card-sumi"
+                      style={{
+                        backgroundColor: '#0E0F14',
+                        border: '1px solid rgba(212, 175, 55, 0.25)',
+                        borderRadius: '18px',
+                        padding: '1.4rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.65)',
+                        transition: 'transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-3px)';
+                        e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.55)';
+                        e.currentTarget.style.boxShadow = '0 16px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.12)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.25)';
+                        e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.65)';
+                      }}
+                    >
+                      {/* Top: Badges e Info */}
+                      <div>
+                        {/* Badges de cabecera */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.3rem',
+                              padding: '0.3rem 0.7rem',
+                              borderRadius: '999px',
+                              backgroundColor: 'rgba(212, 175, 55, 0.14)',
+                              border: '1px solid rgba(212, 175, 55, 0.35)',
+                              color: '#F5D77F',
+                              fontWeight: 800,
+                              fontSize: '0.78rem',
+                            }}
+                          >
+                            <Clock size={13} />
+                            <span>~{routine.durationMinutes} MIN</span>
+                          </span>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                             <span
                               style={{
+                                fontSize: '0.74rem',
+                                color: '#CBD5E1',
+                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                padding: '0.25rem 0.6rem',
+                                borderRadius: '999px',
+                                fontWeight: 700,
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '0.2rem',
-                                padding: '0.15rem 0.45rem',
-                                borderRadius: '4px',
-                                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                                border: '1px solid rgba(239, 68, 68, 0.35)',
-                                color: '#F87171',
-                                fontSize: '0.68rem',
-                                fontWeight: 700,
+                                gap: '0.25rem',
                               }}
                             >
-                              <Zap size={11} /> {loopCount} Súper Serie{loopCount > 1 ? 's' : ''}
+                              <Layers size={11} color="#D4AF37" />
+                              <span>{exerciseCount} ejercicios</span>
                             </span>
-                          )}
+
+                            {loopCount > 0 && (
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.2rem',
+                                  padding: '0.25rem 0.55rem',
+                                  borderRadius: '999px',
+                                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                                  border: '1px solid rgba(239, 68, 68, 0.35)',
+                                  color: '#F87171',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                }}
+                              >
+                                <Zap size={11} />
+                                <span>Súper Serie</span>
+                              </span>
+                            )}
+                          </div>
                         </div>
 
+                        {/* Título de la rutina (Grande y audaz) */}
+                        <h2
+                          style={{
+                            fontSize: '1.45rem',
+                            fontWeight: 900,
+                            color: '#FFFFFF',
+                            margin: '0 0 0.4rem',
+                            lineHeight: 1.25,
+                            letterSpacing: '-0.01em',
+                          }}
+                        >
+                          {routine.title}
+                        </h2>
+
+                        {/* Descripción concisa */}
                         {routine.description ? (
-                          <p style={{ color: '#9FA6B8', fontSize: '0.82rem', margin: 0, lineHeight: 1.4 }}>
+                          <p
+                            style={{
+                              color: '#9FA6B8',
+                              fontSize: '0.86rem',
+                              lineHeight: 1.45,
+                              margin: '0 0 1rem',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              minHeight: '2.5rem',
+                            }}
+                          >
                             {routine.description}
                           </p>
                         ) : (
-                          <span style={{ color: '#64748B', fontSize: '0.76rem', fontStyle: 'italic' }}>
-                            Rutina técnica guiada de karate
-                          </span>
+                          <p style={{ color: '#64748B', fontSize: '0.82rem', margin: '0 0 1rem', fontStyle: 'italic', minHeight: '2.5rem' }}>
+                            Rutina de acondicionamiento y técnica marcial guiada por el Sensei.
+                          </p>
                         )}
-                      </div>
 
-                      {/* Pill de Duración en la esquina */}
-                      <div
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.3rem',
-                          padding: '0.35rem 0.65rem',
-                          borderRadius: '999px',
-                          backgroundColor: 'rgba(212, 175, 55, 0.14)',
-                          border: '1px solid rgba(212, 175, 55, 0.35)',
-                          color: '#F5D77F',
-                          fontWeight: 800,
-                          fontSize: '0.8rem',
-                          whiteSpace: 'nowrap',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <Clock size={13} />
-                        <span>~{routine.durationMinutes}m</span>
-                      </div>
-                    </div>
-
-                    {/* Fila de Insignias: Cantidad de ejercicios + Tags de muestra */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', alignItems: 'center' }}>
-                      <span
-                        style={{
-                          fontSize: '0.74rem',
-                          color: '#CBD5E1',
-                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          padding: '0.2rem 0.5rem',
-                          borderRadius: '6px',
-                          fontWeight: 700,
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.3rem',
-                        }}
-                      >
-                        <Layers size={12} color="#D4AF37" />
-                        {exerciseCount} ejercicios
-                      </span>
-
-                      {(routine.exercises || []).slice(0, 3).map((ex, i) => (
-                        <span
-                          key={i}
+                        {/* Desglose de ejercicios interactivo */}
+                        <div
                           style={{
-                            fontSize: '0.72rem',
-                            color: '#9FA6B8',
-                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                            border: '1px solid rgba(255, 255, 255, 0.06)',
-                            padding: '0.2rem 0.45rem',
-                            borderRadius: '6px',
-                            maxWidth: '120px',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                            paddingTop: '0.75rem',
+                            borderTop: '1px solid rgba(255, 255, 255, 0.07)',
+                            marginBottom: '1.25rem',
                           }}
                         >
-                          {ex.name}
-                        </span>
-                      ))}
+                          <button
+                            onClick={() => toggleExpanded(routineId)}
+                            style={{
+                              width: '100%',
+                              background: 'transparent',
+                              border: 'none',
+                              color: isExpanded ? '#F5D77F' : '#9FA6B8',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0.2rem 0',
+                            }}
+                          >
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                              <Layers size={13} color="#D4AF37" />
+                              <span>Secuencia de técnica ({exerciseCount})</span>
+                            </span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.72rem', color: '#CBD5E1' }}>
+                              {isExpanded ? 'Ocultar' : 'Ver detalle'}
+                              {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                            </span>
+                          </button>
 
-                      {(routine.exercises || []).length > 3 && (
-                        <span style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 600 }}>
-                          +{ (routine.exercises || []).length - 3 } más
-                        </span>
-                      )}
+                          {/* Lista colapsable de ejercicios */}
+                          {isExpanded ? (
+                            <div
+                              style={{
+                                marginTop: '0.65rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.4rem',
+                                maxHeight: '220px',
+                                overflowY: 'auto',
+                                paddingRight: '0.25rem',
+                              }}
+                            >
+                              {(routine.exercises || []).map((ex, exIdx) => (
+                                <div
+                                  key={ex.id || exIdx}
+                                  style={{
+                                    padding: '0.45rem 0.65rem',
+                                    borderRadius: '6px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: '0.5rem',
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0 }}>
+                                    <span
+                                      style={{
+                                        width: '18px',
+                                        height: '18px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                                        color: '#F5D77F',
+                                        fontSize: '0.66rem',
+                                        fontWeight: 800,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                      }}
+                                    >
+                                      {exIdx + 1}
+                                    </span>
+                                    <span style={{ color: '#FFFFFF', fontSize: '0.8rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                      {ex.name}
+                                    </span>
+                                  </div>
+
+                                  <span style={{ color: '#F5D77F', fontSize: '0.74rem', fontWeight: 700, flexShrink: 0 }}>
+                                    {ex.loopId ? `${ex.loopRounds || 4}v` : `${ex.sets || 3}x`}{' '}
+                                    {ex.repsOrDurationValue || 12} {ex.repsOrDurationUnit === 'segundos' ? 's' : 'rep'}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', marginTop: '0.5rem' }}>
+                              {(routine.exercises || []).slice(0, 3).map((ex, i) => (
+                                <span
+                                  key={i}
+                                  style={{
+                                    fontSize: '0.74rem',
+                                    color: '#CBD5E1',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                                    padding: '0.2rem 0.55rem',
+                                    borderRadius: '6px',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    maxWidth: '150px',
+                                  }}
+                                >
+                                  {ex.name}
+                                </span>
+                              ))}
+                              {(routine.exercises || []).length > 3 && (
+                                <span style={{ fontSize: '0.72rem', color: '#9FA6B8', fontWeight: 600, padding: '0.2rem 0.4rem' }}>
+                                  +{(routine.exercises || []).length - 3} más
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', paddingTop: '0.5rem' }}>
+                        <button
+                          onClick={() => setPreviewRoutine(routine)}
+                          style={{
+                            padding: '0.7rem 0.95rem',
+                            borderRadius: '10px',
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            color: '#CBD5E1',
+                            fontSize: '0.82rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            transition: 'all 0.15s ease',
+                          }}
+                          title="Ver desglose y notas técnicas"
+                        >
+                          <Layers size={14} />
+                          <span>Desglose</span>
+                        </button>
+
+                        <button
+                          onClick={() => startWorkout(routine)}
+                          style={{
+                            flex: 1,
+                            padding: '0.72rem 1.15rem',
+                            borderRadius: '10px',
+                            background: 'linear-gradient(135deg, #DC2626 0%, #D4AF37 100%)',
+                            border: 'none',
+                            color: '#FFFFFF',
+                            fontSize: '0.92rem',
+                            fontWeight: 900,
+                            letterSpacing: '0.04em',
+                            textTransform: 'uppercase',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            boxShadow: '0 4px 18px rgba(220, 38, 38, 0.35), 0 0 15px rgba(212, 175, 55, 0.25)',
+                            transition: 'all 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.filter = 'brightness(1.1)';
+                            e.currentTarget.style.transform = 'scale(1.02)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.filter = 'brightness(1)';
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                        >
+                          <Play size={16} fill="currentColor" />
+                          <span>Entrenar</span>
+                        </button>
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* VISTA DE LISTA COMPACTA Y MODERNA */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {filteredRoutines.map((routine) => {
+                  const routineId = routine.id || routine._id || '';
+                  const isExpanded = !!expandedRoutineIds[routineId];
+                  const exerciseCount = routine.exercises?.length || 0;
+                  const loopSet = new Set((routine.exercises || []).map((e) => e.loopId).filter(Boolean));
+                  const loopCount = loopSet.size;
 
-                    {/* Desplegable rápido de ejercicios */}
-                    <div>
-                      <button
-                        onClick={() => toggleExpanded(routineId)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: isExpanded ? '#F5D77F' : '#9FA6B8',
-                          fontSize: '0.78rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                          padding: '0.25rem 0',
-                          touchAction: 'manipulation',
-                        }}
-                      >
-                        <span>{isExpanded ? 'Ocultar ejercicios' : 'Ver lista de ejercicios'}</span>
-                        {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                      </button>
+                  return (
+                    <div
+                      key={`list-${routineId}`}
+                      className="card-sumi"
+                      style={{
+                        backgroundColor: '#0E0F14',
+                        border: '1px solid rgba(212, 175, 55, 0.22)',
+                        borderRadius: '14px',
+                        padding: '1rem 1.25rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.75rem',
+                        boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5)',
+                        transition: 'all 0.18s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.55)';
+                        e.currentTarget.style.backgroundColor = '#12141C';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.22)';
+                        e.currentTarget.style.backgroundColor = '#0E0F14';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                        {/* Lado izquierdo: Icono, Título y Descripción breve */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flex: 1, minWidth: '260px' }}>
+                          <div
+                            style={{
+                              width: '42px',
+                              height: '42px',
+                              borderRadius: '10px',
+                              backgroundColor: 'rgba(212, 175, 55, 0.12)',
+                              border: '1px solid rgba(212, 175, 55, 0.3)',
+                              color: '#F5D77F',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Dumbbell size={20} />
+                          </div>
 
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              <h3 style={{ fontSize: '1.18rem', fontWeight: 900, color: '#FFFFFF', margin: 0, lineHeight: 1.2 }}>
+                                {routine.title}
+                              </h3>
+                              {loopCount > 0 && (
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.2rem',
+                                    padding: '0.15rem 0.5rem',
+                                    borderRadius: '999px',
+                                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                                    border: '1px solid rgba(239, 68, 68, 0.35)',
+                                    color: '#F87171',
+                                    fontSize: '0.68rem',
+                                    fontWeight: 800,
+                                  }}
+                                >
+                                  <Zap size={10} />
+                                  <span>Súper Serie</span>
+                                </span>
+                              )}
+                            </div>
+
+                            <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', color: '#9FA6B8', lineHeight: 1.35 }}>
+                              {routine.description || (
+                                routine.exercises && routine.exercises.length > 0
+                                  ? routine.exercises.slice(0, 4).map((e) => e.name).join(' • ')
+                                  : 'Rutina técnica de entrenamiento marcial'
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Centro: Badges de Duración y Ejercicios */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.3rem',
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '999px',
+                              backgroundColor: 'rgba(212, 175, 55, 0.14)',
+                              border: '1px solid rgba(212, 175, 55, 0.3)',
+                              color: '#F5D77F',
+                              fontWeight: 800,
+                              fontSize: '0.76rem',
+                            }}
+                          >
+                            <Clock size={12} />
+                            <span>~{routine.durationMinutes} min</span>
+                          </span>
+
+                          <button
+                            onClick={() => toggleExpanded(routineId)}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '999px',
+                              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.12)',
+                              color: '#CBD5E1',
+                              fontWeight: 700,
+                              fontSize: '0.74rem',
+                              cursor: 'pointer',
+                            }}
+                            title="Desplegar secuencia de ejercicios"
+                          >
+                            <Layers size={11} color="#D4AF37" />
+                            <span>{exerciseCount} ejercicios</span>
+                            {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          </button>
+                        </div>
+
+                        {/* Lado derecho: Botones de Acción */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <button
+                            onClick={() => setPreviewRoutine(routine)}
+                            style={{
+                              padding: '0.55rem 0.85rem',
+                              borderRadius: '8px',
+                              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.12)',
+                              color: '#CBD5E1',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              transition: 'all 0.15s ease',
+                            }}
+                            title="Ver desglose y notas"
+                          >
+                            <Layers size={13} />
+                            <span>Desglose</span>
+                          </button>
+
+                          <button
+                            onClick={() => startWorkout(routine)}
+                            style={{
+                              padding: '0.55rem 1.15rem',
+                              borderRadius: '8px',
+                              background: 'linear-gradient(135deg, #DC2626 0%, #D4AF37 100%)',
+                              border: 'none',
+                              color: '#FFFFFF',
+                              fontSize: '0.86rem',
+                              fontWeight: 900,
+                              letterSpacing: '0.04em',
+                              textTransform: 'uppercase',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.45rem',
+                              boxShadow: '0 3px 12px rgba(220, 38, 38, 0.3)',
+                              transition: 'all 0.15s ease',
+                            }}
+                          >
+                            <Play size={14} fill="currentColor" />
+                            <span>Entrenar</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Secuencia colapsable en vista de lista */}
                       {isExpanded && (
                         <div
                           style={{
-                            marginTop: '0.5rem',
-                            padding: '0.75rem',
-                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                            border: '1px solid rgba(212, 175, 55, 0.2)',
-                            borderRadius: '8px',
+                            paddingTop: '0.75rem',
+                            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
                             display: 'flex',
-                            flexDirection: 'column',
+                            flexWrap: 'wrap',
                             gap: '0.45rem',
                           }}
                         >
                           {(routine.exercises || []).map((ex, exIdx) => (
-                            <div
-                              key={exIdx}
+                            <span
+                              key={ex.id || exIdx}
                               style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
+                                fontSize: '0.74rem',
+                                padding: '0.25rem 0.65rem',
+                                borderRadius: '6px',
+                                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                border: '1px solid rgba(255, 255, 255, 0.07)',
+                                color: '#CBD5E1',
+                                display: 'inline-flex',
                                 alignItems: 'center',
-                                fontSize: '0.78rem',
-                                padding: '0.35rem 0',
-                                borderBottom: exIdx < (routine.exercises || []).length - 1 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
+                                gap: '0.35rem',
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', overflow: 'hidden', paddingRight: '0.5rem' }}>
-                                <span style={{ color: '#D4AF37', fontWeight: 700, fontSize: '0.72rem', flexShrink: 0 }}>{exIdx + 1}.</span>
-                                <span style={{ color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ex.name}</span>
-                              </div>
-                              <span style={{ color: '#F5D77F', fontWeight: 700, fontSize: '0.75rem', flexShrink: 0 }}>
-                                {ex.loopId ? `${ex.loopRounds || 4}v × ` : ex.sets ? `${ex.sets} × ` : ''}
-                                {ex.repsOrDurationValue || 12} {ex.repsOrDurationUnit || 'reps'}
+                              <strong style={{ color: '#F5D77F' }}>{exIdx + 1}.</strong> {ex.name}
+                              <span style={{ color: '#9FA6B8', fontSize: '0.7rem' }}>
+                                ({ex.loopId ? `${ex.loopRounds || 4}v` : `${ex.sets || 3}x`} {ex.repsOrDurationValue || 12} {ex.repsOrDurationUnit === 'segundos' ? 's' : 'rep'})
                               </span>
-                            </div>
+                            </span>
                           ))}
                         </div>
                       )}
                     </div>
-
-                    {/* Botones de acción táctiles para Móvil */}
-                    <div style={{ display: 'flex', gap: '0.65rem', marginTop: '0.15rem' }}>
-                      <button
-                        onClick={() => setPreviewRoutine(routine)}
-                        style={{
-                          flex: 1,
-                          minHeight: '46px',
-                          padding: '0.65rem 0.75rem',
-                          borderRadius: '8px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                          border: '1px solid rgba(255, 255, 255, 0.18)',
-                          color: '#E2E8F0',
-                          fontSize: '0.82rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.35rem',
-                          touchAction: 'manipulation',
-                        }}
-                      >
-                        <Layers size={14} />
-                        <span>Desglose</span>
-                      </button>
-
-                      <button
-                        onClick={() => startWorkout(routine)}
-                        className="btn-martial-primary"
-                        style={{
-                          flex: 1.8,
-                          minHeight: '46px',
-                          padding: '0.65rem 1rem',
-                          fontSize: '0.92rem',
-                          fontWeight: 800,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.45rem',
-                          borderRadius: '8px',
-                          touchAction: 'manipulation',
-                          boxShadow: '0 4px 14px rgba(212, 175, 55, 0.3)',
-                        }}
-                      >
-                        <Play size={16} />
-                        <span>Iniciar Rutina</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
-      </>
-    )}
 
-    {/* ===================================================================== */}
-    {/* TAB: MI HISTORIAL Y RACHA DE DISCIPLINA                              */}
-    {/* ===================================================================== */}
-    {activeTab === 'history' && (
-      <div style={{ width: '100%' }}>
-        {loadingStats ? (
-          <div style={{ textAlign: 'center', padding: '4rem 0', color: '#9FA6B8' }}>
-            <Dumbbell size={36} className="spin-animation" style={{ color: '#F5D77F', margin: '0 auto 1rem' }} />
-            <p style={{ fontSize: '0.95rem' }}>Cargando historial de entrenamientos...</p>
-          </div>
-        ) : workoutLogs.length === 0 ? (
-          <div
-            className="card-sumi"
-            style={{
-              padding: '4rem 2rem',
-              textAlign: 'center',
-              backgroundColor: '#0E0F14',
-              border: '1px dashed rgba(212, 175, 55, 0.3)',
-              borderRadius: '14px',
-            }}
-          >
-            <Flame size={52} color="#F59E0B" style={{ margin: '0 auto 1.25rem' }} />
-            <h3 style={{ color: '#FFFFFF', fontSize: '1.35rem', fontWeight: 900, marginBottom: '0.4rem' }}>
-              ¡Aún no has registrado ningún entrenamiento!
-            </h3>
-            <p style={{ color: '#9FA6B8', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto 1.75rem', lineHeight: 1.5 }}>
-              Inicia hoy cualquier rutina del catálogo para encender tu fuego de disciplina marcial y comenzar tu racha de días consecutivos en el dojo.
-            </p>
-            <button
-              onClick={() => setActiveTab('catalog')}
-              className="btn-martial-primary"
-              style={{ padding: '0.75rem 1.6rem', fontSize: '0.92rem', fontWeight: 800, borderRadius: '8px' }}
-            >
-              <span>Explorar Catálogo de Rutinas</span>
-            </button>
-          </div>
-        ) : (
-          <div
-            className="card-sumi"
-            style={{
-              backgroundColor: '#0E0F14',
-              border: '1px solid rgba(212, 175, 55, 0.25)',
-              borderRadius: '14px',
-              overflow: 'hidden',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7)',
-            }}
-          >
-            {/* Header del Historial */}
-            <div
-              style={{
-                padding: '1.25rem 1.5rem',
-                borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '0.85rem',
-                backgroundColor: 'rgba(212, 175, 55, 0.03)',
-              }}
-            >
-              <div>
-                <h3 style={{ margin: 0, color: '#FFFFFF', fontSize: '1.15rem', fontWeight: 900 }}>
-                  Registro de Sesiones de Práctica
+        {/* ===================================================================== */}
+        {/* TAB: MI HISTORIAL Y RACHA DE DISCIPLINA                              */}
+        {/* ===================================================================== */}
+        {activeTab === 'history' && (
+          <div style={{ width: '100%' }}>
+            {loadingStats ? (
+              <div style={{ textAlign: 'center', padding: '4rem 0', color: '#9FA6B8' }}>
+                <Dumbbell size={36} className="spin-animation" style={{ color: '#F5D77F', margin: '0 auto 1rem' }} />
+                <p style={{ fontSize: '0.95rem' }}>Cargando historial de entrenamientos...</p>
+              </div>
+            ) : workoutLogs.length === 0 ? (
+              <div
+                className="card-sumi"
+                style={{
+                  padding: '4rem 2rem',
+                  textAlign: 'center',
+                  backgroundColor: '#0E0F14',
+                  border: '1px dashed rgba(212, 175, 55, 0.3)',
+                  borderRadius: '16px',
+                }}
+              >
+                <Flame size={52} color="#F59E0B" style={{ margin: '0 auto 1.25rem' }} />
+                <h3 style={{ color: '#FFFFFF', fontSize: '1.35rem', fontWeight: 900, marginBottom: '0.4rem' }}>
+                  ¡Aún no has registrado ningún entrenamiento!
                 </h3>
-                <span style={{ fontSize: '0.8rem', color: '#9FA6B8' }}>
-                  Has completado un total de {workoutStats.totalWorkouts} entrenamientos • {workoutStats.totalMinutes} minutos acumulados
-                </span>
+                <p style={{ color: '#9FA6B8', fontSize: '0.92rem', maxWidth: '480px', margin: '0 auto 1.75rem', lineHeight: 1.5 }}>
+                  Inicia hoy cualquier rutina del catálogo para encender tu fuego de disciplina marcial y comenzar tu racha de días consecutivos en el dojo.
+                </p>
+                <button
+                  onClick={() => setActiveTab('catalog')}
+                  className="btn-martial-primary"
+                  style={{ padding: '0.75rem 1.6rem', fontSize: '0.92rem', fontWeight: 800, borderRadius: '10px' }}
+                >
+                  <span>Explorar Rutinas</span>
+                </button>
               </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-                <span
+            ) : (
+              <div
+                className="card-sumi"
+                style={{
+                  backgroundColor: '#0E0F14',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7)',
+                }}
+              >
+                {/* Header del Historial */}
+                <div
                   style={{
-                    fontSize: '0.78rem',
-                    color: workoutStats.isStreakActive ? '#F59E0B' : '#9FA6B8',
-                    fontWeight: 800,
-                    backgroundColor: workoutStats.isStreakActive ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                    padding: '0.35rem 0.8rem',
-                    borderRadius: '999px',
-                    border: workoutStats.isStreakActive ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
-                    display: 'inline-flex',
+                    padding: '1.25rem 1.5rem',
+                    borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    gap: '0.35rem',
+                    flexWrap: 'wrap',
+                    gap: '0.85rem',
+                    backgroundColor: 'rgba(212, 175, 55, 0.03)',
                   }}
                 >
-                  <Flame size={14} color={workoutStats.isStreakActive ? '#F59E0B' : '#9FA6B8'} />
-                  <span>
-                    {workoutStats.isStreakActive
-                      ? `Racha marcial: ${workoutStats.streak} ${workoutStats.streak === 1 ? 'día' : 'días'}`
-                      : `Progreso: ${workoutStats.consecutiveDays}/3 días para racha`}
-                  </span>
-                </span>
+                  <div>
+                    <h3 style={{ margin: 0, color: '#FFFFFF', fontSize: '1.2rem', fontWeight: 900 }}>
+                      Registro de Sesiones de Práctica
+                    </h3>
+                    <span style={{ fontSize: '0.8rem', color: '#9FA6B8' }}>
+                      {workoutStats.totalWorkouts} sesiones completadas • {workoutStats.totalMinutes} minutos acumulados
+                    </span>
+                  </div>
 
-                <span
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        color: workoutStats.isStreakActive ? '#F59E0B' : '#9FA6B8',
+                        fontWeight: 800,
+                        backgroundColor: workoutStats.isStreakActive ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                        padding: '0.35rem 0.8rem',
+                        borderRadius: '999px',
+                        border: workoutStats.isStreakActive ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                    >
+                      <Flame size={14} color={workoutStats.isStreakActive ? '#F59E0B' : '#9FA6B8'} />
+                      <span>
+                        {workoutStats.isStreakActive
+                          ? `Racha: ${workoutStats.streak} días`
+                          : `Progreso: ${workoutStats.consecutiveDays}/3 días`}
+                      </span>
+                    </span>
+
+                    <span
+                      style={{
+                        fontSize: '0.78rem',
+                        color: workoutStats.restDaysAvailable > 0 ? '#60A5FA' : '#9FA6B8',
+                        fontWeight: 800,
+                        backgroundColor: workoutStats.restDaysAvailable > 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(255, 255, 255, 0.05)',
+                        padding: '0.35rem 0.8rem',
+                        borderRadius: '999px',
+                        border: workoutStats.restDaysAvailable > 0 ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                    >
+                      <Shield size={14} color={workoutStats.restDaysAvailable > 0 ? '#60A5FA' : '#9FA6B8'} />
+                      <span>
+                        {workoutStats.restDaysAvailable} descanso{workoutStats.restDaysAvailable === 1 ? '' : 's'} libre{workoutStats.restDaysAvailable === 1 ? '' : 's'}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Banner de Reglas del Tanren */}
+                <div
                   style={{
-                    fontSize: '0.78rem',
-                    color: workoutStats.restDaysAvailable > 0 ? '#60A5FA' : '#9FA6B8',
-                    fontWeight: 800,
-                    backgroundColor: workoutStats.restDaysAvailable > 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(255, 255, 255, 0.05)',
-                    padding: '0.35rem 0.8rem',
-                    borderRadius: '999px',
-                    border: workoutStats.restDaysAvailable > 0 ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
+                    margin: '1.25rem 1.5rem 0.75rem 1.5rem',
+                    padding: '0.9rem 1.25rem',
+                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                    border: '1px solid rgba(245, 158, 11, 0.25)',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.85rem',
+                    fontSize: '0.83rem',
+                    color: '#D1D5DB',
+                    lineHeight: 1.55,
                   }}
-                  title="Por cada 5 días de entrenamiento ganas 1 día de descanso libre que te protege si faltas un día."
                 >
-                  <Shield size={14} color={workoutStats.restDaysAvailable > 0 ? '#60A5FA' : '#9FA6B8'} />
-                  <span>
-                    {workoutStats.restDaysAvailable} {workoutStats.restDaysAvailable === 1 ? 'descanso libre' : 'descansos libres'}
-                    {workoutStats.daysUntilNextRestDay > 0 && ` (+1 en ${workoutStats.daysUntilNextRestDay}d)`}
-                  </span>
-                </span>
-              </div>
-            </div>
+                  <Award size={20} color="#F59E0B" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <span style={{ fontWeight: 800, color: '#FDE68A', display: 'block', marginBottom: '0.25rem' }}>
+                      Reglas de la Racha Marcial
+                    </span>
+                    <span style={{ color: '#9CA3AF' }}>
+                      • <strong style={{ color: '#F3F4F6' }}>Activación:</strong> 3 días consecutivos.<br />
+                      • <strong style={{ color: '#F3F4F6' }}>Escudo:</strong> Cada 5 días ganas 1 día de descanso libre.<br />
+                      • <strong style={{ color: '#F3F4F6' }}>Honestidad:</strong> Entrenar a ritmo real valida tu constancia.
+                    </span>
+                  </div>
+                </div>
 
-            {/* Banner de Reglas del Tanren */}
-            <div
-              style={{
-                margin: '1.25rem 1.5rem 0.5rem 1.5rem',
-                padding: '0.9rem 1.25rem',
-                backgroundColor: 'rgba(245, 158, 11, 0.05)',
-                border: '1px solid rgba(245, 158, 11, 0.25)',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '0.85rem',
-                fontSize: '0.83rem',
-                color: '#D1D5DB',
-                lineHeight: 1.55,
-              }}
-            >
-              <Award size={20} color="#F59E0B" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <div>
-                <span style={{ fontWeight: 800, color: '#FDE68A', display: 'block', marginBottom: '0.25rem' }}>
-                  Reglas de la Racha Marcial (Tanren)
-                </span>
-                <span style={{ color: '#9CA3AF' }}>
-                  • <strong style={{ color: '#F3F4F6' }}>Activación:</strong> La racha se gana a partir del <strong>3er día consecutivo</strong> de entrenamiento.<br />
-                  • <strong style={{ color: '#F3F4F6' }}>Descanso merecido:</strong> Por cada <strong>5 días de entrenamiento</strong> ganas <strong>1 día de descanso libre (escudo)</strong>.<br />
-                  • <strong style={{ color: '#F3F4F6' }}>Protección:</strong> Si un día no entrenas, tu día libre ganado cubre la ausencia y tu racha se preserva. Si no tienes descansos disponibles, la racha se pierde y regresa a 0.
-                </span>
-              </div>
-            </div>
-
-            {/* Tabla de Registros */}
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.15)', backgroundColor: 'rgba(212, 175, 55, 0.02)' }}>
-                    <th style={{ padding: '0.9rem 1.25rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha y Hora</th>
-                    <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rutina Realizada</th>
-                    <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tiempo Activo</th>
-                    <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Disciplina</th>
-                    <th style={{ padding: '0.9rem 1.25rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {workoutLogs.map((log, idx) => {
-                    const dateObj = new Date(log.completedAt);
-                    const dateStr = dateObj.toLocaleDateString('es-ES', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    });
-                    const timeStr = dateObj.toLocaleTimeString('es-ES', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
-
-                    const matchingRoutine = routines.find(
-                      (r) => (r.id && r.id === log.routineId) || (r._id && r._id === log.routineId) || r.title === log.routineTitle
-                    );
-
-                    return (
-                      <tr
-                        key={log.id || log._id || idx}
-                        style={{
-                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                          backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.012)',
-                        }}
-                      >
-                        <td style={{ padding: '1rem 1.25rem', color: '#CBD5E1', whiteSpace: 'nowrap' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-                            <div style={{ width: '30px', height: '30px', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F5D77F' }}>
-                              <Calendar size={14} />
-                            </div>
-                            <div>
-                              <strong style={{ display: 'block', color: '#FFFFFF', fontSize: '0.86rem' }}>{dateStr}</strong>
-                              <span style={{ fontSize: '0.72rem', color: '#9FA6B8' }}>{timeStr}</span>
-                            </div>
-                          </div>
-                        </td>
-
-                        <td style={{ padding: '1rem 1rem', color: '#FFFFFF', fontWeight: 700 }}>
-                          <span style={{ fontSize: '0.92rem' }}>{log.routineTitle}</span>
-                        </td>
-
-                        <td style={{ padding: '1rem 1rem', color: '#F5D77F', fontWeight: 800, whiteSpace: 'nowrap' }}>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <Clock size={13} />
-                            <span>{formatTime(log.durationSeconds)}</span>
-                          </span>
-                        </td>
-
-                        <td style={{ padding: '1rem 1rem', whiteSpace: 'nowrap' }}>
-                          {log.isRushed ? (
-                            <span
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.3rem',
-                                color: '#F87171',
-                                fontSize: '0.74rem',
-                                fontWeight: 700,
-                                backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                                padding: '0.2rem 0.55rem',
-                                borderRadius: '4px',
-                                border: '1px solid rgba(239, 68, 68, 0.3)',
-                              }}
-                              title="Completada a ritmo inusualmente acelerado. No contó para la racha por el principio de honestidad marcial."
-                            >
-                              <AlertTriangle size={13} color="#F87171" />
-                              <span>No contó (Acelerado)</span>
-                            </span>
-                          ) : (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10B981', fontSize: '0.76rem', fontWeight: 700, backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '0.2rem 0.55rem', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
-                              <CheckCircle size={13} />
-                              <span>100% Completada</span>
-                            </span>
-                          )}
-                        </td>
-
-                        <td style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                          {matchingRoutine && (
-                            <button
-                              onClick={() => startWorkout(matchingRoutine)}
-                              className="btn-martial-primary"
-                              style={{
-                                padding: '0.45rem 0.95rem',
-                                fontSize: '0.8rem',
-                                fontWeight: 800,
-                                borderRadius: '6px',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.35rem',
-                                boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)',
-                              }}
-                            >
-                              <RotateCcw size={13} />
-                              <span>Repetir</span>
-                            </button>
-                          )}
-                        </td>
+                {/* Tabla de Registros */}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.15)', backgroundColor: 'rgba(212, 175, 55, 0.02)' }}>
+                        <th style={{ padding: '0.9rem 1.25rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fecha</th>
+                        <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Rutina</th>
+                        <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tiempo</th>
+                        <th style={{ padding: '0.9rem 1rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Estado</th>
+                        <th style={{ padding: '0.9rem 1.25rem', color: '#F5D77F', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Acción</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      {workoutLogs.map((log, idx) => {
+                        const dateObj = new Date(log.completedAt);
+                        const dateStr = dateObj.toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        });
+                        const timeStr = dateObj.toLocaleTimeString('es-ES', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        });
+
+                        const matchingRoutine = routines.find(
+                          (r) => (r.id && r.id === log.routineId) || (r._id && r._id === log.routineId) || r.title === log.routineTitle
+                        );
+
+                        return (
+                          <tr
+                            key={log.id || log._id || idx}
+                            style={{
+                              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                              backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.012)',
+                            }}
+                          >
+                            <td style={{ padding: '1rem 1.25rem', color: '#CBD5E1', whiteSpace: 'nowrap' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                                <div style={{ width: '30px', height: '30px', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F5D77F' }}>
+                                  <Calendar size={14} />
+                                </div>
+                                <div>
+                                  <strong style={{ display: 'block', color: '#FFFFFF', fontSize: '0.86rem' }}>{dateStr}</strong>
+                                  <span style={{ fontSize: '0.72rem', color: '#9FA6B8' }}>{timeStr}</span>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td style={{ padding: '1rem 1rem', color: '#FFFFFF', fontWeight: 700 }}>
+                              <span style={{ fontSize: '0.92rem' }}>{log.routineTitle}</span>
+                            </td>
+
+                            <td style={{ padding: '1rem 1rem', color: '#F5D77F', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                                <Clock size={13} />
+                                <span>{formatTime(log.durationSeconds)}</span>
+                              </span>
+                            </td>
+
+                            <td style={{ padding: '1rem 1rem', whiteSpace: 'nowrap' }}>
+                              {log.isRushed ? (
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.3rem',
+                                    color: '#F87171',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 700,
+                                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                                    padding: '0.2rem 0.55rem',
+                                    borderRadius: '4px',
+                                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                                  }}
+                                  title="Completada a ritmo inusualmente acelerado."
+                                >
+                                  <AlertTriangle size={13} color="#F87171" />
+                                  <span>No contó (Acelerado)</span>
+                                </span>
+                              ) : (
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10B981', fontSize: '0.76rem', fontWeight: 700, backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '0.2rem 0.55rem', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                                  <CheckCircle size={13} />
+                                  <span>Completada</span>
+                                </span>
+                              )}
+                            </td>
+
+                            <td style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                              {matchingRoutine && (
+                                <button
+                                  onClick={() => startWorkout(matchingRoutine)}
+                                  className="btn-martial-primary"
+                                  style={{
+                                    padding: '0.45rem 0.95rem',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 800,
+                                    borderRadius: '8px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.35rem',
+                                    boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)',
+                                  }}
+                                >
+                                  <RotateCcw size={13} />
+                                  <span>Repetir</span>
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
-    )}
-  </div>
 
       {/* ===================================================================== */}
       {/* MODAL: VER DESGLOSE COMPLETO ANTES DE INICIAR (BOTTOM SHEET EN MÓVIL) */}
@@ -3651,7 +3585,7 @@ export default function TrainingPage() {
                 style={{
                   flex: 1,
                   padding: '0.75rem',
-                  borderRadius: '8px',
+                  borderRadius: '10px',
                   backgroundColor: 'rgba(255, 255, 255, 0.08)',
                   border: 'none',
                   color: '#9FA6B8',
@@ -3676,7 +3610,7 @@ export default function TrainingPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.4rem',
-                  borderRadius: '8px',
+                  borderRadius: '10px',
                   touchAction: 'manipulation',
                 }}
               >
@@ -3688,17 +3622,15 @@ export default function TrainingPage() {
         </div>
       )}
 
-      {/* Reglas CSS específicas para alternancia Responsiva Desktop vs Móvil */}
+      {/* Reglas CSS de soporte modal bottom-sheet */}
       <style>{`
         @media (min-width: 769px) {
-          .desktop-routine-table { display: block !important; }
-          .mobile-routine-cards { display: none !important; }
           .bottom-sheet-modal {
             align-items: center !important;
             padding: 1rem !important;
           }
           .bottom-sheet-content {
-            border-radius: 14px !important;
+            border-radius: 16px !important;
             max-height: 90vh !important;
           }
           .bottom-sheet-drag-handle {
@@ -3706,8 +3638,6 @@ export default function TrainingPage() {
           }
         }
         @media (max-width: 768px) {
-          .desktop-routine-table { display: none !important; }
-          .mobile-routine-cards { display: flex !important; flex-direction: column !important; gap: 1rem !important; }
           .bottom-sheet-modal {
             align-items: flex-end !important;
             padding: 0 !important;
