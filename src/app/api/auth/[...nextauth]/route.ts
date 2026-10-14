@@ -78,46 +78,74 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async session({ session }) {
+    async jwt({ token, user, trigger }) {
       try {
-        if (session.user?.email) {
-          const db = await getDatabase();
-          const email = session.user.email.toLowerCase().trim();
-          const dbUser = await db.collection('Users').findOne({ email });
-          const isAdmin = isSuperAdminEmail(email);
+        const email = token.email?.toLowerCase().trim();
+        // Sincronizar con MongoDB solo en login inicial, actualizaciones explícitas o si faltan datos
+        if (user || trigger === 'update' || !token.kyuDan) {
+          if (email) {
+            const db = await getDatabase();
+            const dbUser = await db.collection('Users').findOne({ email });
+            const isAdmin = isSuperAdminEmail(email);
 
-          if (dbUser) {
-            const wkf = calculateWKFCategories({
-              birthDate: dbUser.birthDate,
-              weight: dbUser.weight,
-              gender: dbUser.gender || 'male',
-              kyuDan: dbUser.kyuDan || (isAdmin ? '1° Dan' : '9° Kyu'),
-            });
+            if (dbUser) {
+              const wkf = calculateWKFCategories({
+                birthDate: dbUser.birthDate,
+                weight: dbUser.weight,
+                gender: dbUser.gender || 'male',
+                kyuDan: dbUser.kyuDan || (isAdmin ? '1° Dan' : '9° Kyu'),
+              });
 
-            (session.user as Record<string, unknown>).id = dbUser._id.toString();
-            (session.user as Record<string, unknown>).belt = wkf.beltName || dbUser.belt || (isAdmin ? 'Cinturón Negro' : 'Cinturón Blanco');
-            (session.user as Record<string, unknown>).beltColor = wkf.beltColor || dbUser.beltColor || '#FFFFFF';
-            (session.user as Record<string, unknown>).kyuDan = dbUser.kyuDan || (isAdmin ? '1° Dan' : '9° Kyu');
-            (session.user as Record<string, unknown>).birthDate = dbUser.birthDate || '';
-            (session.user as Record<string, unknown>).weight = dbUser.weight !== undefined ? dbUser.weight : null;
-            (session.user as Record<string, unknown>).gender = dbUser.gender || 'male';
-            (session.user as Record<string, unknown>).age = wkf.age;
-            (session.user as Record<string, unknown>).kataCategory = wkf.kataCategory;
-            (session.user as Record<string, unknown>).kumiteCategory = wkf.kumiteCategory;
-            (session.user as Record<string, unknown>).role = isAdmin ? 'administrator' : (dbUser.role || 'viewer');
-            (session.user as Record<string, unknown>).status = isAdmin ? 'active' : (dbUser.status || 'pending');
-            (session.user as Record<string, unknown>).classesAttended = dbUser.classesAttended || 0;
-          } else if (isAdmin) {
-            (session.user as Record<string, unknown>).role = 'administrator';
-            (session.user as Record<string, unknown>).status = 'active';
-            (session.user as Record<string, unknown>).kyuDan = '1° Dan';
+              token.userId = dbUser._id.toString();
+              token.belt = wkf.beltName || dbUser.belt || (isAdmin ? 'Cinturón Negro' : 'Cinturón Blanco');
+              token.beltColor = wkf.beltColor || dbUser.beltColor || '#FFFFFF';
+              token.kyuDan = dbUser.kyuDan || (isAdmin ? '1° Dan' : '9° Kyu');
+              token.birthDate = dbUser.birthDate || '';
+              token.weight = dbUser.weight !== undefined ? dbUser.weight : null;
+              token.gender = dbUser.gender || 'male';
+              token.age = wkf.age;
+              token.kataCategory = wkf.kataCategory;
+              token.kumiteCategory = wkf.kumiteCategory;
+              token.role = isAdmin ? 'administrator' : (dbUser.role || 'viewer');
+              token.status = isAdmin ? 'active' : (dbUser.status || 'pending');
+              token.classesAttended = dbUser.classesAttended || 0;
+            } else if (isAdmin) {
+              token.role = 'administrator';
+              token.status = 'active';
+              token.kyuDan = '1° Dan';
+              token.belt = 'Cinturón Negro';
+              token.beltColor = '#000000';
+            }
           }
         }
       } catch (err) {
-        console.error('Error enriqueciendo sesión con MongoDB Users:', err);
+        console.error('Error enriqueciendo JWT con MongoDB:', err);
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        const u = session.user as Record<string, unknown>;
+        if (token.userId) u.id = token.userId;
+        if (token.belt) u.belt = token.belt;
+        if (token.beltColor) u.beltColor = token.beltColor;
+        if (token.kyuDan) u.kyuDan = token.kyuDan;
+        if (token.birthDate !== undefined) u.birthDate = token.birthDate;
+        if (token.weight !== undefined) u.weight = token.weight;
+        if (token.gender) u.gender = token.gender;
+        if (token.age !== undefined) u.age = token.age;
+        if (token.kataCategory) u.kataCategory = token.kataCategory;
+        if (token.kumiteCategory) u.kumiteCategory = token.kumiteCategory;
+        if (token.role) u.role = token.role;
+        if (token.status) u.status = token.status;
+        if (token.classesAttended !== undefined) u.classesAttended = token.classesAttended;
       }
       return session;
     },
+  },
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 días
   },
   secret: process.env.NEXTAUTH_SECRET || 'ryokukai_auth_super_secret_key_88921471',
 };

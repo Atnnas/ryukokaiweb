@@ -33,7 +33,14 @@ export async function GET() {
         status: 'active',
       }));
 
-    return NextResponse.json({ success: true, sponsors });
+    return NextResponse.json(
+      { success: true, sponsors },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
+      }
+    );
   } catch (err: unknown) {
     console.error('Error obteniendo patrocinadores públicos:', err);
     return NextResponse.json({ success: true, sponsors: [] });

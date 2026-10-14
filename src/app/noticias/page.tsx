@@ -449,7 +449,7 @@ export default function NoticiasPage() {
               return (
                 <article
                   key={item.id}
-                  className="glass-panel"
+                  className="glass-panel render-defer"
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -553,7 +553,7 @@ export default function NoticiasPage() {
                     <a
                       href={item.url}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',

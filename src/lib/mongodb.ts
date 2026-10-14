@@ -18,6 +18,13 @@ export const getDirectReplicaUri = (srvUri: string): string => {
   return srvUri;
 };
 
+const mongoOptions = {
+  maxPoolSize: 10,
+  minPoolSize: 1,
+  maxIdleTimeMS: 30000,
+  serverSelectionTimeoutMS: 5000,
+};
+
 async function connectClient(): Promise<MongoClient> {
   const uri = process.env.MONGODB_URI || '';
   if (!uri) {
@@ -25,7 +32,7 @@ async function connectClient(): Promise<MongoClient> {
   }
 
   try {
-    const client = new MongoClient(uri);
+    const client = new MongoClient(uri, mongoOptions);
     return await client.connect();
   } catch (err: unknown) {
     const error = err as Error;
@@ -36,7 +43,7 @@ async function connectClient(): Promise<MongoClient> {
     ) {
       console.warn('⚠️ Fallo en resolución SRV de Windows. Conectando automáticamente por nodos directos de Atlas...');
       const directUri = getDirectReplicaUri(uri);
-      const fallbackClient = new MongoClient(directUri);
+      const fallbackClient = new MongoClient(directUri, mongoOptions);
       return await fallbackClient.connect();
     }
     throw error;

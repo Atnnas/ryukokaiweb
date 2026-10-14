@@ -117,6 +117,10 @@ function sanitizeExerciseList(rawList: unknown[]): ExerciseItem[] {
     });
 }
 
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // GET: Listar rutinas con búsqueda
 export async function GET(request: NextRequest) {
   try {
@@ -134,10 +138,11 @@ export async function GET(request: NextRequest) {
     const query: Record<string, unknown> = {};
 
     if (search) {
+      const safeSearch = escapeRegex(search.slice(0, 100));
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { 'exercises.name': { $regex: search, $options: 'i' } },
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } },
+        { 'exercises.name': { $regex: safeSearch, $options: 'i' } },
       ];
     }
 

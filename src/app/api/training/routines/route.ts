@@ -47,7 +47,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const search = searchParams.get('search')?.toLowerCase().trim() || '';
+    const rawSearch = searchParams.get('search')?.toLowerCase().trim() || '';
+    const search = rawSearch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').slice(0, 100);
 
     const query: Record<string, unknown> = {};
     if (search) {
@@ -76,7 +77,14 @@ export async function GET(request: NextRequest) {
       updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : undefined,
     }));
 
-    return NextResponse.json({ success: true, routines });
+    return NextResponse.json(
+      { success: true, routines },
+      {
+        headers: {
+          'Cache-Control': 'private, s-maxage=60, stale-while-revalidate=120',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error al obtener rutinas de entrenamiento:', error);
     return NextResponse.json(

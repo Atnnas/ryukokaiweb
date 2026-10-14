@@ -261,6 +261,29 @@ function speakSensei(text: string, enabled: boolean) {
   }
 }
 
+// Retroalimentación háptica sensorial (Web Vibration API) para dojos ruidosos o móviles en tatami
+function triggerHaptic(type: 'tick' | 'start' | 'finish' | 'warning') {
+  if (typeof window === 'undefined' || !('vibrate' in navigator)) return;
+  try {
+    switch (type) {
+      case 'tick':
+        navigator.vibrate(40);
+        break;
+      case 'start':
+        navigator.vibrate([70, 40, 70]);
+        break;
+      case 'finish':
+        navigator.vibrate([120, 80, 200, 80, 300]);
+        break;
+      case 'warning':
+        navigator.vibrate([200, 100, 200]);
+        break;
+    }
+  } catch {
+    // Si el dispositivo o navegador no soporta vibración, continúa en silencio
+  }
+}
+
 export default function TrainingPage() {
   const { user, isLoading: authLoading, openAuthModal } = useAuth();
 
@@ -320,6 +343,9 @@ export default function TrainingPage() {
   const [activeTab, setActiveTab] = useState<'catalog' | 'history'>('catalog');
   const [hasLoggedCurrentWorkout, setHasLoggedCurrentWorkout] = useState(false);
 
+  // Detección de red y soporte PWA Offline
+  const [isOnline, setIsOnline] = useState<boolean>(true);
+
   // Estados del Ejecutor Interactivo de Entrenamiento (Workout Runner)
   const [activeWorkoutRoutine, setActiveWorkoutRoutine] = useState<Routine | null>(null);
   const [workoutSteps, setWorkoutSteps] = useState<WorkoutStep[]>([]);
@@ -330,6 +356,10 @@ export default function TrainingPage() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Screen Wake Lock API para evitar que la pantalla del atleta se suspenda
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const [wakeLockActive, setWakeLockActive] = useState<boolean>(false);
 
   const runnerRef = useRef<HTMLDivElement | null>(null);
   const elapsedSecondsRef = useRef(0);
@@ -345,22 +375,6 @@ export default function TrainingPage() {
 
   const isAdmin = !!user && (user.role === 'administrator' || isSuperAdmin);
   const isApprovedUser = !!user && (user.status === 'active' || isAdmin);
-
-  // Cargar rutinas disponibles desde la API
-  const fetchRoutines = useCallback(async () => {
-    setLoadingRoutines(true);
-    try {
-      const res = await fetch('/api/training/routines');
-      if (res.ok) {
-        const data = await res.json();
-        setRoutines(data.routines || []);
-      }
-    } catch (err) {
-      console.error('Error al cargar rutinas de entrenamiento:', err);
-    } finally {
-      setLoadingRoutines(false);
-    }
-  }, []);
 
   // Cargar estadísticas de racha e historial del usuario
   const fetchWorkoutStats = useCallback(async () => {
@@ -379,10 +393,152 @@ export default function TrainingPage() {
     }
   }, []);
 
+  // Sincronizar cola de entrenamientos completados mientras estaba offline
+  const syncPendingLogs = useCallback(async () => {
+    if (typeof window === 'undefined' || !navigator.onLine) return;
+    try {
+      const queueRaw = localStorage.getItem('ryukokai_offline_workout_queue');
+      if (!queueRaw) return;
+      const queue = JSON.parse(queueRaw);
+      if (Array.isArray(queue) && queue.length > 0) {
+        const remaining: unknown[] = [];
+        for (const logItem of queue) {
+          try {
+            const res = await fetch('/api/training/logs', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(logItem),
+            });
+            if (!res.ok) {
+              remaining.push(logItem);
+            }
+          } catch {
+            remaining.push(logItem);
+          }
+        }
+        if (remaining.length > 0) {
+          localStorage.setItem('ryukokai_offline_workout_queue', JSON.stringify(remaining));
+        } else {
+          localStorage.removeItem('ryukokai_offline_workout_queue');
+          fetchWorkoutStats();
+        }
+      }
+    } catch (e) {
+      console.warn('Error al sincronizar entrenamientos offline:', e);
+    }
+  }, [fetchWorkoutStats]);
+
+  // Listener para estado de conexión en tiempo real
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setIsOnline(navigator.onLine);
+    const handleOnline = () => {
+      setIsOnline(true);
+      syncPendingLogs();
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    syncPendingLogs();
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [syncPendingLogs]);
+
+  // Screen Wake Lock API Effect
+  useEffect(() => {
+    const isWorkingOut = workoutPhase === 'prep' || workoutPhase === 'work' || workoutPhase === 'rest';
+
+    const requestWakeLock = async () => {
+      if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && isWorkingOut) {
+        try {
+          if (!wakeLockRef.current) {
+            wakeLockRef.current = await navigator.wakeLock.request('screen');
+            setWakeLockActive(true);
+            wakeLockRef.current.addEventListener('release', () => {
+              setWakeLockActive(false);
+              wakeLockRef.current = null;
+            });
+          }
+        } catch {
+          setWakeLockActive(false);
+        }
+      }
+    };
+
+    const releaseWakeLock = async () => {
+      if (wakeLockRef.current) {
+        try {
+          await wakeLockRef.current.release();
+        } catch {
+          // ignore
+        }
+        wakeLockRef.current = null;
+        setWakeLockActive(false);
+      }
+    };
+
+    if (isWorkingOut) {
+      requestWakeLock();
+    } else {
+      releaseWakeLock();
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isWorkingOut) {
+        requestWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      releaseWakeLock();
+    };
+  }, [workoutPhase]);
+
+  // Cargar rutinas disponibles desde la API con soporte Offline / Cache
+  const fetchRoutines = useCallback(async () => {
+    setLoadingRoutines(true);
+    try {
+      const res = await fetch('/api/training/routines');
+      if (res.ok) {
+        const data = await res.json();
+        const loaded = data.routines || [];
+        setRoutines(loaded);
+        if (typeof window !== 'undefined' && loaded.length > 0) {
+          try {
+            localStorage.setItem('ryukokai_cached_routines', JSON.stringify(loaded));
+          } catch {
+            // storage quota
+          }
+        }
+      } else {
+        throw new Error('Respuesta no exitosa');
+      }
+    } catch (err) {
+      console.warn('Error al cargar rutinas desde red, recurriendo a caché local:', err);
+      if (typeof window !== 'undefined') {
+        try {
+          const cached = localStorage.getItem('ryukokai_cached_routines');
+          if (cached) {
+            setRoutines(JSON.parse(cached));
+          }
+        } catch (e) {
+          console.error('Error al leer rutinas de caché local:', e);
+        }
+      }
+    } finally {
+      setLoadingRoutines(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (isApprovedUser) {
-      fetchRoutines();
-      fetchWorkoutStats();
+      Promise.all([fetchRoutines(), fetchWorkoutStats()]);
     }
   }, [isApprovedUser, fetchRoutines, fetchWorkoutStats]);
 
@@ -428,6 +584,7 @@ export default function TrainingPage() {
     if (soundEnabled) {
       playAudioTone('gong');
     }
+    triggerHaptic('start');
     speakSensei('¡Hajime!', voiceEnabled);
   }, [soundEnabled, voiceEnabled]);
 
@@ -455,11 +612,13 @@ export default function TrainingPage() {
         if (soundEnabled) {
           playAudioTone('gong');
         }
+        triggerHaptic('warning');
         speakSensei('¡Chui! Advertencia. No te engañes a ti mismo; esta sesión no cuenta para tu racha.', voiceEnabled);
       } else {
         if (soundEnabled) {
           playAudioTone('victory');
         }
+        triggerHaptic('finish');
         speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
       }
       return;
@@ -474,6 +633,7 @@ export default function TrainingPage() {
       if (soundEnabled) {
         playAudioTone('rest');
       }
+      triggerHaptic('tick');
       speakSensei(`¡Yame! Descanso de ${restSeconds} segundos.`, voiceEnabled);
     } else {
       // Transición continua directa al siguiente ejercicio
@@ -507,11 +667,13 @@ export default function TrainingPage() {
         if (soundEnabled) {
           playAudioTone('gong');
         }
+        triggerHaptic('warning');
         speakSensei('¡Chui! Advertencia. No te engañes a ti mismo; esta sesión no cuenta para tu racha.', voiceEnabled);
       } else {
         if (soundEnabled) {
           playAudioTone('victory');
         }
+        triggerHaptic('finish');
         speakSensei('¡Entrenamiento completado! Mokuso... Rei.', voiceEnabled);
       }
     }
@@ -548,27 +710,41 @@ export default function TrainingPage() {
     setIsTimerRunning(false);
   };
 
-  // Registro automático en base de datos al finalizar entrenamiento
+  // Registro automático en base de datos al finalizar entrenamiento (con soporte offline)
   useEffect(() => {
     if (workoutPhase === 'finished' && activeWorkoutRoutine && !hasLoggedCurrentWorkout) {
       setHasLoggedCurrentWorkout(true);
       const isRushed = workoutIntegrityResult?.isRushed ?? false;
 
+      const logPayload = {
+        routineId: activeWorkoutRoutine.id || activeWorkoutRoutine._id,
+        routineTitle: activeWorkoutRoutine.title,
+        durationSeconds: totalElapsedSeconds,
+        stepsCompleted: workoutSteps.length,
+        totalSteps: workoutSteps.length,
+        estimatedMinutes: activeWorkoutRoutine.durationMinutes,
+        isRushed,
+      };
+
       fetch('/api/training/logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          routineId: activeWorkoutRoutine.id || activeWorkoutRoutine._id,
-          routineTitle: activeWorkoutRoutine.title,
-          durationSeconds: totalElapsedSeconds,
-          stepsCompleted: workoutSteps.length,
-          totalSteps: workoutSteps.length,
-          estimatedMinutes: activeWorkoutRoutine.durationMinutes,
-          isRushed,
-        }),
+        body: JSON.stringify(logPayload),
       })
         .then(() => fetchWorkoutStats())
-        .catch((err) => console.error('Error al registrar entrenamiento:', err));
+        .catch((err) => {
+          console.warn('Conexión no disponible al guardar entrenamiento, almacenando en cola local offline:', err);
+          if (typeof window !== 'undefined') {
+            try {
+              const queueRaw = localStorage.getItem('ryukokai_offline_workout_queue');
+              const queue = queueRaw ? JSON.parse(queueRaw) : [];
+              queue.push(logPayload);
+              localStorage.setItem('ryukokai_offline_workout_queue', JSON.stringify(queue));
+            } catch (e) {
+              console.error('Error al guardar en cola offline:', e);
+            }
+          }
+        });
     }
   }, [
     workoutPhase,
@@ -597,9 +773,18 @@ export default function TrainingPage() {
             beginWorkPhase(workoutSteps[currentStepIndex]);
             return 0;
           }
-          if (prev === 4) speakSensei('Tres', voiceEnabled);
-          if (prev === 3) speakSensei('Dos', voiceEnabled);
-          if (prev === 2) speakSensei('Uno', voiceEnabled);
+          if (prev === 4) {
+            speakSensei('Tres', voiceEnabled);
+            triggerHaptic('tick');
+          }
+          if (prev === 3) {
+            speakSensei('Dos', voiceEnabled);
+            triggerHaptic('tick');
+          }
+          if (prev === 2) {
+            speakSensei('Uno', voiceEnabled);
+            triggerHaptic('tick');
+          }
           if (soundEnabled && prev <= 4) {
             playAudioTone('beep');
           }
@@ -613,8 +798,11 @@ export default function TrainingPage() {
               completeCurrentExercise();
               return 0;
             }
-            if (soundEnabled && prev <= 4) {
-              playAudioTone('beep');
+            if (prev <= 4) {
+              triggerHaptic('tick');
+              if (soundEnabled) {
+                playAudioTone('beep');
+              }
             }
             return prev - 1;
           });
@@ -627,9 +815,13 @@ export default function TrainingPage() {
           }
           if (prev === 6) {
             speakSensei('Cinco segundos', voiceEnabled);
+            triggerHaptic('tick');
           }
-          if (soundEnabled && prev <= 4) {
-            playAudioTone('beep');
+          if (prev <= 4) {
+            triggerHaptic('tick');
+            if (soundEnabled) {
+              playAudioTone('beep');
+            }
           }
           return prev - 1;
         });
@@ -1046,6 +1238,28 @@ export default function TrainingPage() {
             >
               <span>{voiceEnabled ? '🗣️ Voz ON' : '🔇 Voz OFF'}</span>
             </button>
+
+            {/* Indicador de Pantalla Siempre Activa (Wake Lock) */}
+            {wakeLockActive && (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.2rem',
+                  padding: '0.25rem 0.45rem',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(52, 211, 153, 0.12)',
+                  border: '1px solid rgba(52, 211, 153, 0.3)',
+                  color: '#34D399',
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                }}
+                title="Screen Wake Lock activo: La pantalla no se suspenderá durante el ejercicio"
+              >
+                <Zap size={12} />
+                <span className="hidden sm:inline">Activa</span>
+              </div>
+            )}
 
             {/* Pantalla completa nativa */}
             <button
@@ -1939,6 +2153,27 @@ export default function TrainingPage() {
                 鍛錬 • TANREN (ENTRENAMIENTO MARCIAL)
               </span>
 
+              {!isOnline && (
+                <span
+                  style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    color: '#F59E0B',
+                    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '4px',
+                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                  }}
+                  title="Entrenando sin conexión. Las rutinas y tu racha se sincronizarán al reconectar."
+                >
+                  <Zap size={11} />
+                  <span>Modo Dojo Offline</span>
+                </span>
+              )}
+
               {isAdmin && (
                 <Link
                   href="/admin/routines"
@@ -2765,7 +3000,7 @@ export default function TrainingPage() {
                 return (
                   <div
                     key={`mob-card-${routineId}`}
-                    className="card-sumi"
+                    className="card-sumi render-defer"
                     style={{
                       backgroundColor: '#0E0F14',
                       border: '1px solid rgba(212, 175, 55, 0.28)',

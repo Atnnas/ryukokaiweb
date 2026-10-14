@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import Image from 'next/image';
 import { Droplets, Flame } from 'lucide-react';
@@ -7,198 +5,75 @@ import SponsorsTicker from '@/components/sponsors/SponsorsTicker';
 
 export default function HomePage() {
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', minHeight: 'calc(100vh - 76px)', display: 'flex', alignItems: 'center' }}>
+    <div className="relative min-h-[calc(100vh-76px)] flex items-center overflow-hidden">
       {/* ================= HERO SECTION (PANTALLA COMPLETA) ================= */}
-      <section
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          paddingTop: 'clamp(2rem, 4vw, 3.5rem)',
-          paddingBottom: 'clamp(2.5rem, 5vw, 4rem)',
-          position: 'relative',
-        }}
-      >
-        <div className="container-dojo" style={{ width: '100%' }}>
-          <div
-            className="hero-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 0.85fr)',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 'clamp(2.5rem, 5vw, 6rem)',
-              width: '100%',
-            }}
-          >
+      <section className="w-full flex items-center py-8 lg:py-14 relative z-10">
+        <div className="container-dojo w-full">
+          <div className="hero-grid grid items-center justify-between gap-10 lg:gap-16 w-full">
             {/* Columna Izquierda: Texto y Pasarela de Patrocinadores */}
-            <div style={{ maxWidth: '780px' }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.45rem 1rem',
-                  borderRadius: '30px',
-                  backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                  border: '1px solid rgba(212, 175, 55, 0.35)',
-                  marginBottom: '1.25rem',
-                  boxShadow: '0 0 15px rgba(212, 175, 55, 0.1)',
-                }}
-              >
-                <div
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: '#D4AF37',
-                    boxShadow: '0 0 8px #D4AF37',
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: '0.78rem',
-                    fontWeight: 800,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    color: '#F5D77F',
-                  }}
-                >
+            <div className="max-w-[780px]">
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[rgba(212,175,55,0.12)] border border-[rgba(212,175,55,0.35)] mb-5 shadow-[0_0_15px_rgba(212,175,55,0.1)]">
+                <div className="w-2 h-2 rounded-full bg-[#D4AF37] shadow-[0_0_8px_#D4AF37]" />
+                <span className="text-xs font-extrabold tracking-widest uppercase text-[#F5D77F]">
                   Dojo Tradicional & Kumite Deportivo
                 </span>
               </div>
 
-              <h1
-                style={{
-                  fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
-                  fontWeight: 900,
-                  lineHeight: 1.08,
-                  letterSpacing: '-0.02em',
-                  marginBottom: '1.25rem',
-                  color: '#FFFFFF',
-                }}
-              >
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight mb-5 text-white">
                 Camino a la Excelencia Marcial en{' '}
-                <span
-                  style={{
-                    background: 'linear-gradient(135deg, #FFFFFF 0%, #F5D77F 50%, #D4AF37 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
+                <span className="bg-gradient-to-r from-white via-[#F5D77F] to-[#D4AF37] bg-clip-text text-transparent">
                   Ryoku Kai
                 </span>
               </h1>
 
-              <p
-                style={{
-                  fontSize: 'clamp(1rem, 1.6vw, 1.15rem)',
-                  color: '#D1D5DB',
-                  lineHeight: 1.65,
-                  marginBottom: '1.75rem',
-                  maxWidth: '640px',
-                }}
-              >
+              <p className="text-base sm:text-lg text-[#D1D5DB] leading-relaxed mb-7 max-w-[640px]">
                 Forjamos mente, cuerpo y espíritu a través del Karate Do tradicional y formativo. Forja tu carácter con disciplina, poder, honor y excelencia marcial.
               </p>
 
-              {/* Cintillo / Pasarela de Patrocinadores */}
+              {/* Cintillo / Pasarela de Patrocinadores (Isla Interactiva Cliente) */}
               <SponsorsTicker />
             </div>
 
             {/* Columna Derecha: Tarjeta Glassmorphic con el Logo Oficial */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                position: 'relative',
-                width: '100%',
-              }}
-            >
-              <div
-                style={{
-                  width: '100%',
-                  maxWidth: '520px',
-                  background: 'linear-gradient(145deg, rgba(16, 18, 24, 0.85) 0%, rgba(8, 9, 12, 0.98) 100%)',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  borderRadius: '16px',
-                  padding: 'clamp(2rem, 4vw, 3rem)',
-                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 50px rgba(212, 175, 55, 0.15)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  textAlign: 'center',
-                }}
-              >
-                {/* Símbolo Central: Logo Oficial */}
-                <div
-                  style={{
-                    width: 'clamp(180px, 30vw, 250px)',
-                    height: 'clamp(180px, 30vw, 250px)',
-                    margin: '0 auto 1.5rem',
-                    position: 'relative',
-                    filter: 'drop-shadow(0 10px 25px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px rgba(212, 175, 55, 0.2))',
-                  }}
-                >
+            <div className="flex justify-center lg:justify-end items-center relative w-full">
+              <div className="w-full max-w-[520px] bg-gradient-to-br from-[rgba(16,18,24,0.85)] to-[rgba(8,9,12,0.98)] border border-[rgba(212,175,55,0.25)] rounded-2xl p-6 sm:p-10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8),0_0_50px_rgba(212,175,55,0.15)] relative overflow-hidden text-center backdrop-blur-md">
+                {/* Símbolo Central: Logo Oficial con LCP optimizado */}
+                <div className="w-48 sm:w-60 h-48 sm:h-60 mx-auto mb-6 relative drop-shadow-[0_10px_25px_rgba(0,0,0,0.8)]">
                   <Image
                     src="/images/logos/LogoRyukukaiSinFondo.png"
                     alt="Logo Insignia Oficial Ryūko Kai"
                     fill
-                    sizes="(max-width: 768px) 200px, 250px"
-                    style={{ objectFit: 'contain' }}
+                    sizes="(max-width: 640px) 192px, 240px"
+                    className="object-contain"
                     priority
                   />
                 </div>
 
-                <h3
-                  style={{
-                    fontSize: '1.4rem',
-                    fontWeight: 900,
-                    letterSpacing: '0.1em',
-                    marginBottom: '0.5rem',
-                    color: '#FFFFFF',
-                  }}
-                >
-                  <span style={{ color: '#D4AF37' }}>RYOKU</span> KAI
-                </h3>
-                <p style={{ fontSize: '0.88rem', color: '#9FA6B8', margin: '0 auto 1.5rem', maxWidth: '360px', lineHeight: 1.5 }}>
+                <h2 className="text-2xl font-black tracking-widest mb-2 text-white">
+                  <span className="text-[#D4AF37]">RYOKU</span> KAI
+                </h2>
+                <p className="text-sm text-[#9FA6B8] mx-auto mb-6 max-w-[360px] leading-relaxed">
                   El arte de vencer sin luchar y la firmeza del golpe que nace de la calma interior.
                 </p>
 
-                {/* Pilares Marciales Dragón y Tigre en Dorado y Blanco */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
-                  <div
-                    style={{
-                      padding: '0.85rem',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                      border: '1px solid rgba(212, 175, 55, 0.35)',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#F5D77F', fontWeight: 800, fontSize: '0.85rem' }}>
-                      <Droplets size={16} color="#D4AF37" />
+                {/* Pilares Marciales Dragón y Tigre */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                  <div className="p-3.5 rounded-lg bg-[rgba(212,175,55,0.12)] border border-[rgba(212,175,55,0.35)]">
+                    <div className="flex items-center gap-1.5 text-[#F5D77F] font-extrabold text-xs sm:text-sm">
+                      <Droplets size={16} className="text-[#D4AF37] shrink-0" />
                       <span>RYŪ • DRAGÓN</span>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: '#CBD5E1', margin: '0.3rem 0 0' }}>
+                    <p className="text-xs text-[#CBD5E1] mt-1 leading-normal">
                       Sabiduría, fluidez técnica, concentración y autocontrol.
                     </p>
                   </div>
 
-                  <div
-                    style={{
-                      padding: '0.85rem',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.18)',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#FFFFFF', fontWeight: 800, fontSize: '0.85rem' }}>
-                      <Flame size={16} color="#FFFFFF" />
+                  <div className="p-3.5 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.18)]">
+                    <div className="flex items-center gap-1.5 text-white font-extrabold text-xs sm:text-sm">
+                      <Flame size={16} className="text-white shrink-0" />
                       <span>KO • TIGRE</span>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: '#CBD5E1', margin: '0.3rem 0 0' }}>
+                    <p className="text-xs text-[#CBD5E1] mt-1 leading-normal">
                       Potencia de impacto, espíritu indomable y resolución.
                     </p>
                   </div>
@@ -208,15 +83,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Media query para grid responsivo */}
-      <style jsx>{`
-        @media (max-width: 1024px) {
-          .hero-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
+

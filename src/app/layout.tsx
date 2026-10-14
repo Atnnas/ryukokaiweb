@@ -51,6 +51,15 @@ export const metadata: Metadata = {
       },
     ],
   },
+  applicationName: 'Ryoku Kai Dojo',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Ryoku Kai',
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -61,10 +70,13 @@ export default function RootLayout({
   return (
     <html lang="es" className={zenKaku.variable}>
       <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <a href="#main-content" className="skip-to-content">
+          Saltar al contenido principal
+        </a>
         <NextAuthWrapper>
           <AuthProvider>
             <Header />
-            <main style={{ flex: 1 }}>{children}</main>
+            <main id="main-content" style={{ flex: 1 }}>{children}</main>
             <Footer />
             <GoogleAuthModal />
           </AuthProvider>
