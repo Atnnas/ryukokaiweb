@@ -154,19 +154,21 @@ p {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.85rem 1.85rem;
+  padding: 0.95rem 2.25rem;
   background: linear-gradient(135deg, var(--color-gold-light) 0%, var(--color-gold) 50%, var(--color-gold-dark) 100%);
   color: #08080A;
   font-weight: 800;
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  border-radius: 4px;
+  border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.35);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   text-decoration: none;
   box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-martial-primary:hover {
@@ -181,18 +183,20 @@ p {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.85rem 1.85rem;
+  padding: 0.95rem 2.25rem;
   background: rgba(212, 175, 55, 0.08);
   color: #FFFFFF;
   font-weight: 700;
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  border-radius: 4px;
+  border-radius: 9999px;
   border: 1px solid var(--border-gold);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-martial-secondary:hover {
@@ -438,6 +442,125 @@ button, a, input, select, textarea {
 .render-defer {
   content-visibility: auto;
   contain-intrinsic-size: 0 320px;
+}
+
+/* ============================================================ */
+/* MICRO-ANIMACIONES DESOPILANTES & DINÁMICAS (RYŪKO MOTION)     */
+/* ============================================================ */
+
+@keyframes floatSubtle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.25), 0 0 50px rgba(212, 175, 55, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(212, 175, 55, 0.5), 0 0 80px rgba(212, 175, 55, 0.22);
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes borderBeam {
+  0% {
+    border-color: rgba(212, 175, 55, 0.25);
+  }
+  50% {
+    border-color: rgba(212, 175, 55, 0.7);
+  }
+  100% {
+    border-color: rgba(212, 175, 55, 0.25);
+  }
+}
+
+.animate-float {
+  animation: floatSubtle 4s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spinSlow 30s linear infinite;
+}
+
+.animate-border-beam {
+  animation: borderBeam 3s ease-in-out infinite;
+}
+
+/* Tarjeta interactiva con brillo y profundidad cinemática */
+.card-martial-interactive {
+  position: relative;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-martial-interactive::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+  transition: 0.6s ease;
+  pointer-events: none;
+}
+
+.card-martial-interactive:hover::before {
+  left: 100%;
+}
+
+.card-martial-interactive:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+/* ============================================================ */
+/* ESTABILIDAD DE SCROLLBAR (Evita saltos horizontales de 17px) */
+/* ============================================================ */
+
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+/* Indicador de pestaña de navegación fluida en Header */
+.nav-tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #D4AF37 0%, #F5D77F 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.65);
 }
 
 

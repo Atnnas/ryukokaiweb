@@ -1,307 +1,63 @@
 import React from 'react';
-import Image from 'next/image';
-import { MapPin, Phone, Mail, Clock, MessageSquare, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Contacto | Ryoku Kai - Escuela de Karate Do',
-  description: 'Contáctanos directamente por WhatsApp o visita las instalaciones de Ryoku Kai.',
+  title: 'Contacto | Ryūko Kai - Escuela de Karate Do',
+  description: 'Contáctanos directamente por WhatsApp para solicitar información, clases de prueba o resolver dudas.',
 };
 
 export default function ContactoPage() {
-  const whatsappMessage = encodeURIComponent(
-    'Hola Sensei! Me gustaría solicitar información sobre las clases y horarios en Ryoku Kai.'
-  );
-
   return (
-    <div style={{ paddingBottom: '6rem' }}>
-      {/* ================= HEADER SECCIÓN CONTACTO ================= */}
-      <section
+    <div className="relative min-h-[calc(100vh-76px)] flex flex-col justify-center items-center px-4 sm:px-8 py-8 overflow-hidden">
+      {/* Título accesible para SEO y lectores de pantalla (oculto visualmente) */}
+      <h1 className="sr-only">Contacto Oficial • Ryūko Kai</h1>
+
+      {/* Halo de luz ambiental sutil de fondo */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[600px] sm:h-[800px] rounded-full pointer-events-none blur-3xl opacity-25"
         style={{
-          padding: 'clamp(3.5rem, 6vw, 5.5rem) 0 3.5rem',
-          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+          background: 'radial-gradient(circle, rgba(37,211,102,0.35) 0%, rgba(212,175,55,0.2) 40%, transparent 70%)'
         }}
-      >
-        <div className="container-dojo">
-          <div style={{ maxWidth: '760px', margin: '0 auto', textAlign: 'center' }}>
-            <div
-              style={{
-                width: '74px',
-                height: '74px',
-                margin: '0 auto 1.25rem',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, transparent 75%)',
-                border: '1.5px solid rgba(212, 175, 55, 0.4)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 25px rgba(212, 175, 55, 0.25)',
-                padding: '8px',
-              }}
-            >
-              <Image
-                src="/images/logos/LogoRyukukaiSinFondo.png"
-                alt="Logo Oficial Ryūko Kai"
-                width={58}
-                height={58}
-                style={{ objectFit: 'contain' }}
-                priority
-              />
-            </div>
-            <span
-              style={{
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                color: '#F5D77F',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                display: 'block',
-                marginBottom: '0.75rem',
-              }}
-            >
-              Atención Inmediata
-            </span>
-            <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', marginBottom: '1.25rem' }}>
-              Contacto & Ubicación
-            </h1>
-            <p style={{ fontSize: '1.1rem', color: '#9DA3B4', lineHeight: 1.7 }}>
-              Te esperamos en el tatami. Escríbenos directamente por WhatsApp para atención inmediata o consulta los canales y ubicación oficial de nuestro dojo.
-            </p>
-          </div>
-        </div>
-      </section>
+      />
 
-      {/* ================= CONTENIDO PRINCIPAL ================= */}
-      <section style={{ padding: 'clamp(3.5rem, 6vw, 5.5rem) 0' }}>
-        <div className="container-dojo" style={{ maxWidth: '1080px' }}>
+      <div className="w-full max-w-3xl mx-auto flex flex-col items-center justify-center text-center relative z-10">
+        {/* Contenedor del Logo de WhatsApp Flotante & Magnético */}
+        <div className="relative flex items-center justify-center">
+          {/* Halo de respiración suave */}
           <div
+            className="absolute w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full blur-2xl animate-glow-pulse pointer-events-none"
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))',
-              gap: '2.5rem',
-              alignItems: 'stretch',
+              background: 'radial-gradient(circle, rgba(37,211,102,0.5) 0%, transparent 70%)'
             }}
+          />
+
+          {/* Logo Flotante Interactivo al estilo de Noticias (sin texto) */}
+          <a
+            href="https://wa.me/525512345678?text=Hola%20Sensei%2C%20tengo%20preguntas%20sobre%20las%20clases%20en%20Ry%C5%ABko%20Kai"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contactar por WhatsApp a Ryūko Kai"
+            className="group relative w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 flex items-center justify-center animate-float hover:scale-120 hover:brightness-125 active:scale-90 transition-all duration-300 cursor-pointer z-10"
           >
-            {/* WhatsApp Directo y Chatear de Inmediato */}
-            <div
-              style={{
-                backgroundColor: '#0F1A14',
-                border: '1px solid rgba(37, 211, 102, 0.35)',
-                borderRadius: '16px',
-                padding: 'clamp(2rem, 5vw, 2.75rem)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                boxShadow: '0 15px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(37, 211, 102, 0.08)',
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                  <div
-                    style={{
-                      width: '54px',
-                      height: '54px',
-                      borderRadius: '50%',
-                      backgroundColor: '#25D366',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#062B16',
-                      boxShadow: '0 0 20px rgba(37, 211, 102, 0.4)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <MessageSquare size={28} />
-                  </div>
-                  <div>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        fontSize: '0.72rem',
-                        fontWeight: 800,
-                        color: '#86EFAC',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        marginBottom: '0.2rem',
-                      }}
-                    >
-                      Canal Preferido
-                    </span>
-                    <h2 style={{ fontSize: '1.5rem', color: '#FFFFFF', margin: 0, fontWeight: 800 }}>
-                      Chatear de Inmediato
-                    </h2>
-                  </div>
-                </div>
+            {/* Resplandor dinámico reactivo en hover */}
+            <div className="absolute -inset-4 rounded-[36px] bg-[radial-gradient(circle,rgba(37,211,102,0.65)_0%,transparent_75%)] opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300 pointer-events-none" />
 
-                <p style={{ fontSize: '1rem', color: '#CBD5E1', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-                  Escríbenos directamente a nuestro WhatsApp oficial para resolver cualquier duda al instante sobre horarios, categorías, uniformes o requisitos de ingreso con el Sensei de guardia.
-                </p>
-
-                <div
-                  style={{
-                    padding: '1.25rem',
-                    backgroundColor: 'rgba(37, 211, 102, 0.08)',
-                    border: '1px solid rgba(37, 211, 102, 0.2)',
-                    borderRadius: '10px',
-                    marginBottom: '2rem',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22C55E', display: 'inline-block' }} />
-                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#86EFAC' }}>
-                      Respuesta Rápida y Personalizada
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '0.85rem', color: '#A7F3D0', margin: 0, lineHeight: 1.5 }}>
-                    Atención directa a practicantes, padres de familia y competidores.
-                  </p>
-                </div>
-              </div>
-
-              <a
-                href={`https://wa.me/525512345678?text=${whatsappMessage}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.75rem',
-                  width: '100%',
-                  padding: '1.1rem 1.75rem',
-                  backgroundColor: '#25D366',
-                  color: '#062B16',
-                  borderRadius: '8px',
-                  fontSize: '1.05rem',
-                  fontWeight: 800,
-                  textDecoration: 'none',
-                  boxShadow: '0 8px 25px rgba(37, 211, 102, 0.35)',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <MessageSquare size={22} />
-                <span>Abrir WhatsApp & Chatear</span>
-              </a>
-            </div>
-
-            {/* Tarjeta de Información del Dojo */}
-            <div
-              className="glass-panel"
-              style={{
-                padding: 'clamp(2rem, 5vw, 2.75rem)',
-                borderRadius: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div>
-                <h2 style={{ fontSize: '1.5rem', color: '#FFFFFF', marginBottom: '1.5rem', fontWeight: 800 }}>
-                  Información del Dojo
-                </h2>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', fontSize: '0.92rem', color: '#9DA3B4' }}>
-                  {/* Dirección */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
-                    <MapPin size={22} color="#D4AF37" style={{ flexShrink: 0, marginTop: '2px' }} />
-                    <div>
-                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
-                        Dirección Central
-                      </strong>
-                      <span style={{ color: '#CBD5E1' }}>Av. de las Artes Marciales #108, Col. Tradición, Zona Centro</span>
-                      <p style={{ fontSize: '0.8rem', color: '#687187', margin: '0.25rem 0 0' }}>
-                        Estacionamiento privado para alumnos y familiares.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Horario */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
-                    <Clock size={22} color="#F5D77F" style={{ flexShrink: 0, marginTop: '2px' }} />
-                    <div>
-                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
-                        Horario de Atención en Recepción
-                      </strong>
-                      <span style={{ color: '#CBD5E1' }}>Lunes a Viernes: 15:30 - 21:30 hrs</span>
-                      <br />
-                      <span style={{ color: '#CBD5E1' }}>Sábados: 08:00 - 13:30 hrs</span>
-                    </div>
-                  </div>
-
-                  {/* Teléfono */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <Phone size={22} color="#D4AF37" style={{ flexShrink: 0 }} />
-                    <div>
-                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
-                        Línea Telefónica Directa
-                      </strong>
-                      <span style={{ color: '#CBD5E1' }}>+52 (55) 1234-5678</span>
-                    </div>
-                  </div>
-
-                  {/* Correo */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                    <Mail size={22} color="#F5D77F" style={{ flexShrink: 0 }} />
-                    <div>
-                      <strong style={{ color: '#FFFFFF', display: 'block', fontSize: '0.95rem' }}>
-                        Correo Electrónico
-                      </strong>
-                      <span style={{ color: '#CBD5E1' }}>contacto@ryokukai.com</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recuadro Tatami y Google Maps */}
-              <div
-                style={{
-                  marginTop: '2rem',
-                  padding: '1.35rem',
-                  backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '1rem',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <div>
-                  <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
-                    Tatami Principal Ryoku Kai
-                  </p>
-                  <p style={{ fontSize: '0.78rem', color: '#9FA6B8', margin: '0.2rem 0 0' }}>
-                    180 m² de tatami reglamentario y zona de entrenamiento
-                  </p>
-                </div>
-                <a
-                  href="https://maps.google.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    color: '#F5D77F',
-                    textDecoration: 'none',
-                    padding: '0.4rem 0.8rem',
-                    backgroundColor: 'rgba(212, 175, 55, 0.12)',
-                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                    borderRadius: '6px',
-                  }}
-                >
-                  <span>Google Maps</span>
-                  <ExternalLink size={14} />
-                </a>
-              </div>
-            </div>
-          </div>
+            <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_25px_50px_rgba(37,211,102,0.55)] transition-transform duration-300 group-hover:-rotate-3 group-hover:-translate-y-1">
+              <defs>
+                <linearGradient id="waGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#2fe476" />
+                  <stop offset="100%" stopColor="#20ba59" />
+                </linearGradient>
+              </defs>
+              <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#waGradient)" />
+              <path
+                d="M50 18c-17.7 0-32 14.3-32 32 0 5.7 1.5 11.1 4.3 16L18 82l16.4-4.3c4.7 2.6 10 4 15.6 4 17.7 0 32-14.3 32-32s-14.3-32-32-32zm0 58.5c-4.9 0-9.8-1.3-14-3.8l-1-.6-10.4 2.7 2.8-10.1-.6-1C24.1 59.4 22.7 54.8 22.7 50c0-15.1 12.3-27.3 27.3-27.3s27.3 12.3 27.3 27.3-12.2 27.5-27.3 27.5zm15-20.6c-.8-.4-4.9-2.4-5.6-2.7-.8-.3-1.3-.4-1.9.4-.6.8-2.2 2.7-2.7 3.3-.5.5-1 .6-1.8.2-.8-.4-3.5-1.3-6.7-4.1-2.5-2.2-4.2-5-4.7-5.8-.5-.8-.1-1.3.4-1.7.4-.4.8-1 1.2-1.5.4-.5.6-.8.8-1.4.3-.6.1-1-.1-1.5-.2-.4-1.9-4.5-2.6-6.2-.7-1.6-1.4-1.4-1.9-1.4h-1.6c-.6 0-1.5.2-2.2 1-0.8.8-3 2.9-3 7 0 4.1 3 8.1 3.4 8.7.4.6 5.9 9 14.3 12.6 2 .9 3.6 1.4 4.8 1.8 2 .6 3.8.5 5.3.3 1.6-.2 4.9-2 5.6-3.9.7-1.9.7-3.6.5-3.9-.2-.5-.7-.7-1.5-1.1z"
+                fill="#FFFFFF"
+              />
+            </svg>
+          </a>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

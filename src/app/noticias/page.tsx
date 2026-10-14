@@ -1,580 +1,177 @@
-'use client';
+import React from 'react';
+import type { Metadata } from 'next';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useAuth } from '@/context/AuthContext';
-import {
-  Calendar,
-  Heart,
-  MessageSquare,
-  Share2,
-  ExternalLink,
-  RefreshCw,
-  Sparkles,
-  ShieldCheck,
-  Tag,
-  CheckCircle2,
-  Filter
-} from 'lucide-react';
-import { NewsItem, SocialPlatform } from '@/types';
+export const metadata: Metadata = {
+  title: 'Redes Sociales Oficiales | Ryūko Kai',
+  description: 'Conéctate a los canales oficiales de Ryūko Kai: Instagram, YouTube, TikTok y Facebook.',
+};
 
 export default function NoticiasPage() {
-  const { user, openAuthModal } = useAuth();
-  const [selectedFilter, setSelectedFilter] = useState<'all' | SocialPlatform>('all');
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncedCount, setSyncedCount] = useState(6);
-  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
-
-  const initialNews: NewsItem[] = [
+  const socialNetworks = [
     {
-      id: 'news-1',
-      title: 'Convocatoria Oficial: Exámenes de Grado (Kyu & Dan) Otoño 2026',
-      content: 'Se abre el periodo de inscripción para los exámenes de ascenso de grado. Los aspirantes desde 8° Kyu (Amarillo) hasta 1er Dan (Cinturón Negro) deben contar con el 85% de asistencia mínima y el aval de su Sensei titular.',
-      excerpt: 'Evaluación técnica de Kihon, Katas reglamentarias y Bunkai ante el tribunal evaluador. Conoce las fechas y requisitos aquí.',
-      platform: 'official',
-      category: 'examen',
-      date: '14 de Septiembre, 2026',
-      author: 'Tribunal Técnico Ryoku Kai',
-      socialHandle: '@ryokukai',
-      url: 'https://instagram.com',
-      likes: 124,
-      commentsCount: 18,
-      featured: true,
-      tags: ['Exámenes', 'Kyu', 'Cinturón Negro', 'Graduación']
+      id: 'instagram',
+      name: 'Instagram',
+      url: 'https://instagram.com/ryukokai',
+      glow: 'rgba(225, 48, 108, 0.45)',
+      hoverGlow: 'rgba(225, 48, 108, 0.7)',
+      borderColor: 'rgba(225, 48, 108, 0.55)',
+      shapeClass: 'rounded-[26px] sm:rounded-[32px]',
+      pingDuration: '2.6s',
+      pingDelay: '0.2s',
+      floatDelay: '0s',
+      tiltClass: 'group-hover:-rotate-3',
+      icon: (
+        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_20px_40px_rgba(225,48,108,0.5)]">
+          <defs>
+            <radialGradient id="igGradient" cx="20%" cy="110%" r="130%">
+              <stop offset="0%" stopColor="#ffdb7d" />
+              <stop offset="20%" stopColor="#f46f30" />
+              <stop offset="40%" stopColor="#e1306c" />
+              <stop offset="65%" stopColor="#c13584" />
+              <stop offset="100%" stopColor="#833ab4" />
+            </radialGradient>
+          </defs>
+          <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#igGradient)" />
+          <rect x="18" y="18" width="64" height="64" rx="18" fill="none" stroke="#FFFFFF" strokeWidth="7" />
+          <circle cx="50" cy="50" r="16" fill="none" stroke="#FFFFFF" strokeWidth="7" />
+          <circle cx="71" cy="29" r="4.5" fill="#FFFFFF" />
+        </svg>
+      )
     },
     {
-      id: 'news-2',
-      title: 'Oro y Plata en el Campeonato Nacional WKF',
-      content: 'Felicitamos a nuestros atletas del equipo de Kumite de alta competencia por su destacada actuación este fin de semana en el Torneo Nacional. Tres medallas de oro en categorías juvenil y dos de plata en senior.',
-      excerpt: '¡Orgullo Ryoku Kai! Nuestros alumnos demostraron temple, respeto y precisión en cada combate.',
-      platform: 'instagram',
-      category: 'torneo',
-      date: '12 de Septiembre, 2026',
-      author: 'Instagram Feed • @ryokukai',
-      socialHandle: '@ryokukai_karate',
-      url: 'https://instagram.com',
-      likes: 289,
-      commentsCount: 34,
-      tags: ['Torneo', 'Kumite', 'Medallistas', 'OrgulloMarcial']
+      id: 'youtube',
+      name: 'YouTube',
+      url: 'https://youtube.com/@ryukokai',
+      glow: 'rgba(255, 0, 0, 0.45)',
+      hoverGlow: 'rgba(255, 0, 0, 0.7)',
+      borderColor: 'rgba(255, 0, 0, 0.55)',
+      shapeClass: 'rounded-[24px] sm:rounded-[28px]',
+      pingDuration: '3.3s',
+      pingDelay: '1.1s',
+      floatDelay: '0.7s',
+      tiltClass: 'group-hover:rotate-3',
+      icon: (
+        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_20px_40px_rgba(255,0,0,0.5)]">
+          <rect x="2" y="14" width="96" height="72" rx="22" fill="#FF0000" />
+          <polygon points="41,35 69,50 41,65" fill="#FFFFFF" />
+        </svg>
+      )
     },
     {
-      id: 'news-3',
-      title: 'Seminario Magistral de Katas Superiores con Shihan Takahashi',
-      content: 'El próximo sábado 26 de septiembre tendremos una jornada intensiva de 4 horas analizando la dinámica del cuerpo, la respiración profunda y los puntos de presión en las formas Kanku Dai y Bassai Dai.',
-      excerpt: 'Abierto a practicantes desde cinta verde en adelante. Cupos limitados para preservar la calidad del tatami.',
-      platform: 'facebook',
-      category: 'seminario',
-      date: '10 de Septiembre, 2026',
-      author: 'Facebook Page • Ryoku Kai',
-      socialHandle: 'facebook.com/ryokukai',
-      url: 'https://facebook.com',
-      likes: 95,
-      commentsCount: 12,
-      tags: ['Seminario', 'Katas', 'Maestría', 'Okinawa']
+      id: 'tiktok',
+      name: 'TikTok',
+      url: 'https://tiktok.com/@ryukokai',
+      glow: 'rgba(37, 244, 238, 0.45)',
+      hoverGlow: 'rgba(37, 244, 238, 0.7)',
+      borderColor: 'rgba(37, 244, 238, 0.55)',
+      shapeClass: 'rounded-[26px] sm:rounded-[32px]',
+      pingDuration: '2.3s',
+      pingDelay: '0.6s',
+      floatDelay: '1.4s',
+      tiltClass: 'group-hover:-rotate-3',
+      icon: (
+        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_20px_40px_rgba(37,244,238,0.4)]">
+          <rect x="2" y="2" width="96" height="96" rx="26" fill="#010101" stroke="rgba(255,255,255,0.15)" strokeWidth="2" />
+          <g transform="translate(18, 14) scale(2.8)">
+            {/* Cyan displacement */}
+            <path
+              d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.13v-3.5a6.37 6.37 0 0 0-.86-.06A6.34 6.34 0 0 0 3 15.68a6.34 6.34 0 0 0 10.82 4.47V10.8a8.16 8.16 0 0 0 5.77 2.14V9.5a4.83 4.83 0 0 1 0-2.81z"
+              fill="#25F4EE"
+              transform="translate(-0.35, -0.35)"
+              opacity="0.9"
+            />
+            {/* Magenta/Red displacement */}
+            <path
+              d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.13v-3.5a6.37 6.37 0 0 0-.86-.06A6.34 6.34 0 0 0 3 15.68a6.34 6.34 0 0 0 10.82 4.47V10.8a8.16 8.16 0 0 0 5.77 2.14V9.5a4.83 4.83 0 0 1 0-2.81z"
+              fill="#FE2C55"
+              transform="translate(0.35, 0.35)"
+              opacity="0.9"
+            />
+            {/* White core */}
+            <path
+              d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.86.13v-3.5a6.37 6.37 0 0 0-.86-.06A6.34 6.34 0 0 0 3 15.68a6.34 6.34 0 0 0 10.82 4.47V10.8a8.16 8.16 0 0 0 5.77 2.14V9.5a4.83 4.83 0 0 1 0-2.81z"
+              fill="#FFFFFF"
+            />
+          </g>
+        </svg>
+      )
     },
     {
-      id: 'news-4',
-      title: 'Nueva Serie Técnica: Los 5 Preceptos del Dojo Kun en Video',
-      content: 'Estrenamos en nuestro canal oficial una serie de videos cortos donde el Shihan explica la aplicación práctica de cada principio del Dojo Kun en la vida cotidiana y laboral moderna.',
-      excerpt: 'Aprende cómo la disciplina marcial transforma tus decisiones diarias fuera del dojo.',
-      platform: 'youtube',
-      category: 'comunidad',
-      date: '8 de Septiembre, 2026',
-      author: 'YouTube Channel • Ryoku Kai TV',
-      socialHandle: 'youtube.com/@ryokukai',
-      url: 'https://youtube.com',
-      likes: 340,
-      commentsCount: 42,
-      tags: ['YouTube', 'Filosofía', 'DojoKun', 'Bushido']
-    },
-    {
-      id: 'news-5',
-      title: 'Taller Especial: Defensa Personal Femenina y Manejo del Pánico',
-      content: 'Una clase de inmersión práctica de 2 horas donde compartimos estrategias preventivas de escape ante situaciones de agresión física, técnicas de palanca y uso de la voz como primer escudo.',
-      excerpt: 'No se requiere ningún tipo de experiencia marcial previa. Entrada libre para alumnas y familiares.',
-      platform: 'instagram',
-      category: 'seminario',
-      date: '5 de Septiembre, 2026',
-      author: 'Instagram Reel • Sensei Laura S.',
-      socialHandle: '@ryokukai_karate',
-      url: 'https://instagram.com',
-      likes: 182,
-      commentsCount: 19,
-      tags: ['DefensaPersonal', 'MujeresFuertes', 'Comunidad']
-    },
-    {
-      id: 'news-6',
-      title: 'Apertura de Nuevos Horarios para Little Warriors (4 a 6 años)',
-      content: 'Debido a la alta demanda hemos abierto un nuevo horario formativo los martes y jueves a las 16:00 hrs, enfocado en juego psicomotriz, orden y valores marciales.',
-      excerpt: 'Inscripciones abiertas con clase de diagnóstico sin costo para evaluar la integración de los pequeños.',
-      platform: 'official',
-      category: 'comunidad',
-      date: '1 de Septiembre, 2026',
-      author: 'Dirección Administrativa',
-      socialHandle: '@ryokukai',
-      url: 'https://instagram.com',
-      likes: 78,
-      commentsCount: 7,
-      tags: ['Infantil', 'Horarios', 'Formación']
+      id: 'facebook',
+      name: 'Facebook',
+      url: 'https://facebook.com/ryukokai',
+      glow: 'rgba(24, 119, 242, 0.45)',
+      hoverGlow: 'rgba(24, 119, 242, 0.7)',
+      borderColor: 'rgba(24, 119, 242, 0.55)',
+      shapeClass: 'rounded-full',
+      pingDuration: '3.0s',
+      pingDelay: '1.7s',
+      floatDelay: '0.4s',
+      tiltClass: 'group-hover:rotate-3',
+      icon: (
+        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-[0_20px_40px_rgba(24,119,242,0.5)]">
+          <circle cx="50" cy="50" r="48" fill="#1877F2" />
+          <path
+            d="M63 53.5l1.8-11.8h-11.3V34c0-3.2 1.6-6.4 6.7-6.4h5.2V17.5s-4.7-.8-9.2-.8c-9.4 0-15.5 5.7-15.5 16v8.9H30.5v11.9h10.2V88.8c2.1.3 4.2.5 6.4.5 2.2 0 4.3-.2 6.4-.5V53.5H63z"
+            fill="#FFFFFF"
+          />
+        </svg>
+      )
     }
   ];
 
-  const filteredNews = selectedFilter === 'all'
-    ? initialNews
-    : initialNews.filter((item) => item.platform === selectedFilter);
-
-  const toggleLike = (id: string) => {
-    setLikedPosts((prev) => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
-
-  const handleSyncSocial = () => {
-    setIsSyncing(true);
-    setTimeout(() => {
-      setIsSyncing(false);
-      setSyncedCount(filteredNews.length);
-    }, 1200);
-  };
-
-  const getPlatformBadge = (platform: SocialPlatform) => {
-    switch (platform) {
-      case 'instagram':
-        return {
-          name: 'Instagram',
-          bg: 'linear-gradient(45deg, #833AB4, #FD1D1D, #FCB045)',
-          color: '#ffffff',
-          icon: (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-            </svg>
-          )
-        };
-      case 'facebook':
-        return {
-          name: 'Facebook',
-          bg: '#1877F2',
-          color: '#ffffff',
-          icon: (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-            </svg>
-          )
-        };
-      case 'youtube':
-        return {
-          name: 'YouTube',
-          bg: '#FF0000',
-          color: '#ffffff',
-          icon: (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="10 15 15 12 10 9 10 15" />
-            </svg>
-          )
-        };
-      default:
-        return {
-          name: 'Oficial Dojo',
-          bg: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)',
-          color: '#08080A',
-          icon: <ShieldCheck size={14} />
-        };
-    }
-  };
-
   return (
-    <div style={{ paddingBottom: '6rem' }}>
-      {/* ================= HEADER SECCIÓN NOTICIAS ================= */}
-      <section
+    <div className="relative min-h-[calc(100vh-76px)] flex flex-col justify-center items-center px-4 sm:px-8 py-8 overflow-hidden">
+      {/* Título accesible para SEO y lectores de pantalla (oculto visualmente) */}
+      <h1 className="sr-only">Redes Sociales Oficiales • Ryūko Kai</h1>
+
+      {/* Halo de luz ambiental sutil de fondo */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[850px] h-[600px] sm:h-[850px] rounded-full pointer-events-none blur-3xl opacity-25"
         style={{
-          padding: 'clamp(3.5rem, 6vw, 5.5rem) 0 3.5rem',
-          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
+          background: 'radial-gradient(circle, rgba(212,175,55,0.4) 0%, rgba(225,48,108,0.2) 30%, rgba(24,119,242,0.2) 65%, transparent 100%)'
         }}
-      >
-        <div className="container-dojo">
-          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <div
-              style={{
-                width: '74px',
-                height: '74px',
-                margin: '0 auto 1.25rem',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, transparent 75%)',
-                border: '1.5px solid rgba(212, 175, 55, 0.4)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 25px rgba(212, 175, 55, 0.25)',
-                padding: '8px',
-              }}
-            >
-              <Image
-                src="/images/logos/LogoRyukukaiSinFondo.png"
-                alt="Logo Oficial Ryūko Kai"
-                width={58}
-                height={58}
-                style={{ objectFit: 'contain' }}
-                priority
-              />
-            </div>
-            <span
-              style={{
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                color: '#F5D77F',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                display: 'block',
-                marginBottom: '0.75rem',
-              }}
-            >
-              Comunidad, Eventos & Redes
-            </span>
-            <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', marginBottom: '1.25rem' }}>
-              Noticias de Ryoku Kai
-            </h1>
-            <p style={{ fontSize: '1.1rem', color: '#9DA3B4', lineHeight: 1.7 }}>
-              Mantente al día con los eventos, torneos, ascensos de grado y las publicaciones más recientes conectadas directamente desde nuestras redes sociales.
-            </p>
-          </div>
-        </div>
-      </section>
+      />
 
-      {/* ================= PANEL DE SINCRONIZACIÓN Y PREVISTA ================= */}
-      <section style={{ padding: '2rem 0', backgroundColor: 'rgba(10, 15, 29, 0.65)', borderBottom: '1px solid rgba(212, 175, 55, 0.15)' }}>
-        <div className="container-dojo">
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '1.25rem',
-              backgroundColor: 'rgba(17, 24, 39, 0.85)',
-              border: '1px solid rgba(212, 175, 55, 0.25)',
-              borderRadius: '12px',
-              padding: '1rem 1.5rem',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+      <div className="w-full max-w-5xl mx-auto flex items-center justify-center relative z-10">
+        {/* Logos Oficiales Ordenados con Animación Asincrónica de Radar y Auras de Marca */}
+        <div className="flex flex-row flex-wrap sm:flex-nowrap items-center justify-center gap-7 sm:gap-11 md:gap-14 lg:gap-18">
+          {socialNetworks.map((item) => (
+            <div key={item.id} className="relative flex items-center justify-center">
+              {/* Halo de respiración suave en el color característico de la red */}
               <div
+                className="absolute w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full blur-2xl animate-glow-pulse pointer-events-none"
                 style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(212, 175, 55, 0.15)',
-                  color: '#F5D77F',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  background: `radial-gradient(circle, ${item.glow} 0%, transparent 70%)`,
+                  animationDelay: item.floatDelay
                 }}
+              />
+
+              {/* Logo con animación flotante e interactividad magnética que incita a dar clic */}
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={item.name}
+                style={{ animationDelay: item.floatDelay }}
+                className="group relative w-20 h-20 sm:w-26 sm:h-26 md:w-30 md:h-30 lg:w-34 lg:h-34 flex items-center justify-center animate-float hover:scale-120 hover:brightness-125 active:scale-90 transition-all duration-300 cursor-pointer z-10"
               >
-                <Sparkles size={20} />
-              </div>
-              <div>
-                <p style={{ fontSize: '0.95rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
-                  Prevista de Sincronización Social Activa
-                </p>
-                <p style={{ fontSize: '0.78rem', color: '#9DA3B4', margin: '0.15rem 0 0' }}>
-                  Conectada a Instagram Graph API, Facebook Pages y YouTube RSS Feed ({syncedCount} publicaciones sincronizadas).
-                </p>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <button
-                onClick={handleSyncSocial}
-                disabled={isSyncing}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.5rem 1rem',
-                  backgroundColor: 'rgba(212, 175, 55, 0.1)',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  borderRadius: '6px',
-                  color: '#F5D77F',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  cursor: isSyncing ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s',
-                }}
-              >
-                <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
-                <span>{isSyncing ? 'Sincronizando...' : 'Actualizar Feed'}</span>
-              </button>
-
-              {!user && (
-                <button
-                  onClick={openAuthModal}
+                {/* Resplandor reactivo en hover con su propio color de marca */}
+                <div
+                  className={`absolute -inset-3 ${item.shapeClass} opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300 pointer-events-none`}
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 1rem',
-                    backgroundColor: 'rgba(212, 175, 55, 0.18)',
-                    border: '1px solid rgba(212, 175, 55, 0.4)',
-                    borderRadius: '6px',
-                    color: '#F5D77F',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
+                    background: `radial-gradient(circle, ${item.hoverGlow} 0%, transparent 75%)`
                   }}
-                >
-                  Acceso Alumnos para Notificaciones
-                </button>
-              )}
+                />
+
+                <div className={`w-full h-full transition-transform duration-300 ${item.tiltClass} group-hover:-translate-y-1`}>
+                  {item.icon}
+                </div>
+              </a>
             </div>
-          </div>
+          ))}
         </div>
-      </section>
-
-      {/* ================= CONTENIDO Y FILTROS ================= */}
-      <section style={{ padding: 'clamp(2.5rem, 5vw, 4rem) 0' }}>
-        <div className="container-dojo">
-          {/* Botones de Filtro */}
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.65rem',
-              alignItems: 'center',
-              marginBottom: '2.5rem',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#9FA6B8', fontSize: '0.85rem', marginRight: '0.5rem' }}>
-              <Filter size={16} />
-              <span>Filtrar por canal:</span>
-            </div>
-
-            <button
-              onClick={() => setSelectedFilter('all')}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: selectedFilter === 'all' ? '1px solid var(--color-gold)' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'all' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(17, 24, 39, 0.8)',
-                color: selectedFilter === 'all' ? '#FFFFFF' : '#9DA3B4',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Todas las Fuentes
-            </button>
-
-            <button
-              onClick={() => setSelectedFilter('instagram')}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: selectedFilter === 'instagram' ? '1px solid #E1306C' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'instagram' ? 'rgba(225, 48, 108, 0.25)' : 'rgba(17, 24, 39, 0.8)',
-                color: selectedFilter === 'instagram' ? '#FFFFFF' : '#9DA3B4',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Instagram
-            </button>
-
-            <button
-              onClick={() => setSelectedFilter('facebook')}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: selectedFilter === 'facebook' ? '1px solid #1877F2' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'facebook' ? 'rgba(24, 119, 242, 0.25)' : 'rgba(17, 24, 39, 0.8)',
-                color: selectedFilter === 'facebook' ? '#FFFFFF' : '#9DA3B4',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Facebook
-            </button>
-
-            <button
-              onClick={() => setSelectedFilter('youtube')}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: selectedFilter === 'youtube' ? '1px solid #FF0000' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'youtube' ? 'rgba(255, 0, 0, 0.25)' : 'rgba(17, 24, 39, 0.8)',
-                color: selectedFilter === 'youtube' ? '#FFFFFF' : '#9DA3B4',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              YouTube
-            </button>
-
-            <button
-              onClick={() => setSelectedFilter('official')}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: selectedFilter === 'official' ? '1px solid var(--color-gold)' : '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: selectedFilter === 'official' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(17, 24, 39, 0.8)',
-                color: selectedFilter === 'official' ? '#FFFFFF' : '#9DA3B4',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Anuncios Oficiales
-            </button>
-          </div>
-
-          {/* Grid de Noticias / Feed de Redes */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
-              gap: '2rem',
-            }}
-          >
-            {filteredNews.map((item) => {
-              const badge = getPlatformBadge(item.platform);
-              const isLiked = likedPosts[item.id];
-              const totalLikes = item.likes + (isLiked ? 1 : 0);
-
-              return (
-                <article
-                  key={item.id}
-                  className="glass-panel render-defer"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    padding: '2rem',
-                    borderRadius: '12px',
-                    position: 'relative',
-                  }}
-                >
-                  <div>
-                    {/* Cabecera del Post con Canal y Fecha */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                      <div
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.45rem',
-                          padding: '0.35rem 0.75rem',
-                          background: badge.bg,
-                          color: badge.color,
-                          borderRadius: '20px',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          letterSpacing: '0.04em',
-                        }}
-                      >
-                        {badge.icon}
-                        <span>{badge.name}</span>
-                      </div>
-
-                      <span style={{ fontSize: '0.78rem', color: '#9FA6B8', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <Calendar size={13} />
-                        {item.date}
-                      </span>
-                    </div>
-
-                    {/* Título y Contenido */}
-                    <h3 style={{ fontSize: '1.25rem', color: '#FFFFFF', lineHeight: 1.35, marginBottom: '0.75rem' }}>
-                      {item.title}
-                    </h3>
-                    <p style={{ fontSize: '0.9rem', color: '#CBD5E1', lineHeight: 1.6, marginBottom: '1.25rem' }}>
-                      {item.content}
-                    </p>
-
-                    {/* Tags */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1.5rem' }}>
-                      {item.tags.map((t) => (
-                        <span
-                          key={t}
-                          style={{
-                            fontSize: '0.72rem',
-                            padding: '0.2rem 0.55rem',
-                            borderRadius: '4px',
-                            backgroundColor: 'rgba(212, 175, 55, 0.08)',
-                            color: '#F5D77F',
-                            border: '1px solid rgba(212, 175, 55, 0.2)',
-                          }}
-                        >
-                          #{t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Pie de la Tarjeta con Acciones Sociales */}
-                  <div
-                    style={{
-                      paddingTop: '1rem',
-                      borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <button
-                        onClick={() => toggleLike(item.id)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                          color: isLiked ? '#F5D77F' : '#9DA3B4',
-                          fontSize: '0.85rem',
-                          cursor: 'pointer',
-                          padding: 0,
-                          transition: 'color 0.2s',
-                        }}
-                      >
-                        <Heart size={16} fill={isLiked ? '#F5D77F' : 'none'} />
-                        <span>{totalLikes}</span>
-                      </button>
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#9DA3B4', fontSize: '0.85rem' }}>
-                        <MessageSquare size={16} />
-                        <span>{item.commentsCount}</span>
-                      </div>
-                    </div>
-
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        color: '#F5D77F',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      <span>Ver original</span>
-                      <ExternalLink size={13} />
-                    </a>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

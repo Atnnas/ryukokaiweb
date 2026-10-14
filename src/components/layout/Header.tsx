@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import dynamic from 'next/dynamic';
-import { Menu, X, LogIn, LogOut, Award, Shield, Clock, User as UserIcon, ChevronRight } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, Shield, Clock, ChevronRight } from 'lucide-react';
 
 const StudentProfileModal = dynamic(
   () => import('@/components/auth/StudentProfileModal'),
@@ -76,7 +76,7 @@ export default function Header() {
         WebkitBackdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(212, 175, 55, 0.22)',
         boxShadow: '0 4px 30px rgba(0, 0, 0, 0.4)',
-        transition: 'all 0.3s ease',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease',
       }}
     >
       <div
@@ -135,7 +135,7 @@ export default function Header() {
                 color: '#FFFFFF',
               }}
             >
-              <span style={{ color: '#D4AF37' }}>RYOKU</span> <span style={{ color: '#FFFFFF' }}>KAI</span>
+              <span style={{ color: '#D4AF37' }}>RYŪKO</span> <span style={{ color: '#FFFFFF' }}>KAI</span>
             </span>
             <span
               style={{
@@ -147,7 +147,7 @@ export default function Header() {
                 textTransform: 'uppercase',
               }}
             >
-              Karate Do • Tradición & Poder
+              Karate Do
             </span>
           </div>
         </Link>
@@ -167,32 +167,25 @@ export default function Header() {
               <Link
                 key={link.name}
                 href={link.href}
+                className="group"
                 style={{
                   textDecoration: 'none',
-                  fontSize: '0.9rem',
-                  fontWeight: isActive ? 800 : 500,
-                  letterSpacing: '0.05em',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
                   textTransform: 'uppercase',
-                  color: isActive ? '#F5D77F' : '#A0A5B5',
+                  color: isActive ? '#F5D77F' : '#94A3B8',
+                  textShadow: isActive ? '0 0 12px rgba(212, 175, 55, 0.4)' : 'none',
                   position: 'relative',
                   padding: '0.5rem 0',
-                  transition: 'color 0.2s ease',
+                  transition: 'color 0.25s ease, text-shadow 0.25s ease',
                 }}
               >
-                {link.name}
+                <span className="group-hover:text-[#F5D77F] transition-colors duration-200">
+                  {link.name}
+                </span>
                 {isActive && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '2px',
-                      background: 'linear-gradient(90deg, #D4AF37 0%, #F5D77F 100%)',
-                      borderRadius: '2px',
-                      boxShadow: '0 0 8px rgba(212, 175, 55, 0.6)',
-                    }}
-                  />
+                  <span className="nav-tab-indicator" />
                 )}
               </Link>
             );
@@ -439,11 +432,11 @@ export default function Header() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.55rem',
-                padding: '0.6rem 1.15rem',
+                gap: '0.65rem',
+                padding: '0.65rem 1.65rem',
                 backgroundColor: 'rgba(212, 175, 55, 0.12)',
                 border: '1.5px solid rgba(212, 175, 55, 0.45)',
-                borderRadius: '4px',
+                borderRadius: '9999px',
                 color: '#FFFFFF',
                 fontSize: '0.85rem',
                 fontWeight: 800,
@@ -452,6 +445,8 @@ export default function Header() {
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 boxShadow: '0 0 15px rgba(212, 175, 55, 0.12)',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
               {/* Google G icon */}
@@ -538,10 +533,10 @@ export default function Header() {
             </div>
             <div>
               <span style={{ fontSize: '1.05rem', fontWeight: 900, letterSpacing: '0.06em', color: '#FFFFFF' }}>
-                <span style={{ color: '#D4AF37' }}>RYOKU</span> KAI
+                <span style={{ color: '#D4AF37' }}>RYŪKO</span> KAI
               </span>
               <span style={{ display: 'block', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.18em', color: '#C5A059', textTransform: 'uppercase' }}>
-                Escuela de Karate Do
+                Karate Do
               </span>
             </div>
           </div>
@@ -693,16 +688,17 @@ export default function Header() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '0.5rem',
-                  padding: '0.85rem',
+                  gap: '0.65rem',
+                  padding: '0.9rem 1.5rem',
                   backgroundColor: '#121318',
                   border: '1.5px solid rgba(212, 175, 55, 0.45)',
-                  borderRadius: '4px',
+                  borderRadius: '9999px',
                   color: '#FFFFFF',
                   fontSize: '0.95rem',
                   fontWeight: 800,
                   cursor: 'pointer',
                   boxShadow: '0 0 15px rgba(212, 175, 55, 0.12)',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 <LogIn size={18} color="#D4AF37" /> Iniciar Sesión con Google

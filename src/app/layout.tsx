@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import GoogleAuthModal from '@/components/auth/GoogleAuthModal';
+import MagicRings from '@/components/ui/MagicRings';
 
 const zenKaku = Zen_Kaku_Gothic_New({
   weight: ['300', '400', '500', '700', '900'],
@@ -73,10 +74,26 @@ export default function RootLayout({
         <a href="#main-content" className="skip-to-content">
           Saltar al contenido principal
         </a>
+        {/* Fondo ambiental interactivo MagicRings en todas las páginas (aislado fuera de auth wrappers para persistencia absoluta) */}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+          <MagicRings
+            color="#D4AF37"
+            colorTwo="#6366F1"
+            motion="breathe"
+            ringCount={6}
+            speed={0.8}
+            lineThickness={2}
+            glow={1.1}
+            hoverScale={1.15}
+            clickBurst={true}
+            opacity={0.4}
+            parallax={0.05}
+          />
+        </div>
         <NextAuthWrapper>
           <AuthProvider>
             <Header />
-            <main id="main-content" style={{ flex: 1 }}>{children}</main>
+            <main id="main-content" style={{ flex: 1, position: 'relative', zIndex: 1 }}>{children}</main>
             <Footer />
             <GoogleAuthModal />
           </AuthProvider>

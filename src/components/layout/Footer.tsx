@@ -17,89 +17,46 @@ export default function Footer() {
   }
 
   return (
-    <footer
-      style={{
-        backgroundColor: 'rgba(10, 15, 29, 0.96)',
-        borderTop: '1px solid rgba(212, 175, 55, 0.25)',
-        boxShadow: '0 -20px 40px rgba(0, 0, 0, 0.45)',
-        position: 'relative',
-        zIndex: 10,
-        paddingTop: '4.5rem',
-        paddingBottom: '2.5rem',
-        marginTop: 'auto',
-      }}
-    >
-      <div className="container-dojo">
+    <footer className="relative z-10 mt-auto pt-14 pb-8 bg-[rgba(10,15,29,0.96)] border-t border-[rgba(212,175,55,0.25)] shadow-[0_-20px_40px_rgba(0,0,0,0.45)]">
+      <div className="container-dojo max-w-6xl mx-auto">
         {/* Cuadrícula Principal del Footer */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: 'clamp(2rem, 4vw, 3.5rem)',
-            marginBottom: '3.5rem',
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-12">
           {/* Columna 1: Marca & Identidad */}
-          <div style={{ maxWidth: '360px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-              <div
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 80%)',
-                  border: '1.5px solid rgba(212, 175, 55, 0.35)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  flexShrink: 0,
-                  boxShadow: '0 0 15px rgba(212, 175, 55, 0.15)',
-                }}
-              >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,0.18)_0%,transparent_80%)] border border-[rgba(212,175,55,0.35)] flex items-center justify-center overflow-hidden shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
                 <Image
                   src="/images/logos/LogoRyukukaiSinFondo.png"
                   alt="Logo Oficial Ryūko Kai"
-                  width={42}
-                  height={42}
-                  style={{ objectFit: 'contain' }}
+                  width={38}
+                  height={38}
+                  className="object-contain"
                 />
               </div>
               <div>
-                <span style={{ display: 'block', fontSize: '1.2rem', fontWeight: 900, color: '#FFFFFF', letterSpacing: '0.06em', lineHeight: 1.1 }}>
-                  <span style={{ color: '#D4AF37' }}>RYOKU</span> <span style={{ color: '#FFFFFF' }}>KAI</span>
+                <span className="block text-lg font-black tracking-wider text-white leading-tight">
+                  <span className="text-[#D4AF37]">RYŪKO</span> KAI
                 </span>
-                <span style={{ fontSize: '0.68rem', color: '#C5A059', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 700 }}>
+                <span className="text-[11px] font-bold text-[#C5A059] uppercase tracking-widest block">
                   Karate Do Tradicional
                 </span>
               </div>
             </div>
 
-            <p style={{ fontSize: '0.88rem', color: '#D1D5DB', lineHeight: 1.65, marginBottom: '1.5rem' }}>
+            <p className="text-xs text-[#CBD5E1] leading-relaxed">
               Forjamos carácter, rectitud moral, autocontrol y fortaleza física y mental a través del camino del Karate Do tradicional y formativo.
             </p>
 
-            {/* Redes Sociales */}
-            <div style={{ display: 'flex', gap: '0.65rem' }}>
+            {/* Redes Sociales con efecto hover */}
+            <div className="flex gap-2.5 pt-1">
               <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(17, 24, 39, 0.85)',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#F5D77F',
-                  transition: 'all 0.2s',
-                }}
-                aria-label="Instagram Ryoku Kai"
+                className="w-9 h-9 rounded-lg bg-[rgba(17,24,39,0.85)] border border-[rgba(212,175,55,0.25)] flex items-center justify-center text-[#F5D77F] hover:bg-[rgba(212,175,55,0.2)] hover:border-[#D4AF37] hover:scale-105 transition-all"
+                aria-label="Instagram Ryūko Kai"
               >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                   <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
@@ -110,21 +67,10 @@ export default function Footer() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noreferrer"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(17, 24, 39, 0.85)',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#F5D77F',
-                  transition: 'all 0.2s',
-                }}
-                aria-label="Facebook Ryoku Kai"
+                className="w-9 h-9 rounded-lg bg-[rgba(17,24,39,0.85)] border border-[rgba(212,175,55,0.25)] flex items-center justify-center text-[#F5D77F] hover:bg-[rgba(212,175,55,0.2)] hover:border-[#D4AF37] hover:scale-105 transition-all"
+                aria-label="Facebook Ryūko Kai"
               >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                 </svg>
               </a>
@@ -133,21 +79,10 @@ export default function Footer() {
                 href="https://youtube.com"
                 target="_blank"
                 rel="noreferrer"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(17, 24, 39, 0.85)',
-                  border: '1px solid rgba(212, 175, 55, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#F5D77F',
-                  transition: 'all 0.2s',
-                }}
-                aria-label="YouTube Ryoku Kai"
+                className="w-9 h-9 rounded-lg bg-[rgba(17,24,39,0.85)] border border-[rgba(212,175,55,0.25)] flex items-center justify-center text-[#F5D77F] hover:bg-[rgba(212,175,55,0.2)] hover:border-[#D4AF37] hover:scale-105 transition-all"
+                aria-label="YouTube Ryūko Kai"
               >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
                   <polygon points="10 15 15 12 10 9 10 15" fill="currentColor"/>
                 </svg>
@@ -155,152 +90,106 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Columna 2: Navegación & Acceso */}
-          <div>
-            <h4 style={{ fontSize: '0.9rem', color: '#F5D77F', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          {/* Columna 2: Navegación */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-[#F5D77F]">
               Navegación
             </h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: 0 }}>
+            <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/" className="text-[#CBD5E1] hover:text-[#F5D77F] transition-colors">
                   Inicio
                 </Link>
               </li>
               <li>
-                <Link href="/nosotros" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/nosotros" className="text-[#CBD5E1] hover:text-[#F5D77F] transition-colors">
                   Nosotros & Senseis
                 </Link>
               </li>
               <li>
-                <Link href="/noticias" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/noticias" className="text-[#CBD5E1] hover:text-[#F5D77F] transition-colors">
                   Noticias & Redes
                 </Link>
               </li>
               <li>
-                <Link href="/contacto" style={{ color: '#D1D5DB', textDecoration: 'none', fontSize: '0.88rem', transition: 'color 0.15s' }}>
+                <Link href="/contacto" className="text-[#CBD5E1] hover:text-[#F5D77F] transition-colors">
                   Ubicación & Contacto
                 </Link>
               </li>
               <li>
                 <button
                   onClick={openAuthModal}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#F5D77F',
-                    cursor: 'pointer',
-                    fontSize: '0.88rem',
-                    fontWeight: 700,
-                    padding: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                  }}
+                  type="button"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#F5D77F] hover:text-white transition-colors cursor-pointer"
                 >
-                  <Users size={14} color="#D4AF37" /> Acceso Alumnos
+                  <Users size={13} className="text-[#D4AF37]" />
+                  <span>Portal Alumnos</span>
                 </button>
               </li>
             </ul>
           </div>
 
           {/* Columna 3: Principios del Dojo (Dojo Kun) */}
-          <div>
-            <h4 style={{ fontSize: '0.9rem', color: '#F5D77F', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              Dojo Kun (Principios)
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-[#F5D77F]">
+              Dojo Kun (Código)
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.82rem', color: '#D1D5DB' }}>
-              <p style={{ margin: 0 }}>• Perfeccionar el carácter personal.</p>
-              <p style={{ margin: 0 }}>• Ser leal y mantener el camino de la sinceridad.</p>
-              <p style={{ margin: 0 }}>• Cultivar el espíritu de superación constante.</p>
-              <p style={{ margin: 0 }}>• Honrar los principios de la cortesía y el respeto.</p>
-              <p style={{ margin: 0 }}>• Abstenerse de la conducta violenta.</p>
+            <div className="space-y-1.5 text-xs text-[#94A3B8] leading-relaxed">
+              <p>• Perfeccionar el carácter personal.</p>
+              <p>• Ser leal y mantener el camino de la verdad.</p>
+              <p>• Cultivar el espíritu del esfuerzo constante.</p>
+              <p>• Honrar las reglas de cortesía y respeto.</p>
+              <p>• Abstenerse de la conducta violenta.</p>
             </div>
           </div>
 
           {/* Columna 4: Contacto Directo */}
-          <div>
-            <h4 style={{ fontSize: '0.9rem', color: '#F5D77F', marginBottom: '1.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <div className="space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-[#F5D77F]">
               Horarios & Contacto
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.85rem', color: '#D1D5DB' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                <MapPin size={17} color="#D4AF37" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span>Instalaciones Centrales del Dojo, Área de Tatami Oficial</span>
+            <div className="space-y-2.5 text-xs text-[#CBD5E1]">
+              <div className="flex items-start gap-2">
+                <MapPin size={15} className="text-[#D4AF37] shrink-0 mt-0.5" />
+                <span>Instalaciones Centrales del Dojo, Tatami Oficial</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <Clock size={17} color="#D4AF37" style={{ flexShrink: 0 }} />
+              <div className="flex items-center gap-2">
+                <Clock size={15} className="text-[#D4AF37] shrink-0" />
                 <span>Lun a Vie: 16:00 - 21:30 | Sáb: 08:00 - 13:00</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <Phone size={17} color="#D4AF37" style={{ flexShrink: 0 }} />
+              <div className="flex items-center gap-2">
+                <Phone size={15} className="text-[#D4AF37] shrink-0" />
                 <span>Informes & WhatsApp Directo</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <Mail size={17} color="#D4AF37" style={{ flexShrink: 0 }} />
-                <span>contacto@ryokukai.com</span>
+              <div className="flex items-center gap-2">
+                <Mail size={15} className="text-[#D4AF37] shrink-0" />
+                <span>contacto@ryukokai.com</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Fila Intermedia: Copyright y Seguridad */}
-        <div
-          style={{
-            paddingTop: '1.75rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '1rem',
-            fontSize: '0.8rem',
-            color: '#8E929D',
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            © {new Date().getFullYear()} Ryoku Kai - Escuela de Karate Do. Todos los derechos reservados.
+        <div className="pt-6 border-t border-[rgba(255,255,255,0.08)] flex flex-wrap justify-between items-center gap-4 text-xs text-[#64748B]">
+          <p>
+            © {new Date().getFullYear()} Ryūko Kai - Escuela de Karate Do. Todos los derechos reservados.
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <Shield size={14} color="#D4AF37" /> Sistema Autenticado con Google OAuth 2.0
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-[#94A3B8]">
+              <Shield size={14} className="text-[#D4AF37]" />
+              <span>Autenticación Segura</span>
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-              <Award size={14} color="#D4AF37" /> Grados Oficiales
+            <span className="flex items-center gap-1.5 text-[#94A3B8]">
+              <Award size={14} className="text-[#D4AF37]" />
+              <span>Grados Federados</span>
             </span>
           </div>
         </div>
 
-        {/* ============================================================ */}
-        {/* PURA BASE: DEVELOPED BY KUMADEV.INC                          */}
-        {/* ============================================================ */}
-        <div
-          style={{
-            marginTop: '1.75rem',
-            paddingTop: '1.5rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            fontSize: '0.78rem',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: '#8A92A6',
-          }}
-        >
+        {/* Créditos del Desarrollador */}
+        <div className="mt-5 pt-4 border-t border-[rgba(255,255,255,0.04)] flex items-center justify-center gap-2 text-[11px] uppercase tracking-wider text-[#64748B]">
           <span>developed by</span>
-          <span
-            style={{
-              fontWeight: 800,
-              color: '#F5D77F',
-              letterSpacing: '0.14em',
-              backgroundColor: 'rgba(212, 175, 55, 0.12)',
-              padding: '0.2rem 0.65rem',
-              borderRadius: '4px',
-              border: '1px solid rgba(212, 175, 55, 0.35)',
-              boxShadow: '0 0 12px rgba(212, 175, 55, 0.15)',
-            }}
-          >
+          <span className="font-extrabold text-[#F5D77F] tracking-widest bg-[rgba(212,175,55,0.1)] px-2.5 py-0.5 rounded border border-[rgba(212,175,55,0.3)] shadow-[0_0_10px_rgba(212,175,55,0.12)]">
             Kumadev.inc
           </span>
         </div>

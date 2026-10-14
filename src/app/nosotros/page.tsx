@@ -5,19 +5,19 @@ import { Shield, Award, ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Nosotros | Ryoku Kai - Escuela de Karate Do',
-  description: 'Conoce la historia, linaje marcial y filosofía de Ryoku Kai.',
+  title: 'Nosotros | Ryūko Kai - Escuela de Karate Do',
+  description: 'Conoce la historia, linaje marcial y filosofía de Ryūko Kai.',
 };
 
 export default function NosotrosPage() {
   return (
-    <div style={{ paddingBottom: '5rem' }}>
+    <div className="relative pb-20">
       {/* ================= HERO NOSOTROS ================= */}
       <section
         style={{
           padding: 'clamp(3.5rem, 6vw, 5.5rem) 0 3.5rem',
           borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
-          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 29, 0.95) 100%)',
+          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(10, 15, 29, 0.9) 100%)',
           position: 'relative',
         }}
       >
@@ -37,7 +37,7 @@ export default function NosotrosPage() {
               Linaje, Historia & Tradición
             </span>
             <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', marginBottom: '1.25rem' }}>
-              Sobre Ryoku Kai
+              Sobre Ryūko Kai
             </h1>
             <p style={{ fontSize: '1.1rem', color: '#9DA3B4', lineHeight: 1.7 }}>
               Nacimos con el firme propósito de ser más que una academia deportiva: un santuario donde cada alumno descubre su máximo potencial físico y cultiva una mente inquebrantable.
@@ -65,7 +65,7 @@ export default function NosotrosPage() {
                 La Fuerza del Dragón y el Tigre
               </h2>
               <p style={{ fontSize: '1rem', color: '#9DA3B4', lineHeight: 1.7, marginBottom: '1.25rem' }}>
-                Fundado con el más alto rigor marcial, <strong>Ryoku Kai</strong> toma su inspiración de la unión del Dragón y el Tigre. Creemos que la fuerza sin control mental es destructiva, y que la calma sin capacidad de respuesta es vulnerable.
+                Fundado con el más alto rigor marcial, <strong>Ryūko Kai</strong> toma su inspiración de la unión del Dragón y el Tigre. Creemos que la fuerza sin control mental es destructiva, y que la calma sin capacidad de respuesta es vulnerable.
               </p>
               <p style={{ fontSize: '1rem', color: '#9DA3B4', lineHeight: 1.7, marginBottom: '2rem' }}>
                 Nuestro método forja al practicante en el dominio técnico integral: la serenidad táctica, la fluidez del esquive, la explosividad del impacto y un código de honor inquebrantable.
